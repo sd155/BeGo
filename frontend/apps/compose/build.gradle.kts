@@ -1,3 +1,5 @@
+import java.io.File
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -19,23 +21,11 @@ kotlin {
         }
     }
     
-//     jvm("desktop")
-    
-//     listOf(
-//         iosX64(),
-//         iosArm64(),
-//         iosSimulatorArm64()
-//     ).forEach { iosTarget ->
-//         iosTarget.binaries.framework {
-//             baseName = "composeApp"
-//             isStatic = true
-//         }
-//     }
-    
     sourceSets {
-        val desktopMain by getting        
         commonMain.dependencies {
-//             
+            implementation(projects.features.diKodein)
+            implementation(projects.features.theme)
+            implementation(libs.compose.navigation)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
@@ -46,6 +36,24 @@ kotlin {
 android {
     namespace = libs.versions.application.namespace.get()
     compileSdk = libs.versions.android.compileSdk.get().toInt()
+
+    val props = Properties()
+    val propFile = File(project.rootDir, "local.properties")
+    if (propFile.exists()) {
+        props.load(propFile.inputStream())
+    }
+    signingConfigs {
+        create("release") {
+            storeFile = props.getProperty("RELEASE_KEYSTORE_FILE")?.let { file(it) }
+                ?: error("Missing RELEASE_KEYSTORE_FILE in local.properties")
+            storePassword = props.getProperty("RELEASE_KEYSTORE_PASSWORD")
+                ?: error("Missing RELEASE_KEYSTORE_PASSWORD in local.properties")
+            keyAlias = props.getProperty("RELEASE_KEY_ALIAS")
+                ?: error("Missing RELEASE_KEY_ALIAS in local.properties")
+            keyPassword = props.getProperty("RELEASE_KEY_PASSWORD")
+                ?: error("Missing RELEASE_KEY_PASSWORD in local.properties")
+        }
+    }
 
     defaultConfig {
         applicationId = libs.versions.application.namespace.get()
@@ -61,13 +69,14 @@ android {
     }
     buildTypes {
         val appName = libs.versions.application.name.get()
-        // getByName("release") {
-        //     isMinifyEnabled = true
-        //     isShrinkResources = true
-        //     proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "../proguard-rules.pro")
-        //     signingConfig = signingConfigs.getByName("release")
-        //     resValue("String", "app_name", appName)
-        // }
+        val appVersion = libs.versions.application.version.name.get()
+         getByName("release") {
+             isMinifyEnabled = true
+             isShrinkResources = true
+             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "../proguard-rules.pro")
+             signingConfig = signingConfigs.getByName("release")
+             resValue("String", "app_name", appName)
+         }
         getByName("debug") {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
@@ -75,7 +84,8 @@ android {
             isShrinkResources = false
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
-            resValue("string", "app_name", "$appName debug")
+            resValue("string", "app_name", appName)
+            resValue("string", "app_version", "$appVersion-debug")
         }
     }
     compileOptions {
@@ -83,15 +93,3 @@ android {
         targetCompatibility = _javaVersion
     }
 }
-
-// compose.desktop {
-//     application {
-//         mainClass = "MainKt"
-// 
-//         nativeDistributions {
-//             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-//             packageName = libs.versions.application.namespace.get()
-//             packageVersion = libs.versions.application.version.name.get()
-//         }
-//     }
-// }

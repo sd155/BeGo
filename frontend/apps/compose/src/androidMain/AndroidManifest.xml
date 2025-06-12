@@ -5,7 +5,7 @@
     >
 
     <application
-        android:name=".MyApplication"
+        android:name=".BegoApplication"
         android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -17,7 +17,7 @@
         tools:ignore="UnusedAttribute">
 
         <activity
-            android:name=".MyActivity"
+            android:name=".BegoActivity"
             android:exported="true"
             >
             <intent-filter>
