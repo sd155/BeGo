@@ -27,3 +27,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+
+include(":features:theme")
