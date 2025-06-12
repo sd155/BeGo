@@ -28,4 +28,5 @@ dependencyResolutionManagement {
     }
 }
 
+include(":features:di-kodein")
 include(":features:theme")
