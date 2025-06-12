@@ -5,6 +5,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
+/**
+ * Typography system for the Bego application.
+ * Defines text styles used throughout the app.
+ *
+ * @property header Text style for headers and titles.
+ * @property label Text style for labels and buttons.
+ * @property bodyL Text style for large body text.
+ * @property bodyM Text style for medium body text.
+ */
 class BegoTypography(
     val header: TextStyle,
     val label: TextStyle,

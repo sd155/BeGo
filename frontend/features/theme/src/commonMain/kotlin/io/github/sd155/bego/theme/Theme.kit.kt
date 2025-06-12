@@ -16,6 +16,17 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.TextStyle
 
+/**
+ * A filled button component that follows the Bego design system.
+ * This button is based on Material 3 Filled Button.
+ *
+ * @param modifier The modifier to be applied to the button.
+ * @param onClick The callback to be invoked when the button is clicked.
+ * @param label The text to be displayed on the button.
+ * @param contentColor The color of the button's content (text and icons).
+ * @param backgroundColor The background color of the button.
+ * @param enabled Whether the button is enabled for interaction.
+ */
 @Composable
 fun BegoFilledButton(
     modifier: Modifier = Modifier,

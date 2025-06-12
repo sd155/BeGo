@@ -4,6 +4,15 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+/**
+ * Size definitions for the Bego application.
+ * Defines the dimensions used for UI elements.
+ *
+ * @property screen The device screen size this set of sizes is designed for.
+ * @property icon The standard size for icons.
+ * @property paddingVertical The standard vertical padding.
+ * @property paddingHorizontal The standard horizontal padding.
+ */
 class BegoSizes(
     val screen: DeviceScreen,
     val icon: Dp,

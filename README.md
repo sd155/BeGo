@@ -1,5 +1,11 @@
-# BeGo - your running training app
+# BeGo - Running training app
 
-## Feature
+[Project specification](./PROJECT.md)
+
+[Frontend specification](./frontend/README.md)
 
 ## Installation
+
+## Frontend Features
+
+- App theme system, [more details](./frontend/features/theme/README.md)

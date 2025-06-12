@@ -3,6 +3,17 @@ package io.github.sd155.bego.theme
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
+/**
+ * Color palette for the Bego application.
+ * Defines the main colors used throughout the app.
+ *
+ * @property primary The primary color used for main UI elements.
+ * @property secondary The secondary color used for supporting UI elements.
+ * @property background The background color for screens and surfaces.
+ * @property accent The accent color used for highlights and CTAs.
+ * @property warning The warning color used for error states and alerts.
+ * @property onAccent The color to use on top of accent color for contrast.
+ */
 class BegoPalette(
     val primary: Color,
     val secondary: Color,
