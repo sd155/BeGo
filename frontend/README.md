@@ -16,7 +16,8 @@
 │   └── ios/                   # iOS app module (In progress)
 │
 ├── features/                     # KMP project features
-│   └── theme/                    # App theme module
+│   ├── theme/                    # App theme module
+│   └── di-kodein/                # Shared DI module (Kodein DI)
 │
 ├── gradle/                       # Gradle wrapper
 │   └── wrapper/
@@ -29,3 +30,8 @@
 ├── gradlew.bat                   # KMP project gradle wrapper script (for Windows)
 └── settings.gradle.kts           # KMP project settings
 ```
+
+## Frontend Features
+
+- App theme system, [more details](./frontend/features/theme/README.md)
+- Dependency injection system (Kodein DI), [more details](./frontend/features/di-kodein/README.md)
