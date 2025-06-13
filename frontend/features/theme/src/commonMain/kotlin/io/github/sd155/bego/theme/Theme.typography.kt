@@ -34,7 +34,7 @@ internal fun begoTypography(screen: DeviceScreen) = when (screen) {
             ),
             bodyL = TextStyle(
                 fontWeight = FontWeight.W400,
-                fontSize = 24.sp,
+                fontSize = 28.sp,
             ),
             bodyM = TextStyle(
                 fontWeight = FontWeight.W400,
@@ -53,7 +53,7 @@ internal fun begoTypography(screen: DeviceScreen) = when (screen) {
             ),
             bodyL = TextStyle(
                 fontWeight = FontWeight.W400,
-                fontSize = 36.sp,
+                fontSize = 42.sp,
             ),
             bodyM = TextStyle(
                 fontWeight = FontWeight.W400,
