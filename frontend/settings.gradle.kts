@@ -31,3 +31,4 @@ dependencyResolutionManagement {
 include(":apps:compose")
 include(":features:di-kodein")
 include(":features:theme")
+include(":features:timer")
