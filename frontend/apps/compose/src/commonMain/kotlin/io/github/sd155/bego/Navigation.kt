@@ -1,6 +1,5 @@
 package io.github.sd155.bego
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -8,6 +7,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.github.sd155.bego.timer.ui.TimerScreen
+import io.github.sd155.bego.timer.ui.TimerScreenRoute
 
 internal val LocalNavHost = staticCompositionLocalOf<NavHostController> { error("No default implementation") }
 
@@ -21,15 +22,11 @@ internal fun AppNavGraph() {
         val appVersion = LocalPlatform.current.appVersion
         NavHost(
             navController = navController,
-            startDestination = StartScreenRoute
+            startDestination = TimerScreenRoute
         ) {
-            composable<StartScreenRoute> {
-                //TODO: Not Implemented
+            composable<TimerScreenRoute> {
+                TimerScreen()
             }
         }
     }
 }
-
-//debug
-@SuppressLint("MissingSerializableAnnotation")
-private object StartScreenRoute

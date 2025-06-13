@@ -23,9 +23,10 @@ kotlin {
     
     sourceSets {
         commonMain.dependencies {
+            implementation(libs.compose.navigation)
             implementation(projects.features.diKodein)
             implementation(projects.features.theme)
-            implementation(libs.compose.navigation)
+            implementation(projects.features.timer)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
