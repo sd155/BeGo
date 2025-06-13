@@ -106,6 +106,12 @@ private fun TextButton(
     }
 }
 
+/**
+ * A header text component that follows the Bego design system.
+ * This component is used for main headings and titles.
+ *
+ * @param text The text content to be displayed.
+ */
 @Composable
 fun BegoHeaderText(
     text: String,
@@ -119,5 +125,27 @@ fun BegoHeaderText(
         text = text,
         color = BegoTheme.palette.primary,
         style = BegoTheme.typography.header,
+    )
+}
+
+/**
+ * A large body text component that follows the Bego design system.
+ * This component is used for main content text with larger size.
+ *
+ * @param text The text content to be displayed.
+ */
+@Composable
+fun BegoBodyLargeText(
+    text: String,
+) {
+    Text(
+        modifier = Modifier
+            .padding(
+                horizontal = BegoTheme.sizes.paddingHorizontal,
+                vertical = BegoTheme.sizes.paddingVertical,
+            ),
+        text = text,
+        color = BegoTheme.palette.secondary,
+        style = BegoTheme.typography.bodyL,
     )
 }
