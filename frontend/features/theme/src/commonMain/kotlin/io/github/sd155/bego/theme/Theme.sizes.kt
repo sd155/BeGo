@@ -16,8 +16,10 @@ import androidx.compose.ui.unit.dp
 class BegoSizes(
     val screen: DeviceScreen,
     val icon: Dp,
+    val buttonWidth: Dp,
     val paddingVertical: Dp,
     val paddingHorizontal: Dp,
+    val contentVerticalPadding: Dp,
 )
 
 internal fun begoSizes(screen: DeviceScreen) = when (screen) {
@@ -25,15 +27,19 @@ internal fun begoSizes(screen: DeviceScreen) = when (screen) {
         BegoSizes(
             screen = screen,
             icon = 32.dp,
+            buttonWidth = 160.dp,
             paddingVertical = 8.dp,
             paddingHorizontal = 16.dp,
+            contentVerticalPadding = 64.dp,
         )
     DeviceScreen.Medium ->
         BegoSizes(
             screen = screen,
             icon = 48.dp,
+            buttonWidth = 240.dp,
             paddingVertical = 12.dp,
             paddingHorizontal = 24.dp,
+            contentVerticalPadding = 96.dp,
         )
 }
 
