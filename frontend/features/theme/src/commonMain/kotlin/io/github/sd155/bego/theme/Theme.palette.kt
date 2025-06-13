@@ -27,7 +27,7 @@ internal fun begoPalette(isDarkTheme: Boolean) = when (isDarkTheme) {
     true ->
         BegoPalette(
             primary = Colors.colorNeutral700Light,
-            secondary = Colors.colorNeutral300Light,
+            secondary = Colors.colorNeutral400Light,
             background = Colors.colorNeutral700Dark,
             accent = Colors.colorBlue700,
             warning = Colors.colorRed700,
@@ -36,7 +36,7 @@ internal fun begoPalette(isDarkTheme: Boolean) = when (isDarkTheme) {
     false ->
         BegoPalette(
             primary = Colors.colorNeutral700Dark,
-            secondary = Colors.colorNeutral300Dark,
+            secondary = Colors.colorNeutral400Dark,
             background = Colors.colorNeutral700Light,
             accent = Colors.colorBlue700,
             warning = Colors.colorRed700,
@@ -51,8 +51,8 @@ internal val LocalBegoPalette = staticCompositionLocalOf<BegoPalette> {
 private object Colors {
     val colorBlue700 = Color(0xFF4C6AFF)
     val colorNeutral700Light = Color(0xFFFFFFFF)
-    val colorNeutral300Light = Color(0x29FFFFFF)
+    val colorNeutral400Light = Color(0x66FFFFFF)
     val colorNeutral700Dark = Color(0xFF1C1E28)
-    val colorNeutral300Dark = Color(0x291C1E28)
+    val colorNeutral400Dark = Color(0x661C1E28)
     val colorRed700 = Color(0xFFED4747)
 }
