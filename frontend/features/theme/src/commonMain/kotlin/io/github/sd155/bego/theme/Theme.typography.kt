@@ -25,12 +25,12 @@ internal fun begoTypography(screen: DeviceScreen) = when (screen) {
     DeviceScreen.Small ->
         BegoTypography(
             header = TextStyle(
-                fontWeight = FontWeight.W600,
-                fontSize = 32.sp,
+                fontWeight = FontWeight.W400,
+                fontSize = 64.sp,
             ),
             label = TextStyle(
                 fontWeight = FontWeight.W500,
-                fontSize = 16.sp,
+                fontSize = 20.sp,
             ),
             bodyL = TextStyle(
                 fontWeight = FontWeight.W400,
@@ -44,12 +44,12 @@ internal fun begoTypography(screen: DeviceScreen) = when (screen) {
     DeviceScreen.Medium ->
         BegoTypography(
             header = TextStyle(
-                fontWeight = FontWeight.W600,
-                fontSize = 48.sp,
+                fontWeight = FontWeight.W400,
+                fontSize = 96.sp,
             ),
             label = TextStyle(
                 fontWeight = FontWeight.W500,
-                fontSize = 24.sp,
+                fontSize = 30.sp,
             ),
             bodyL = TextStyle(
                 fontWeight = FontWeight.W400,
