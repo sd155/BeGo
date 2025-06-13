@@ -11,9 +11,12 @@ import bego.features.timer.generated.resources.start_action
 import bego.features.timer.generated.resources.stop_action
 import bego.features.timer.generated.resources.next_lap_action
 import bego.features.timer.generated.resources.reset_action
-import io.github.sd155.bego.theme.BegoFilledButton
+import io.github.sd155.bego.theme.BegoBodyLargeText
+import io.github.sd155.bego.theme.BegoAccentFilledButton
 import io.github.sd155.bego.theme.BegoHeaderText
+import io.github.sd155.bego.theme.BegoPrimaryFilledButton
 import io.github.sd155.bego.theme.BegoTheme
+import io.github.sd155.bego.theme.BegoWarningFilledButton
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -99,35 +102,32 @@ private fun Actions(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         onStart?.let { onAction ->
-            BegoFilledButton(
+            BegoAccentFilledButton(
                 onClick = onAction,
                 label = stringResource(Res.string.start_action),
             )
         }
         onStop?.let { onAction ->
-            BegoFilledButton(
+            BegoWarningFilledButton(
                 onClick = onAction,
-                backgroundColor = BegoTheme.palette.warning,
                 label = stringResource(Res.string.stop_action),
             )
         }
         onNext?.let { onAction ->
-            BegoFilledButton(
+            BegoPrimaryFilledButton(
                 onClick = onAction,
-                backgroundColor = BegoTheme.palette.primary,
                 label = stringResource(Res.string.next_lap_action),
             )
         }
         onContinue?.let { onAction ->
-            BegoFilledButton(
+            BegoAccentFilledButton(
                 onClick = onAction,
                 label = stringResource(Res.string.continue_action),
             )
         }
         onReset?.let { onAction ->
-            BegoFilledButton(
+            BegoPrimaryFilledButton(
                 onClick = onAction,
-                backgroundColor = BegoTheme.palette.primary,
                 label = stringResource(Res.string.reset_action),
             )
         }

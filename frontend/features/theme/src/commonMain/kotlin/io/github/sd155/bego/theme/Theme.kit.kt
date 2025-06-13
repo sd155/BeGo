@@ -18,23 +18,20 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.TextStyle
 
 /**
- * A filled button component that follows the Bego design system.
- * This button is based on Material 3 Filled Button.
+ * A filled button component with accent color that follows the Bego design system.
+ * This button is based on Material 3 Filled Button and uses the accent color scheme.
+ * Use this button for primary actions that need to stand out.
  *
  * @param modifier The modifier to be applied to the button.
  * @param onClick The callback to be invoked when the button is clicked.
  * @param label The text to be displayed on the button.
- * @param contentColor The color of the button's content (text and icons).
- * @param backgroundColor The background color of the button.
  * @param enabled Whether the button is enabled for interaction.
  */
 @Composable
-fun BegoFilledButton(
+fun BegoAccentFilledButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     label: String,
-    contentColor: Color = BegoTheme.palette.onAccent,
-    backgroundColor: Color = BegoTheme.palette.accent,
     enabled: Boolean = true,
 ) = TextButton(
     modifier = modifier
@@ -44,10 +41,72 @@ fun BegoFilledButton(
     icon = null,
     enabled = enabled,
     buttonColors = ButtonDefaults.buttonColors(
-        backgroundColor = backgroundColor,
-        disabledBackgroundColor = backgroundColor,
-        contentColor = contentColor,
-        disabledContentColor = contentColor,
+        backgroundColor = BegoTheme.palette.accent,
+        disabledBackgroundColor = BegoTheme.palette.accent,
+        contentColor = BegoTheme.palette.onAccent,
+        disabledContentColor = BegoTheme.palette.onAccent,
+    ),
+)
+
+/**
+ * A filled button component with warning color that follows the Bego design system.
+ * This button is based on Material 3 Filled Button and uses the warning color scheme.
+ * Use this button for destructive or cautionary actions.
+ *
+ * @param modifier The modifier to be applied to the button.
+ * @param onClick The callback to be invoked when the button is clicked.
+ * @param label The text to be displayed on the button.
+ * @param enabled Whether the button is enabled for interaction.
+ */
+@Composable
+fun BegoWarningFilledButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    label: String,
+    enabled: Boolean = true,
+) = TextButton(
+    modifier = modifier
+        .width(BegoTheme.sizes.buttonWidth),
+    onClick = onClick,
+    label = label,
+    icon = null,
+    enabled = enabled,
+    buttonColors = ButtonDefaults.buttonColors(
+        backgroundColor = BegoTheme.palette.warning,
+        disabledBackgroundColor = BegoTheme.palette.warning,
+        contentColor = BegoTheme.palette.onAccent,
+        disabledContentColor = BegoTheme.palette.onAccent,
+    ),
+)
+
+/**
+ * A filled button component with primary color that follows the Bego design system.
+ * This button is based on Material 3 Filled Button and uses the primary color scheme.
+ * Use this button for standard actions that don't need special emphasis.
+ *
+ * @param modifier The modifier to be applied to the button.
+ * @param onClick The callback to be invoked when the button is clicked.
+ * @param label The text to be displayed on the button.
+ * @param enabled Whether the button is enabled for interaction.
+ */
+@Composable
+fun BegoPrimaryFilledButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    label: String,
+    enabled: Boolean = true,
+) = TextButton(
+    modifier = modifier
+        .width(BegoTheme.sizes.buttonWidth),
+    onClick = onClick,
+    label = label,
+    icon = null,
+    enabled = enabled,
+    buttonColors = ButtonDefaults.buttonColors(
+        backgroundColor = BegoTheme.palette.primary,
+        disabledBackgroundColor = BegoTheme.palette.primary,
+        contentColor = BegoTheme.palette.background,
+        disabledContentColor = BegoTheme.palette.background,
     ),
 )
 
