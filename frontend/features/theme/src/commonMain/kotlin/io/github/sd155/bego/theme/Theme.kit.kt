@@ -2,6 +2,7 @@ package io.github.sd155.bego.theme
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
@@ -36,7 +37,8 @@ fun BegoFilledButton(
     backgroundColor: Color = BegoTheme.palette.accent,
     enabled: Boolean = true,
 ) = TextButton(
-    modifier = modifier,
+    modifier = modifier
+        .width(BegoTheme.sizes.buttonWidth),
     onClick = onClick,
     label = label,
     icon = null,
@@ -86,8 +88,11 @@ private fun TextButton(
             Spacer(modifier = Modifier.width(BegoTheme.sizes.paddingHorizontal))
         }
         Text(
+            modifier = Modifier
+                .padding(vertical = BegoTheme.sizes.paddingVertical),
             text = label,
             style = textStyle ?: BegoTheme.typography.label,
+            maxLines = 1,
         )
         tailIcon?.let { painter ->
             Spacer(modifier = Modifier.width(BegoTheme.sizes.paddingHorizontal))
