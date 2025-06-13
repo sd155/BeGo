@@ -100,3 +100,19 @@ private fun TextButton(
         }
     }
 }
+
+@Composable
+fun BegoHeaderText(
+    text: String,
+) {
+    Text(
+        modifier = Modifier
+            .padding(
+                horizontal = BegoTheme.sizes.paddingHorizontal,
+                vertical = BegoTheme.sizes.paddingVertical,
+            ),
+        text = text,
+        color = BegoTheme.palette.primary,
+        style = BegoTheme.typography.header,
+    )
+}
