@@ -14,12 +14,12 @@ internal sealed class TimerViewState {
     data class RunningWithLaps(
         val totalTimeCs: Long,
         val currentLapTimeCs: Long,
-        val laps: List<LapItem>
+        val laps: List<LapItem> = emptyList()//TODO: remove default value
     ) : TimerViewState()
     data class StoppedWithLaps(
         val totalTimeCs: Long,
         val currentLapTimeCs: Long,
-        val laps: List<LapItem>
+        val laps: List<LapItem> = emptyList()//TODO: remove default value
     ) : TimerViewState()
 }
 

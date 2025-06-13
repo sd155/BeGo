@@ -13,6 +13,7 @@ import kotlin.time.TimeSource
 internal class TimerViewModel : ViewModel() {
     private var timerJob: Job? = null
     private val _totalTimerStartCs = MutableStateFlow(value = 0L)
+    private val _lapTimerStartCs = MutableStateFlow(value = 0L)
     private val _state = MutableStateFlow<TimerViewState>(TimerViewState.Initial)
     internal val state: StateFlow<TimerViewState> = _state.asStateFlow()
 
@@ -22,7 +23,7 @@ internal class TimerViewModel : ViewModel() {
             TimerViewIntent.StopTimer -> stopTimer()
             TimerViewIntent.ContinueTimer -> startTimer()
             TimerViewIntent.ResetTimer -> resetTimer()
-            TimerViewIntent.NextLap -> TODO()
+            TimerViewIntent.NextLap -> startLap()
         }
 
     private fun startTimer() {
@@ -40,6 +41,26 @@ internal class TimerViewModel : ViewModel() {
         _state.value = TimerViewState.Initial
     }
 
+    private fun startLap() {
+        _state.value = _state.value.toLaps()
+    }
+
+    private fun TimerViewState.toLaps(): TimerViewState =
+        when (this) {
+            is TimerViewState.RunningNoLaps -> {
+                _lapTimerStartCs.value = totalTimeCs
+                TimerViewState.RunningWithLaps(
+                    totalTimeCs = totalTimeCs,
+                    currentLapTimeCs = 0L,
+                )
+            }
+            is TimerViewState.RunningWithLaps -> {
+                _lapTimerStartCs.value = totalTimeCs
+                copy(currentLapTimeCs = 0L)
+            }
+            else -> this
+        }
+
     private fun TimerViewState.toStopped(): TimerViewState =
         when (this) {
             is TimerViewState.RunningNoLaps ->
@@ -50,7 +71,6 @@ internal class TimerViewModel : ViewModel() {
                 TimerViewState.StoppedWithLaps(
                     totalTimeCs = totalTimeCs,
                     currentLapTimeCs = currentLapTimeCs,
-                    laps = laps
                 )
             else -> this
         }
@@ -59,6 +79,7 @@ internal class TimerViewModel : ViewModel() {
         when (this) {
             TimerViewState.Initial -> {
                 _totalTimerStartCs.value = 0L
+                _lapTimerStartCs.value = 0L
                 TimerViewState.RunningNoLaps()
             }
             is TimerViewState.StoppedNoLaps -> {
@@ -72,14 +93,15 @@ internal class TimerViewModel : ViewModel() {
                 TimerViewState.RunningWithLaps(
                     totalTimeCs = totalTimeCs,
                     currentLapTimeCs = currentLapTimeCs,
-                    laps = laps
                 )
             }
             else -> this
         }
 
     private fun TimerViewState.incrementTime(elapsedMs: Long): TimerViewState {
-        val totalCs = _totalTimerStartCs.value + (elapsedMs / 10L)
+        val elapsedCs = elapsedMs / 10L
+        val totalCs = _totalTimerStartCs.value + elapsedCs
+        val lapCs = totalCs - _lapTimerStartCs.value
         return when (this) {
             is TimerViewState.RunningNoLaps ->
                 copy(
@@ -88,7 +110,7 @@ internal class TimerViewModel : ViewModel() {
             is TimerViewState.RunningWithLaps ->
                 copy(
                     totalTimeCs = totalCs,
-                    currentLapTimeCs = currentLapTimeCs,
+                    currentLapTimeCs = lapCs,
                 )
             else -> this
         }

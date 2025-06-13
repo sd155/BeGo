@@ -29,6 +29,7 @@ internal fun TimerView(
     onNextLap: () -> Unit = {},
 ) {
     var totalTime = 0L
+    var lapTime = 0L
     var startAction: (() -> Unit)? = null
     var stopAction: (() -> Unit)? = null
     var nextAction: (() -> Unit)? = null
@@ -48,8 +49,18 @@ internal fun TimerView(
             continueAction = onContinue
             resetAction = onReset
         }
-        is TimerViewState.RunningWithLaps -> TODO()
-        is TimerViewState.StoppedWithLaps -> TODO()
+        is TimerViewState.RunningWithLaps -> {
+            totalTime = state.totalTimeCs
+            lapTime = state.currentLapTimeCs
+            stopAction = onStop
+            nextAction = onNextLap
+        }
+        is TimerViewState.StoppedWithLaps -> {
+            totalTime = state.totalTimeCs
+            lapTime = state.currentLapTimeCs
+            continueAction = onContinue
+            resetAction = onReset
+        }
     }
 
     Column(
@@ -57,12 +68,13 @@ internal fun TimerView(
             .fillMaxSize()
             .background(BegoTheme.palette.background),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom
+        verticalArrangement = Arrangement.Bottom,
     ) {
         Timer(
             modifier = Modifier
                 .weight(1f),
-            totalTime = formatTime(totalTime)
+            totalTime = formatTime(totalTime),
+            lapTime = if (lapTime == 0L) null else formatTime(lapTime),
         )
         Actions(
             onStart = startAction,
@@ -79,14 +91,14 @@ internal fun TimerView(
 private fun Timer(
     modifier: Modifier = Modifier,
     totalTime: String,
+    lapTime: String?,
 ) = Column(
     modifier = modifier,
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center
 ) {
-    BegoHeaderText(
-        text = totalTime,
-    )
+    BegoHeaderText(text = totalTime)
+    lapTime?.let { BegoBodyLargeText(text = it) }
 }
 
 @Composable
