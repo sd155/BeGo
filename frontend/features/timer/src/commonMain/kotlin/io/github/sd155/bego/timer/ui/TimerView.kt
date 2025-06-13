@@ -30,6 +30,7 @@ internal fun TimerView(
 ) {
     var totalTime = 0L
     var lapTime = 0L
+    var showLapTime = false
     var startAction: (() -> Unit)? = null
     var stopAction: (() -> Unit)? = null
     var nextAction: (() -> Unit)? = null
@@ -52,12 +53,14 @@ internal fun TimerView(
         is TimerViewState.RunningWithLaps -> {
             totalTime = state.totalTimeCs
             lapTime = state.currentLapTimeCs
+            showLapTime = true
             stopAction = onStop
             nextAction = onNextLap
         }
         is TimerViewState.StoppedWithLaps -> {
             totalTime = state.totalTimeCs
             lapTime = state.currentLapTimeCs
+            showLapTime = true
             continueAction = onContinue
             resetAction = onReset
         }
@@ -74,7 +77,7 @@ internal fun TimerView(
             modifier = Modifier
                 .weight(1f),
             totalTime = formatTime(totalTime),
-            lapTime = if (lapTime == 0L) null else formatTime(lapTime),
+            lapTime = if (showLapTime) formatTime(lapTime) else null,
         )
         Actions(
             onStart = startAction,
