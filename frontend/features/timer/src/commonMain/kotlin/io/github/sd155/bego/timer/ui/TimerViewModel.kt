@@ -2,132 +2,83 @@ package io.github.sd155.bego.timer.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import io.github.sd155.bego.di.Inject
+import io.github.sd155.bego.timer.domain.RunningState
+import io.github.sd155.bego.timer.domain.RunningTimer
+import io.github.sd155.logs.api.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlin.time.TimeSource
 
 internal class TimerViewModel : ViewModel() {
-    private var timerJob: Job? = null
-    private val _totalTimerStartCs = MutableStateFlow(value = 0L)
-    private val _lapTimerStartCs = MutableStateFlow(value = 0L)
-    private val _state = MutableStateFlow<TimerViewState>(TimerViewState.Initial)
+    private val _logger by lazy { Inject.instance<Logger>() }
+    private val _timer by lazy { Inject.instance<RunningTimer>() }
+    private val _formatter by lazy { TimeFormatter() }
+    private val _state = MutableStateFlow<TimerViewState>(TimerViewState.Initial(_formatter.format(timeMs = 0L)))
     internal val state: StateFlow<TimerViewState> = _state.asStateFlow()
 
-    internal fun onViewIntent(intent: TimerViewIntent) =
+    init {
+        _timer.state.onEach(::collectTimerState).launchIn(viewModelScope)
+    }
+
+    internal fun onViewIntent(intent: TimerViewIntent) = viewModelScope.launch {
+        _logger.debug("--->>> VIEW INTENT :::", diagnostics = listOf(intent))
         when (intent) {
-            TimerViewIntent.StartTimer -> startTimer()
-            TimerViewIntent.StopTimer -> stopTimer()
-            TimerViewIntent.ContinueTimer -> startTimer()
-            TimerViewIntent.ResetTimer -> resetTimer()
-            TimerViewIntent.NextLap -> startLap()
-        }
-
-    private fun startTimer() {
-        _state.value = _state.value.toRunning()
-        launchTimerJob()
-    }
-
-    private fun stopTimer() {
-        stopTimerJob()
-        _state.value = _state.value.toStopped()
-    }
-
-    private fun resetTimer() {
-        stopTimerJob()
-        _state.value = TimerViewState.Initial
-    }
-
-    private fun startLap() {
-        _state.value = _state.value.toLaps()
-    }
-
-    private fun TimerViewState.toLaps(): TimerViewState =
-        when (this) {
-            is TimerViewState.RunningNoLaps -> {
-                _lapTimerStartCs.value = totalTimeCs
-                TimerViewState.RunningWithLaps(
-                    totalTimeCs = totalTimeCs,
-                    currentLapTimeCs = 0L,
-                )
-            }
-            is TimerViewState.RunningWithLaps -> {
-                _lapTimerStartCs.value = totalTimeCs
-                copy(currentLapTimeCs = 0L)
-            }
-            else -> this
-        }
-
-    private fun TimerViewState.toStopped(): TimerViewState =
-        when (this) {
-            is TimerViewState.RunningNoLaps ->
-                TimerViewState.StoppedNoLaps(
-                    totalTimeCs = totalTimeCs
-                )
-            is TimerViewState.RunningWithLaps ->
-                TimerViewState.StoppedWithLaps(
-                    totalTimeCs = totalTimeCs,
-                    currentLapTimeCs = currentLapTimeCs,
-                )
-            else -> this
-        }
-
-    private fun TimerViewState.toRunning(): TimerViewState =
-        when (this) {
-            TimerViewState.Initial -> {
-                _totalTimerStartCs.value = 0L
-                _lapTimerStartCs.value = 0L
-                TimerViewState.RunningNoLaps()
-            }
-            is TimerViewState.StoppedNoLaps -> {
-                _totalTimerStartCs.value = totalTimeCs
-                TimerViewState.RunningNoLaps(
-                    totalTimeCs = totalTimeCs
-                )
-            }
-            is TimerViewState.StoppedWithLaps -> {
-                _totalTimerStartCs.value = totalTimeCs
-                TimerViewState.RunningWithLaps(
-                    totalTimeCs = totalTimeCs,
-                    currentLapTimeCs = currentLapTimeCs,
-                )
-            }
-            else -> this
-        }
-
-    private fun TimerViewState.incrementTime(elapsedMs: Long): TimerViewState {
-        val elapsedCs = elapsedMs / 10L
-        val totalCs = _totalTimerStartCs.value + elapsedCs
-        val lapCs = totalCs - _lapTimerStartCs.value
-        return when (this) {
-            is TimerViewState.RunningNoLaps ->
-                copy(
-                    totalTimeCs = totalCs
-                )
-            is TimerViewState.RunningWithLaps ->
-                copy(
-                    totalTimeCs = totalCs,
-                    currentLapTimeCs = lapCs,
-                )
-            else -> this
+            TimerViewIntent.StartTimer -> _timer.startLap()
+            TimerViewIntent.StopTimer -> _timer.pause()
+            TimerViewIntent.ContinueTimer -> _timer.resume()
+            TimerViewIntent.ResetTimer -> _timer.reset()
+            TimerViewIntent.NextLap -> _timer.startLap()
         }
     }
 
-    private fun launchTimerJob() {
-        stopTimerJob()
-        timerJob = viewModelScope.launch {
-            val start = TimeSource.Monotonic.markNow()
-            while (true) {
-                delay(150L)
-                val elapsedMs = start.elapsedNow().inWholeMilliseconds
-                _state.value = _state.value.incrementTime(elapsedMs)
+    private fun collectTimerState(state: RunningState) {
+        _logger.trace("VM collected domain state", diagnostics = listOf(state))
+        val totalTimeMs = state.currentStartMs + state.elapsedMs
+        val totalTime = _formatter.format(totalTimeMs)
+        val currentLapTime = _formatter.format(timeMs = totalTimeMs - state.currentLapStartMs)
+        _state.value =
+            if (state.isRunning) {
+                if (state.isFirstLap())
+                    TimerViewState.RunningNoLaps(totalTime = totalTime)
+                else
+                    TimerViewState.RunningWithLaps(
+                        totalTime = totalTime,
+                        currentLapTime = currentLapTime,
+                    )
             }
-        }
+            else {
+                if (state.isInitial())
+                    TimerViewState.Initial(totalTime = totalTime)
+                else if (state.isFirstLap())
+                    TimerViewState.StoppedNoLaps(totalTime = totalTime)
+                else
+                    TimerViewState.StoppedWithLaps(
+                        totalTime = totalTime,
+                        currentLapTime = currentLapTime,
+                    )
+            }
     }
 
-    private fun stopTimerJob() =
-        timerJob?.cancel()
+    private fun RunningState.isFirstLap() =
+        currentLapStartMs == 0L
+
+    private fun RunningState.isInitial() =
+        currentStartMs == 0L && elapsedMs == 0L && !isRunning
+
+
+}
+
+internal class TimeFormatter {
+
+    internal fun format(timeMs: Long = 0L): String {
+        val totalSeconds = timeMs / 1000
+        val minutes = totalSeconds / 60
+        val seconds = totalSeconds % 60
+        val centiSeconds = (timeMs % 1000) / 10
+        return "%02d : %02d . %02d".format(minutes, seconds, centiSeconds)
+    }
 }

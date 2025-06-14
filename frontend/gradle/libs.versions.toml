@@ -38,6 +38,7 @@ ktor = "3.1.2"
 serialization = "1.8.0"
 gson = "2.13.1"
 zxing = "3.5.3"
+kmplogs = "0.0.5"
 
 [libraries]
 #Kotlin
@@ -80,7 +81,9 @@ ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 #Barcode
 zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
-
+#SD-155
+sd155-kmplogs-api = { module = "io.github.sd155:kmplogs-api", version.ref = "kmplogs"}
+sd155-kmplogs-core = { module = "io.github.sd155:kmplogs-core", version.ref = "kmplogs"}
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

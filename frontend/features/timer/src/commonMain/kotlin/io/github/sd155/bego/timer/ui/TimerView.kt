@@ -28,8 +28,8 @@ internal fun TimerView(
     onReset: () -> Unit = {},
     onNextLap: () -> Unit = {},
 ) {
-    var totalTime = 0L
-    var lapTime = 0L
+    var totalTime = ""
+    var lapTime = ""
     var showLapTime = false
     var startAction: (() -> Unit)? = null
     var stopAction: (() -> Unit)? = null
@@ -37,29 +37,30 @@ internal fun TimerView(
     var resetAction: (() -> Unit)? = null
     var continueAction: (() -> Unit)? = null
     when (state) {
-        TimerViewState.Initial -> {
+        is TimerViewState.Initial -> {
             startAction = onStart
+            totalTime = state.totalTime
         }
         is TimerViewState.RunningNoLaps -> {
-            totalTime = state.totalTimeCs
+            totalTime = state.totalTime
             stopAction = onStop
             nextAction = onNextLap
         }
         is TimerViewState.StoppedNoLaps -> {
-            totalTime = state.totalTimeCs
+            totalTime = state.totalTime
             continueAction = onContinue
             resetAction = onReset
         }
         is TimerViewState.RunningWithLaps -> {
-            totalTime = state.totalTimeCs
-            lapTime = state.currentLapTimeCs
+            totalTime = state.totalTime
+            lapTime = state.currentLapTime
             showLapTime = true
             stopAction = onStop
             nextAction = onNextLap
         }
         is TimerViewState.StoppedWithLaps -> {
-            totalTime = state.totalTimeCs
-            lapTime = state.currentLapTimeCs
+            totalTime = state.totalTime
+            lapTime = state.currentLapTime
             showLapTime = true
             continueAction = onContinue
             resetAction = onReset
@@ -76,8 +77,8 @@ internal fun TimerView(
         Timer(
             modifier = Modifier
                 .weight(1f),
-            totalTime = formatTime(totalTime),
-            lapTime = if (showLapTime) formatTime(lapTime) else null,
+            totalTime = totalTime,
+            lapTime = if (showLapTime) lapTime else null,
         )
         Actions(
             onStart = startAction,
@@ -147,13 +148,4 @@ private fun Actions(
             )
         }
     }
-}
-
-private fun formatTime(timeInCentiSeconds: Long = 0L): String {
-    val totalSeconds = timeInCentiSeconds / 100
-    val minutes = totalSeconds / 60
-    val seconds = totalSeconds % 60
-    val centiSeconds = timeInCentiSeconds % 100
-
-    return "%02d:%02d.%02d".format(minutes, seconds, centiSeconds)
 }

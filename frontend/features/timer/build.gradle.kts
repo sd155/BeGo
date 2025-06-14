@@ -28,6 +28,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.compose.viewmodel)
+            implementation(libs.sd155.kmplogs.api)
             implementation(compose.components.resources)
         }
 
