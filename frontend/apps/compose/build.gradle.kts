@@ -27,9 +27,11 @@ kotlin {
             implementation(projects.features.diKodein)
             implementation(projects.features.theme)
             implementation(projects.features.timer)
+            implementation(libs.sd155.kmplogs.api)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
+            implementation(libs.sd155.kmplogs.core)
         }
     }
 }
