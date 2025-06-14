@@ -1,6 +1,6 @@
 # App Theme Module
 
-The theme module provides a comprehensive design system for the Bego application. It implements a Material Design-based theming system using Jetpack Compose.
+The theme module provides a comprehensive design system for the [Bego frontend application](../../README.md). It implements a Material Design-based theming system using Jetpack Compose.
 
 ## Key Components
 
@@ -10,17 +10,24 @@ The theme module provides a comprehensive design system for the Bego application
    - Adapts to different screen sizes (Small and Medium)
 
 ### BegoTheme object
-Provides access to theme values
+Provides access to theme values:
 ```kotlin
-//use it to get theme colors
+// Get theme colors
 BegoTheme.palette
-//use it to get theme text styles
+// Get theme text styles
 BegoTheme.typography
-//use it to get theme shapes
+// Get theme shapes
 BegoTheme.shapes
-//use it to get theme size styles
+// Get theme size styles
 BegoTheme.sizes
 ```
+
+### UI Components
+- **BegoAccentFilledButton**: A filled button with accent color for primary actions
+- **BegoWarningFilledButton**: A filled button with warning color for destructive actions
+- **BegoPrimaryFilledButton**: A filled button with primary color for standard actions
+- **BegoHeaderText**: Text component for main headings and titles
+- **BegoBodyLargeText**: Text component for large body text
 
 ### Design System Elements
 - **Colors**: Defines the app's color palette with primary, secondary, accent, and semantic colors
@@ -28,6 +35,8 @@ BegoTheme.sizes
 - **Shapes**: Defines shapes for UI elements like buttons
 - **Sizes**: Manages consistent dimensions for icons, padding, and other UI elements
 
-### **UI Components**
-- **BegoFilledButton**: A pre-styled button component following the design system
-- More components can be added as needed
+### Preview Utilities
+The module includes preview utilities for Android Studio (Android target):
+- Device specifications for different screen sizes and orientations
+- Locale constants for internationalization testing
+- `ThemedPreview` composable for previewing with the Bego theme applied

@@ -1,6 +1,6 @@
 # Dependency Injection Module (di-kodein)
 
-This module provides a simple dependency injection (DI) system for the BeGo frontend, based on [Kodein DI](https://kodein.org/di/). It enables easy and type-safe access to shared dependencies across the application.
+This module provides a simple dependency injection (DI) system for the [BeGo frontend application](../../README.md), based on [Kodein DI](https://kodein.org/di/). It enables easy and type-safe access to shared dependencies across the application.
 
 ## Key Components
 

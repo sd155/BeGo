@@ -1,5 +1,20 @@
 # BeGo Frontend
 
+[BeGo](../README.md) is a running training application designed to help users track and improve their running performance. The frontend is built using Kotlin Multiplatform (KMP) technology, allowing for a consistent user experience across multiple platforms.
+
+## Purpose
+The application helps runners:
+- Track their running sessions with precise timing
+- Record total and lap times
+
+## Functionality
+- **Timer**: Precise stopwatch functionality with lap recording
+
+## Supported Platforms
+- **Android**: Full native support with Material Design 3
+- **Aurora**: In progress
+- **iOS**: In progress
+
 ## Frontend scheme
 ```text
 /
@@ -16,8 +31,9 @@
 │   └── ios/                   # iOS app module (In progress)
 │
 ├── features/                     # KMP project features
+│   ├── di-kodein/                # Shared DI module (Kodein DI)
 │   ├── theme/                    # App theme module
-│   └── di-kodein/                # Shared DI module (Kodein DI)
+│   └── timer/                    # Timer feature module
 │
 ├── gradle/                       # Gradle wrapper
 │   └── wrapper/
@@ -33,5 +49,6 @@
 
 ## Frontend Features
 
-- App theme system, [more details](./frontend/features/theme/README.md)
-- Dependency injection system (Kodein DI), [more details](./frontend/features/di-kodein/README.md)
+- App theme system, [more details](./features/theme/README.md)
+- Timer functionality, [more details](./features/timer/README.md)
+- Dependency injection system (Kodein DI), [more details](./features/di-kodein/README.md)
