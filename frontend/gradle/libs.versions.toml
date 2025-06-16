@@ -1,19 +1,11 @@
 [versions]
+java = "21"
+kotlin = "2.1.21"
 compose-plugin = "1.7.3"
 agp = "8.10.1"
 android-compileSdk = "36"
 android-minSdk = "28"
 android-targetSdk = "36"
-androidx-activityCompose = "1.11.0-rc01"
-androidx-appcompat = "1.7.1"
-androidx-constraintlayout = "2.2.1"
-androidx-core-ktx = "1.16.0"
-androidx-espresso-core = "3.6.1"
-androidx-lifecycle = "2.8.4"
-androidx-material = "1.12.0"
-androidx-navigation-compose = "2.8.9"
-androidx-security-crypto = "1.0.0"
-androidx-test-junit = "1.2.1"
 application-name = "BeGo"
 application-namespace = "io.github.sd155.bego"
 application-version-name = "0.1.0"
@@ -25,65 +17,53 @@ application-version-code = "1"
 # library-inception = "2025"
 # library-git = "https://github.com/sd155/???"
 # library-version-name = "0.0.1"
-compose-bom = "2025.03.01"
-compose-navigation = "2.9.0-alpha17"
-compose-viewmodel = "2.8.4"
-compose-tooling = "1.8.2"
-java = "21"
-junit = "4.13.2"
-kotlin = "2.1.20"
-kotlinx-coroutines = "1.10.1"
-kodein = "7.26.0"
-ktor = "3.1.2"
-serialization = "1.8.0"
-gson = "2.13.1"
-zxing = "3.5.3"
-kmplogs = "0.0.5"
+serialization = "1.8.1"
+coroutines = "1.10.2"
+compose-android-lifecycle = "2.9.0"
+ktor = "3.2.0"
+kmplogs = "0.0.4"
 
 [libraries]
-#Kotlin
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
-kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+#Multiplatform
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
-#Android
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
-androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-espresso-core" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
-androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidx-material" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
-androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
-androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
-androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "androidx-security-crypto" }
-#Compose
-compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
-compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-tooling" }
-compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-viewmodel" }
-#Tests
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-tests-mockk = { module = "io.mockk:mockk", version = "1.13.8" }
-#DI
-kodein-di = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
-#Ktor
-ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-ios = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
-ktor-client-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
-ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
-ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
-#Gson
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-#Barcode
-zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
-#SD-155
+kodein-di = { module = "org.kodein.di:kodein-di", version = "7.26.1" } # Kodein Core
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" } # Kotlin lib
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" } # Kotlin lib
+ktor-client-ios = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" } # Kotlin lib
+ktor-client-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" } # Kotlin lib
+ktor-client-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" } # Kotlin lib
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" } # Kotlin lib
+ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktor" } # Kotlin lib
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" } # Kotlin lib
+ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" } # Kotlin lib
+google-gson = { module = "com.google.code.gson:gson", version = "2.13.1" } # Java lib
+google-zxing-core = { module = "com.google.zxing:core", version = "3.5.3" } # Java lib
 sd155-kmplogs-api = { module = "io.github.sd155:kmplogs-api", version.ref = "kmplogs"}
 sd155-kmplogs-core = { module = "io.github.sd155:kmplogs-core", version.ref = "kmplogs"}
+#Compose
+compose-material = { module = "org.jetbrains.compose.material:material", version = "1.8.1" }
+compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.0-beta02" } # Compose integration with Navigation
+compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-android-lifecycle" } # Compose integration with Lifecycle ViewModel
+compose-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "compose-android-lifecycle" } #Compose integration with Lifecycle
+compose-android-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "compose-android-lifecycle" } #Android Lifecycle ViewModel
+#Android
+androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.16.0" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.1" }
+google-android-material = { module = "com.google.android.material:material", version = "1.12.0" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.11.0-rc01" } # Jetpak compose integration with Activity
+androidx-security-crypto = { module = "androidx.security:security-crypto", version = "1.0.0" } # Jetpack security
+androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version = "1.8.2" } # Jetpack compose tooling
+google-gms-location = { module = "com.google.android.gms:play-services-location", version = "21.3.0" }
+#Tests
+junit = { module = "junit:junit", version = "4.13.2" } # Java
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" } # Kotlin Test Multiplatform library
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" } # Kotlin Test library support for JUnit
+tests-mockk = { module = "io.mockk:mockk", version = "1.14.2" } # Mocking library for Kotlin
+androidx-test-junit = { module = "androidx.test.ext:junit", version = "1.2.1" } # Android
+androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version = "3.6.1" } # Android
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
