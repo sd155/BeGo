@@ -1,25 +1,25 @@
-package io.github.sd155.bego.timer.ui
+package io.github.sd155.bego.tracker.ui
 
-internal sealed class TimerViewState {
+internal sealed class StopwatchViewState {
     data class Initial(
         val totalTime: String,
-    ) : TimerViewState()
+    ) : StopwatchViewState()
     data class RunningNoLaps(
         val totalTime: String,
-    ) : TimerViewState()
+    ) : StopwatchViewState()
     data class StoppedNoLaps(
         val totalTime: String,
-    ) : TimerViewState()
+    ) : StopwatchViewState()
     data class RunningWithLaps(
         val totalTime: String,
         val currentLapTime: String,
         val laps: List<LapItem> = emptyList()//TODO: remove default value
-    ) : TimerViewState()
+    ) : StopwatchViewState()
     data class StoppedWithLaps(
         val totalTime: String,
         val currentLapTime: String,
         val laps: List<LapItem> = emptyList()//TODO: remove default value
-    ) : TimerViewState()
+    ) : StopwatchViewState()
 }
 
 internal data class LapItem(

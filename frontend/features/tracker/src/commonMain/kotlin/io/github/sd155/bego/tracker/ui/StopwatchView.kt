@@ -1,16 +1,16 @@
-package io.github.sd155.bego.timer.ui
+package io.github.sd155.bego.tracker.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import bego.features.timer.generated.resources.Res
-import bego.features.timer.generated.resources.continue_action
-import bego.features.timer.generated.resources.start_action
-import bego.features.timer.generated.resources.stop_action
-import bego.features.timer.generated.resources.next_lap_action
-import bego.features.timer.generated.resources.reset_action
+import bego.features.tracker.generated.resources.Res
+import bego.features.tracker.generated.resources.continue_action
+import bego.features.tracker.generated.resources.start_action
+import bego.features.tracker.generated.resources.stop_action
+import bego.features.tracker.generated.resources.next_lap_action
+import bego.features.tracker.generated.resources.reset_action
 import io.github.sd155.bego.theme.BegoBodyLargeText
 import io.github.sd155.bego.theme.BegoAccentFilledButton
 import io.github.sd155.bego.theme.BegoHeaderText
@@ -20,8 +20,8 @@ import io.github.sd155.bego.theme.BegoWarningFilledButton
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun TimerView(
-    state: TimerViewState,
+internal fun StopwatchView(
+    state: StopwatchViewState,
     onStart: () -> Unit = {},
     onStop: () -> Unit = {},
     onContinue: () -> Unit = {},
@@ -37,28 +37,28 @@ internal fun TimerView(
     var resetAction: (() -> Unit)? = null
     var continueAction: (() -> Unit)? = null
     when (state) {
-        is TimerViewState.Initial -> {
+        is StopwatchViewState.Initial -> {
             startAction = onStart
             totalTime = state.totalTime
         }
-        is TimerViewState.RunningNoLaps -> {
+        is StopwatchViewState.RunningNoLaps -> {
             totalTime = state.totalTime
             stopAction = onStop
             nextAction = onNextLap
         }
-        is TimerViewState.StoppedNoLaps -> {
+        is StopwatchViewState.StoppedNoLaps -> {
             totalTime = state.totalTime
             continueAction = onContinue
             resetAction = onReset
         }
-        is TimerViewState.RunningWithLaps -> {
+        is StopwatchViewState.RunningWithLaps -> {
             totalTime = state.totalTime
             lapTime = state.currentLapTime
             showLapTime = true
             stopAction = onStop
             nextAction = onNextLap
         }
-        is TimerViewState.StoppedWithLaps -> {
+        is StopwatchViewState.StoppedWithLaps -> {
             totalTime = state.totalTime
             lapTime = state.currentLapTime
             showLapTime = true

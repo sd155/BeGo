@@ -1,4 +1,4 @@
-package io.github.sd155.bego.timer
+package io.github.sd155.bego.tracker
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.runtime.Composable
@@ -7,9 +7,9 @@ import io.github.sd155.bego.theme.LOCALE_EN
 import io.github.sd155.bego.theme.LOCALE_RU
 import io.github.sd155.bego.theme.PHONE_PORT_SPEC
 import io.github.sd155.bego.theme.ThemedPreview
-import io.github.sd155.bego.timer.ui.TimeFormatter
-import io.github.sd155.bego.timer.ui.TimerView
-import io.github.sd155.bego.timer.ui.TimerViewState
+import io.github.sd155.bego.tracker.ui.TimeFormatter
+import io.github.sd155.bego.tracker.ui.StopwatchView
+import io.github.sd155.bego.tracker.ui.StopwatchViewState
 
 private fun format(timeMs: Long = 0L) = TimeFormatter().format(timeMs)
 
@@ -18,10 +18,10 @@ private fun format(timeMs: Long = 0L) = TimeFormatter().format(timeMs)
 @Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
 @Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
 @Composable
-private fun InitialTimerPreview() {
+private fun InitialStopwatchPreview() {
     ThemedPreview {
-        TimerView(
-            state = TimerViewState.Initial(format())
+        StopwatchView(
+            state = StopwatchViewState.Initial(format())
         )
     }
 }
@@ -31,10 +31,10 @@ private fun InitialTimerPreview() {
 @Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
 @Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
 @Composable
-private fun RunningNoLapsTimerPreview() {
+private fun RunningNoLapsStopwatchPreview() {
     ThemedPreview {
-        TimerView(
-            state = TimerViewState.RunningNoLaps(
+        StopwatchView(
+            state = StopwatchViewState.RunningNoLaps(
                 totalTime = format(timeMs = 35665L),
             )
         )
@@ -46,10 +46,10 @@ private fun RunningNoLapsTimerPreview() {
 @Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
 @Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
 @Composable
-private fun StoppedNoLapsTimerPreview() {
+private fun StoppedNoLapsStopwatchPreview() {
     ThemedPreview {
-        TimerView(
-            state = TimerViewState.StoppedNoLaps(
+        StopwatchView(
+            state = StopwatchViewState.StoppedNoLaps(
                 totalTime = format(timeMs = 155665L),
             )
         )
@@ -61,10 +61,10 @@ private fun StoppedNoLapsTimerPreview() {
 @Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
 @Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
 @Composable
-private fun RunningWithLapsTimerPreview() {
+private fun RunningWithLapsStopwatchPreview() {
     ThemedPreview {
-        TimerView(
-            state = TimerViewState.RunningWithLaps(
+        StopwatchView(
+            state = StopwatchViewState.RunningWithLaps(
                 totalTime = format(timeMs = 35665L),
                 currentLapTime = format(timeMs = 1555L),
             )
@@ -77,10 +77,10 @@ private fun RunningWithLapsTimerPreview() {
 @Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
 @Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
 @Composable
-private fun StoppedWithLapsTimerPreview() {
+private fun StoppedWithLapsStopwatchPreview() {
     ThemedPreview {
-        TimerView(
-            state = TimerViewState.StoppedWithLaps(
+        StopwatchView(
+            state = StopwatchViewState.StoppedWithLaps(
                 totalTime = format(timeMs = 155665L),
                 currentLapTime = format(timeMs = 5551L),
             )

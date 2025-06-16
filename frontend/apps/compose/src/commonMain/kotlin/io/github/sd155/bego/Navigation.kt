@@ -7,8 +7,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.github.sd155.bego.timer.ui.TimerScreen
-import io.github.sd155.bego.timer.ui.TimerScreenRoute
+import io.github.sd155.bego.tracker.ui.StopwatchScreen
+import io.github.sd155.bego.tracker.ui.StopwatchScreenRoute
 
 internal val LocalNavHost = staticCompositionLocalOf<NavHostController> { error("No default implementation") }
 
@@ -22,10 +22,10 @@ internal fun AppNavGraph() {
         val appVersion = LocalPlatform.current.appVersion
         NavHost(
             navController = navController,
-            startDestination = TimerScreenRoute
+            startDestination = StopwatchScreenRoute
         ) {
-            composable<TimerScreenRoute> {
-                TimerScreen()
+            composable<StopwatchScreenRoute> {
+                StopwatchScreen()
             }
         }
     }

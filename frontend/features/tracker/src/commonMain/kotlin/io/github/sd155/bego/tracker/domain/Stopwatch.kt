@@ -1,4 +1,4 @@
-package io.github.sd155.bego.timer.domain
+package io.github.sd155.bego.tracker.domain
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,10 +13,10 @@ import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.time.TimeSource
 
-internal class RunningTimer {
+internal class Stopwatch {
     private val _timer by lazy { Timer(_resolutionMs = 10L, ::onTimerUpdate) }
-    private val _state = MutableStateFlow(RunningState())
-    internal val state: StateFlow<RunningState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(StopwatchState())
+    internal val state: StateFlow<StopwatchState> = _state.asStateFlow()
 
     internal fun startLap() {
         _state.value.reduce {
@@ -50,20 +50,20 @@ internal class RunningTimer {
 
     internal fun reset() {
         _timer.stop()
-        _state.value.reduce { RunningState() }
+        _state.value.reduce { StopwatchState() }
     }
 
     private fun onTimerUpdate(elapsedMs: Long) {
         _state.value.reduce { copy(elapsedMs = elapsedMs) }
     }
 
-    private fun RunningState.reduce(reducer: RunningState.() -> RunningState): RunningState {
+    private fun StopwatchState.reduce(reducer: StopwatchState.() -> StopwatchState): StopwatchState {
         _state.value = reducer(this)
         return this
     }
 }
 
-internal data class RunningState(
+internal data class StopwatchState(
     val currentStartMs: Long = 0L,
     val currentLapStartMs: Long = 0L,
     val elapsedMs: Long = 0L,
@@ -73,7 +73,7 @@ internal data class RunningState(
 @OptIn(ExperimentalAtomicApi::class)
 private class Timer(
     private val _resolutionMs: Long,
-    private val _consumer: (elapsedMs: Long) -> Unit,
+    private val _onUpdate: (elapsedMs: Long) -> Unit,
 ) {
     private val _scope by lazy { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
     private val _job by lazy { AtomicReference<Job?>(value = null) }
@@ -85,7 +85,7 @@ private class Timer(
             while (true) {
                 delay(timeMillis = _resolutionMs)
                 val elapsedMs = start.elapsedNow().inWholeMilliseconds
-                _consumer(elapsedMs)
+                _onUpdate(elapsedMs)
             }
         })
     }

@@ -8,7 +8,7 @@ The application helps runners:
 - Record total and lap times
 
 ## Functionality
-- **Timer**: Precise stopwatch functionality with lap recording
+- **Stopwatch**: Precise stopwatch functionality with lap recording
 
 ## Supported Platforms
 - **Android**: Full native support with Material Design 3
@@ -33,7 +33,7 @@ The application helps runners:
 ├── features/                     # KMP project features
 │   ├── di-kodein/                # Shared DI module (Kodein DI)
 │   ├── theme/                    # App theme module
-│   └── timer/                    # Timer feature module
+│   └── tracker/                    # Tracker feature module
 │
 ├── gradle/                       # Gradle wrapper
 │   └── wrapper/
@@ -50,5 +50,5 @@ The application helps runners:
 ## Frontend Features
 
 - App theme system, [more details](./features/theme/README.md)
-- Timer functionality, [more details](./features/timer/README.md)
+- Tracker functionality, [more details](./features/tracker/README.md)
 - Dependency injection system (Kodein DI), [more details](./features/di-kodein/README.md)

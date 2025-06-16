@@ -1,7 +1,7 @@
 package io.github.sd155.bego
 
 import io.github.sd155.bego.di.Inject
-import io.github.sd155.bego.timer.di.timerModule
+import io.github.sd155.bego.tracker.di.trackerModule
 import io.github.sd155.logs.api.Logger
 import org.kodein.di.DI
 import org.kodein.di.bind
@@ -24,7 +24,7 @@ internal object PlatformDi {
             DI {
                 importAll(
                     applicationModule,
-                    timerModule(loggerProvider)
+                    trackerModule(loggerProvider)
                 )
             }.direct
         )
