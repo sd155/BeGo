@@ -3,6 +3,7 @@ package io.github.sd155.bego.timer.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.sd155.bego.di.Inject
+import io.github.sd155.bego.timer.di.moduleName
 import io.github.sd155.bego.timer.domain.RunningState
 import io.github.sd155.bego.timer.domain.RunningTimer
 import io.github.sd155.logs.api.Logger
@@ -14,7 +15,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 internal class TimerViewModel : ViewModel() {
-    private val _logger by lazy { Inject.instance<Logger>() }
+    private val _logger by lazy { Inject.instance<Logger>(tag = moduleName) }
     private val _timer by lazy { Inject.instance<RunningTimer>() }
     private val _formatter by lazy { TimeFormatter() }
     private val _state = MutableStateFlow<TimerViewState>(TimerViewState.Initial(_formatter.format(timeMs = 0L)))

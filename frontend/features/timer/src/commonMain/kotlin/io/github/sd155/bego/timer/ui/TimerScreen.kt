@@ -5,6 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.sd155.bego.di.Inject
+import io.github.sd155.bego.timer.di.moduleName
 import io.github.sd155.logs.api.Logger
 import kotlinx.serialization.Serializable
 
@@ -22,7 +23,7 @@ object TimerScreenRoute
 fun TimerScreen() {
     val viewModel: TimerViewModel = viewModel { TimerViewModel() }
     val state by viewModel.state.collectAsState()
-    val logger = Inject.instance<Logger>()
+    val logger = Inject.instance<Logger>(tag = moduleName)
     logger.debug("View received state", diagnostics = listOf(state))
 
     TimerView(

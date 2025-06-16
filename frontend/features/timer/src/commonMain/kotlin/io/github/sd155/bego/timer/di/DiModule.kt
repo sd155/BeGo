@@ -15,7 +15,9 @@ import org.kodein.di.singleton
  */
 fun timerModule(
     loggerProvider: (source: String) -> Logger,
-) = DI.Module(name = "timer") {
+) = DI.Module(name = moduleName) {
     bind<RunningTimer>() with singleton { RunningTimer() }
-    bind<Logger>() with singleton { loggerProvider("Timer") }
+    bind<Logger>(moduleName) with singleton { loggerProvider("Timer") }
 }
+
+internal val moduleName = "timer"
