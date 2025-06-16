@@ -21,4 +21,14 @@ internal class BegoActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        BegoForegroundService.stopService(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        BegoForegroundService.startService(this)
+    }
 }

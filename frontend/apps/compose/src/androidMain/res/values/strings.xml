@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="foreground_service_explanation">This service ensures, that training session is being measured (e.g. with stopwatch) even if screen is off, or app lost its foreground in any other cases.</string>
+</resources>

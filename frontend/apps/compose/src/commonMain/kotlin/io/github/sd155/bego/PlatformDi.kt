@@ -9,19 +9,21 @@ import org.kodein.di.direct
 import org.kodein.di.singleton
 
 internal object PlatformDi {
+    const val APPLICATION_MODULE_NAME: String = "application"
 
     fun init(
         configuration: PlatformConfiguration,
         loggerProvider: (source: String) -> Logger,
     ) {
-        val coreModule = DI.Module("core") {
+        val applicationModule = DI.Module(APPLICATION_MODULE_NAME) {
             bind<PlatformConfiguration>() with singleton { configuration }
+            bind<Logger>(APPLICATION_MODULE_NAME) with singleton { loggerProvider("APP") }
         }
 
         Inject.createDependencies(
             DI {
                 importAll(
-                    coreModule,
+                    applicationModule,
                     timerModule(loggerProvider)
                 )
             }.direct
