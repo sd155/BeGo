@@ -16,7 +16,7 @@ import kotlin.math.sqrt
 internal class Tracker {
     private val _logger by lazy { Inject.instance<Logger>(trackerModuleName) }
     private val _scope by lazy { CoroutineScope(Dispatchers.Default) }
-    private val _stopwatch by lazy { Inject.instance<Stopwatch>() }
+    private val _stopwatch by lazy { Stopwatch() }
     private val _location by lazy { Inject.instance<LocationProvider>() }
     private val _state = MutableStateFlow(TrackerState())
     internal val state: StateFlow<TrackerState> = _state.asStateFlow()

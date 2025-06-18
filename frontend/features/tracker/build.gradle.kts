@@ -24,15 +24,16 @@ kotlin {
     sourceSets {        
         commonMain.dependencies {
             implementation(projects.features.diKodein)
+            implementation(projects.features.result)
             implementation(projects.features.theme)
             implementation(libs.kotlinx.serialization.core)
-            implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.compose.android.lifecycle.viewmodel)
             implementation(libs.compose.viewmodel)
             implementation(libs.sd155.kmplogs.api)
             implementation(compose.components.resources)
         }
-
         androidMain.dependencies {
+            implementation(libs.google.gms.location)
         }
     }
 }
@@ -63,6 +64,6 @@ android {
         targetCompatibility = _javaVersion
     }
     dependencies {
-        debugImplementation(libs.compose.tooling)
+        debugImplementation(libs.androidx.ui.tooling)
     }
 } 

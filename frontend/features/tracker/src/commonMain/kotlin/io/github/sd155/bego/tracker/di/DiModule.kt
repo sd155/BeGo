@@ -1,6 +1,7 @@
 package io.github.sd155.bego.tracker.di
 
-import io.github.sd155.bego.tracker.domain.Stopwatch
+import io.github.sd155.bego.tracker.domain.LocationProvider
+import io.github.sd155.bego.tracker.domain.Tracker
 import io.github.sd155.logs.api.Logger
 import org.kodein.di.bind
 import org.kodein.di.DI
@@ -15,9 +16,11 @@ import org.kodein.di.singleton
  */
 fun trackerModule(
     loggerProvider: (source: String) -> Logger,
-) = DI.Module(name = moduleName) {
-    bind<Stopwatch>() with singleton { Stopwatch() }
-    bind<Logger>(moduleName) with singleton { loggerProvider("Timer") }
+    locationProvider: LocationProvider,
+) = DI.Module(name = trackerModuleName) {
+    bind<Logger>(trackerModuleName) with singleton { loggerProvider("Tracker") }
+    bind<LocationProvider>() with singleton { locationProvider }
+    bind<Tracker>() with singleton { Tracker() }
 }
 
-internal val moduleName = "tracker"
+internal const val trackerModuleName = "tracker"
