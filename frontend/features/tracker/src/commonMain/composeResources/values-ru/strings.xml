@@ -2,7 +2,5 @@
 <resources>
     <string name="start_action">Старт</string>
     <string name="stop_action">Стоп</string>
-    <string name="next_lap_action">Круг</string>
-    <string name="continue_action">Продолжить</string>
     <string name="reset_action">Сбросить</string>
 </resources> 

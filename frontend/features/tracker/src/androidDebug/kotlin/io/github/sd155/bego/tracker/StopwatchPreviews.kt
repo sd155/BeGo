@@ -7,11 +7,9 @@ import io.github.sd155.bego.theme.LOCALE_EN
 import io.github.sd155.bego.theme.LOCALE_RU
 import io.github.sd155.bego.theme.PHONE_PORT_SPEC
 import io.github.sd155.bego.theme.ThemedPreview
-import io.github.sd155.bego.tracker.ui.TimeFormatter
-import io.github.sd155.bego.tracker.ui.StopwatchView
-import io.github.sd155.bego.tracker.ui.StopwatchViewState
+import io.github.sd155.bego.tracker.ui.UiFormatter
 
-private fun format(timeMs: Long = 0L) = TimeFormatter().format(timeMs)
+private fun format(timeMs: Long = 0L) = UiFormatter().format(timeMs)
 
 @Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
 @Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
@@ -20,9 +18,9 @@ private fun format(timeMs: Long = 0L) = TimeFormatter().format(timeMs)
 @Composable
 private fun InitialStopwatchPreview() {
     ThemedPreview {
-        StopwatchView(
-            state = StopwatchViewState.Initial(format())
-        )
+//        StopwatchView(
+//            state = StopwatchViewState.Initial(format())
+//        )
     }
 }
 
@@ -33,11 +31,11 @@ private fun InitialStopwatchPreview() {
 @Composable
 private fun RunningNoLapsStopwatchPreview() {
     ThemedPreview {
-        StopwatchView(
-            state = StopwatchViewState.RunningNoLaps(
-                totalTime = format(timeMs = 35665L),
-            )
-        )
+//        StopwatchView(
+//            state = StopwatchViewState.RunningNoLaps(
+//                totalTime = format(timeMs = 35665L),
+//            )
+//        )
     }
 }
 
@@ -48,11 +46,11 @@ private fun RunningNoLapsStopwatchPreview() {
 @Composable
 private fun StoppedNoLapsStopwatchPreview() {
     ThemedPreview {
-        StopwatchView(
-            state = StopwatchViewState.StoppedNoLaps(
-                totalTime = format(timeMs = 155665L),
-            )
-        )
+//        StopwatchView(
+//            state = StopwatchViewState.StoppedNoLaps(
+//                totalTime = format(timeMs = 155665L),
+//            )
+//        )
     }
 }
 
@@ -63,12 +61,12 @@ private fun StoppedNoLapsStopwatchPreview() {
 @Composable
 private fun RunningWithLapsStopwatchPreview() {
     ThemedPreview {
-        StopwatchView(
-            state = StopwatchViewState.RunningWithLaps(
-                totalTime = format(timeMs = 35665L),
-                currentLapTime = format(timeMs = 1555L),
-            )
-        )
+//        StopwatchView(
+//            state = StopwatchViewState.RunningWithLaps(
+//                totalTime = format(timeMs = 35665L),
+//                currentLapTime = format(timeMs = 1555L),
+//            )
+//        )
     }
 }
 
@@ -79,11 +77,11 @@ private fun RunningWithLapsStopwatchPreview() {
 @Composable
 private fun StoppedWithLapsStopwatchPreview() {
     ThemedPreview {
-        StopwatchView(
-            state = StopwatchViewState.StoppedWithLaps(
-                totalTime = format(timeMs = 155665L),
-                currentLapTime = format(timeMs = 5551L),
-            )
-        )
+//        StopwatchView(
+//            state = StopwatchViewState.StoppedWithLaps(
+//                totalTime = format(timeMs = 155665L),
+//                currentLapTime = format(timeMs = 5551L),
+//            )
+//        )
     }
 }
