@@ -6,29 +6,21 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
 import io.github.sd155.bego.di.Inject
 import io.github.sd155.bego.theme.screenSize
+import io.github.sd155.bego.tracker.AndroidTrackerModuleDi
 
 internal class BegoActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AndroidTrackerModuleDi().onCreateActivity(activity = this)
         setContent {
             CompositionLocalProvider(
-                LocalPlatform provides Inject.instance<PlatformConfiguration>(),
+                LocalAppName provides Inject.instance<AppName>(),
             ) {
                 App(
                     screen = screenSize(),
                 )
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        BegoForegroundService.stopService(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        BegoForegroundService.startService(this)
     }
 }

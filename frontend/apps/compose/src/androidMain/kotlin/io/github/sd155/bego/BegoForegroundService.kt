@@ -16,7 +16,7 @@ import io.github.sd155.bego.di.Inject
 import io.github.sd155.logs.api.Logger
 
 internal class BegoForegroundService : Service() {
-    private val _logger by lazy { Inject.instance<Logger>(tag = PlatformDi.APPLICATION_MODULE_NAME) }
+    private val _logger by lazy { Inject.instance<Logger>(tag = applicationModuleName) }
 
     companion object {
         private const val CHANNEL_ID = "BegoForegroundServiceChannel"
@@ -82,9 +82,9 @@ internal class BegoForegroundService : Service() {
     }
 
     private fun createNotification(): Notification {
-        val platformConfig = Inject.instance<PlatformConfiguration>()
+        val platformConfig = Inject.instance<AppName>()
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("ver ${platformConfig.appVersion}")
+            .setContentTitle("ver ${platformConfig.version}")
             .setSmallIcon(R.mipmap.ic_launcher)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()

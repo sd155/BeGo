@@ -23,10 +23,10 @@ kotlin {
     
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.compose.navigation)
             implementation(projects.features.diKodein)
             implementation(projects.features.theme)
             implementation(projects.features.tracker)
+            implementation(libs.compose.navigation)
             implementation(libs.sd155.kmplogs.api)
         }
         androidMain.dependencies {
