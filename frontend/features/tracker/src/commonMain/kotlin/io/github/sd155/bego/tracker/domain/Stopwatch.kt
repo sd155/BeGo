@@ -18,34 +18,17 @@ internal class Stopwatch {
     private val _state = MutableStateFlow(StopwatchState())
     internal val state: StateFlow<StopwatchState> = _state.asStateFlow()
 
-    internal fun startLap() {
-        _state.value.reduce {
-            copy(
-                isRunning = true,
-                currentLapStartMs = currentStartMs + elapsedMs,
-            )
-        }
+    internal fun start() {
+        _state.value
+            .reduce { StopwatchState(isRunning = true) }
             .also { oldState ->
                 if (!oldState.isRunning) _timer.start()
             }
     }
 
-    internal fun pause() {
+    internal fun stop() {
         _timer.stop()
-        _state.value.reduce {
-            copy(
-                isRunning = false,
-                currentStartMs = currentStartMs + elapsedMs,
-                elapsedMs = 0L,
-            )
-        }
-    }
-
-    internal fun resume() {
-        _state.value.reduce {
-            copy(isRunning = true)
-        }
-        _timer.start()
+        _state.value.reduce { copy(isRunning = false) }
     }
 
     internal fun reset() {
@@ -62,13 +45,6 @@ internal class Stopwatch {
         return this
     }
 }
-
-internal data class StopwatchState(
-    val currentStartMs: Long = 0L,
-    val currentLapStartMs: Long = 0L,
-    val elapsedMs: Long = 0L,
-    val isRunning: Boolean = false,
-)
 
 @OptIn(ExperimentalAtomicApi::class)
 private class Timer(
