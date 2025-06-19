@@ -7,25 +7,30 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import io.github.sd155.logs.api.Logger
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+@OptIn(ExperimentalAtomicApi::class)
 class AndroidPermissionValidator(
     private val logger: Logger? = null,
 ) {
-    private var _activityResultLauncher: ActivityResultLauncher<Array<String>>? = null
-    private var _request: PermissionRequest? = null
+    private val _activityResultLauncher = AtomicReference<ActivityResultLauncher<Array<String>>?>(value = null)
+    private val _request = AtomicReference<PermissionRequest?>(value = null)
 
     fun setup(activity: ComponentActivity) {
-        _activityResultLauncher = activity.registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions(),
-            ::onActivityCallback
+        _activityResultLauncher.store(
+            newValue = activity.registerForActivityResult(
+                ActivityResultContracts.RequestMultiplePermissions(),
+                ::onActivityCallback
+            )
         )
     }
 
     private fun onActivityCallback(results: Map<String, Boolean>) =
-        _request?.onResponse(results)
+        _request.load()?.onResponse(results)
             ?: run { logger?.warn(event = "Called onActivityCallback with no request!") }
 
     fun check(
@@ -57,14 +62,14 @@ class AndroidPermissionValidator(
     }
 
     private suspend inline fun request(permissions: Array<String>): Boolean {
-        val launcher = _activityResultLauncher
+        val launcher = _activityResultLauncher.load()
             ?: run {
                 logger?.error(event = "Permissions request failed due to unset ActivityResultLauncher!")
                 return false
             }
         return PermissionRequest(permissions, launcher, logger)
             .let { request ->
-                _request = request
+                _request.store(request)
                 request.launch()
             }
     }

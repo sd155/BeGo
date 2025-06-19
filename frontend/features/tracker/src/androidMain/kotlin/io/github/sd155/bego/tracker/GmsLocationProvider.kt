@@ -24,21 +24,24 @@ import io.github.sd155.logs.api.Logger
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import java.lang.ref.WeakReference
 import java.util.concurrent.Executor
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+@OptIn(ExperimentalAtomicApi::class)
 class GmsLocationProvider : LocationProvider() {
     private val _locationIntervalMs = 1000L
     private val _logger by lazy { Inject.instance<Logger>(tag = trackerModuleName) }
-    private var activityRef: WeakReference<ComponentActivity>? = null
     private val _permissions by lazy { AndroidPermissionValidator(_logger) }
-    private var locationRequest: LocationRequest? = null
-    private var onLocation: GmsLocationListener? = null
+    private val _activityRef = AtomicReference<WeakReference<ComponentActivity>?>(null)
+    private val _locationRequest = AtomicReference<LocationRequest?>(null)
+    private val _onLocation = AtomicReference<GmsLocationListener?>(null)
 
     fun setActivity(activity: ComponentActivity) {
-        activityRef = WeakReference(activity)
+        _activityRef.store(WeakReference(activity))
         _permissions.setup(activity)
     }
 
@@ -57,7 +60,7 @@ class GmsLocationProvider : LocationProvider() {
                 }
                 .next { checkLocationSettings(activity) }
                 .next { locationRequest ->
-                    this.locationRequest = locationRequest
+                    _locationRequest.store(locationRequest)
                     Unit.asSuccess()
                 }
         }
@@ -66,7 +69,7 @@ class GmsLocationProvider : LocationProvider() {
     private inline fun <S> withActivity(
         block: (ComponentActivity) -> Result<LocationError, S>
     ): Result<LocationError, S> {
-        val activity = activityRef?.get()
+        val activity = _activityRef.load()?.get()
         return if (activity == null)
             LocationError.IllegalState.asFailure()
         else
@@ -131,7 +134,7 @@ class GmsLocationProvider : LocationProvider() {
 
     override fun unsub() {
         withActivity { activity ->
-            onLocation?.let { listener ->
+            _onLocation.load()?.let { listener ->
                 LocationServices.getFusedLocationProviderClient(activity)
                     .removeLocationUpdates(listener)
             }
@@ -142,10 +145,10 @@ class GmsLocationProvider : LocationProvider() {
     override suspend fun sub(onUpdate: (TrackPoint) -> Unit): Result<LocationError, Unit> {
         return try {
             withActivity  { activity ->
-                val request = locationRequest
+                val request = _locationRequest.load()
                     ?: return LocationError.NotStarted.asFailure()
                 val listener = GmsLocationListener(onUpdate)
-                onLocation = listener
+                _onLocation.store(listener)
                 getExecutorOrNull()
                     ?.let { executor ->
                         LocationServices.getFusedLocationProviderClient(activity)
