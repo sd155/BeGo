@@ -1,7 +1,6 @@
 package io.github.sd155.bego.tracker.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -21,7 +20,4 @@ fun TrackerScreen() {
         onStop = { viewModel.onViewIntent(TrackerViewIntent.Stop) },
         onReset = { viewModel.onViewIntent(TrackerViewIntent.Reset) },
     )
-    LaunchedEffect(Unit) {
-        viewModel.onViewIntent(TrackerViewIntent.Prepare)
-    }
 }

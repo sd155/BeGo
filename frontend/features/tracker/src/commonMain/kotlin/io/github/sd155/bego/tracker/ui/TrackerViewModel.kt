@@ -27,9 +27,10 @@ internal class TrackerViewModel : ViewModel() {
     internal val state: StateFlow<TrackerViewState> = _state.asStateFlow()
 
     init {
-        Inject.instance<Tracker>().state
+        _tracker.state
             .onEach(::collectTrackerState)
             .launchIn(viewModelScope)
+        viewModelScope.launch(Dispatchers.Default) { _tracker.prepare() }
     }
 
     private fun collectTrackerState(state: TrackerState) {
@@ -46,7 +47,6 @@ internal class TrackerViewModel : ViewModel() {
     internal fun onViewIntent(intent: TrackerViewIntent) = viewModelScope.launch(Dispatchers.Default) {
         _logger.trace(event = "VM received View Intent: $intent")
         when (intent) {
-            TrackerViewIntent.Prepare -> _tracker.prepare()
             TrackerViewIntent.Start -> _tracker.start()
             TrackerViewIntent.Stop -> _tracker.stop()
             TrackerViewIntent.Reset -> _tracker.reset()
