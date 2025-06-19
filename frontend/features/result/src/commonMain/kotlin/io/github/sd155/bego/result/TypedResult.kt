@@ -1,7 +1,5 @@
 package io.github.sd155.bego.result
 
-import io.github.sd155.bego.result.Result.Failure
-import io.github.sd155.bego.result.Result.Success
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -27,8 +25,8 @@ suspend fun <F, S, R> Result<F, S>.fold(
         callsInPlace(onFailure, InvocationKind.AT_MOST_ONCE)
     }
     return when (this) {
-        is Success -> onSuccess(value)
-        is Failure -> onFailure(error)
+        is Result.Success -> onSuccess(value)
+        is Result.Failure -> onFailure(error)
     }
 }
 
@@ -39,7 +37,7 @@ fun <T> T.asFailure() = Result.Failure(this)
 @OptIn(ExperimentalContracts::class)
 suspend fun <F, S, R> Result<F, S>.next(block: suspend (S) -> Result<F, R>): Result<F, R> {
     contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
     return  when(this) {
         is Result.Success -> block(value)
