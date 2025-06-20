@@ -39,7 +39,7 @@ kotlin {
 }
 
 android {
-    namespace = "${libs.versions.application.namespace.get()}.timer"
+    namespace = "${libs.versions.application.namespace.get()}.tracker"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
