@@ -120,13 +120,15 @@ class GmsLocationProvider : LocationProvider() {
             onUpdate(
                 TrackPoint(
                     timeMs = location.time,
-                    latitude = location.latitude,
-                    longitude = location.longitude,
-                    horizontalAccuracyMeters = location.accuracy,
-                    altitudeMeters = location.altitude,
-                    altitudeAccuracyMeters = location.verticalAccuracyMeters,
-                    speedMetersPerSecond = location.speed,
-                    speedAccuracyMeterPerSecond = location.speedAccuracyMetersPerSecond,
+                    latitudeDegrees = location.latitude,
+                    longitudeDegrees = location.longitude,
+                    horizontalAccuracyMeters = location.accuracy,//opt
+                    altitudeMeters = location.altitude,//opt
+                    altitudeAccuracyMeters = location.verticalAccuracyMeters,//opt
+                    speedMetersPerSecond = location.speed,//opt
+                    speedAccuracyMeterPerSecond = location.speedAccuracyMetersPerSecond,//opt
+                    bearingDegrees = location.bearing,//opt
+                    bearingAccuracyDegrees = location.bearingAccuracyDegrees//opt
                 )
             )
         }

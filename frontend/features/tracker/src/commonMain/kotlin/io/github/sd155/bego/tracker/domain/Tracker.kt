@@ -18,6 +18,7 @@ internal class Tracker {
     private val _scope by lazy { CoroutineScope(Dispatchers.Default) }
     private val _stopwatch by lazy { Stopwatch() }
     private val _location by lazy { Inject.instance<LocationProvider>() }
+    private val _kalmanFilter by lazy { KalmanLatLngFilter(processNoise = 1.0) }
     private val _state = MutableStateFlow(TrackerState())
     internal val state: StateFlow<TrackerState> = _state.asStateFlow()
 
@@ -40,14 +41,15 @@ internal class Tracker {
 
     private fun handleTrackPoint(point: TrackPoint) {
         _state.value.let { state ->
+            val filteredPoint = _kalmanFilter.filter(point)
             state.last
                 ?.let { last ->
-                    val distance = approximateDistance(last, point)
+                    val distance = approximateDistance(last, filteredPoint)
                     _logger.debug("Distance check, distance:${distance}m ? accuracy:${last.horizontalAccuracyMeters}m")
                     if (distance > last.horizontalAccuracyMeters) {
                         state.copy(
                             distance = state.distance + distance,
-                            last = point
+                            last = filteredPoint
                         )
                             .apply {
                                 if (this.distance >= 1000.0) stop()
@@ -56,8 +58,8 @@ internal class Tracker {
                     }
                 }
                 ?: run {
-                    _logger.debug(event = "Receive first point")
-                    _state.value = state.copy(last = point)
+                    _logger.debug(event = "Receive first point (filtered)")
+                    _state.value = state.copy(last = filteredPoint)
                 }
         }
     }
@@ -75,17 +77,20 @@ internal class Tracker {
     internal fun reset() {
         _stopwatch.reset()
         _location.unsub()
+        _kalmanFilter.reset()
         _state.value = TrackerState()
     }
 
-    // That is simplified flat-Earth approximation.
-    // That one has accuracy like Haversine but faster.
-    // That one loosing a little in accuracy to Vincenty, but wins great in speed.
+    /**
+     * That is simplified flat-Earth approximation.
+     * That one has accuracy like Haversine but faster.
+     * That one loosing a little in accuracy to Vincenty, but wins great in speed.
+     */
     private fun approximateDistance(p1: TrackPoint, p2: TrackPoint): Double {
-        val earthRadiusMeter = 6371000.0
-        val latAvg = Math.toRadians((p1.latitude + p2.latitude) / 2)
-        val x = Math.toRadians(p2.longitude - p1.longitude) * cos(latAvg)
-        val y = Math.toRadians(p2.latitude - p1.latitude)
-        return sqrt(x * x + y * y) * earthRadiusMeter
+        val earthRadiusMeters = 6371000.0
+        val latAvg = Math.toRadians((p1.latitudeDegrees + p2.latitudeDegrees) / 2)
+        val x = Math.toRadians(p2.longitudeDegrees - p1.longitudeDegrees) * cos(latAvg)
+        val y = Math.toRadians(p2.latitudeDegrees - p1.latitudeDegrees)
+        return sqrt(x * x + y * y) * earthRadiusMeters
     }
 }
