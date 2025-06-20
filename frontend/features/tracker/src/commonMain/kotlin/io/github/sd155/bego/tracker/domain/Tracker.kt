@@ -18,7 +18,7 @@ internal class Tracker {
     private val _scope by lazy { CoroutineScope(Dispatchers.Default) }
     private val _stopwatch by lazy { Stopwatch() }
     private val _location by lazy { Inject.instance<LocationProvider>() }
-    private val _kalmanFilter by lazy { KalmanLatLngFilter(processNoise = 1.0) }
+    private val _locationFilter by lazy { KalmanLocationFilter(processNoise = 1.0) }
     private val _state = MutableStateFlow(TrackerState())
     internal val state: StateFlow<TrackerState> = _state.asStateFlow()
 
@@ -41,12 +41,12 @@ internal class Tracker {
 
     private fun handleTrackPoint(point: TrackPoint) {
         _state.value.let { state ->
-            val filteredPoint = _kalmanFilter.filter(point)
+            val filteredPoint = _locationFilter.filter(point)
             state.last
                 ?.let { last ->
                     val distance = approximateDistance(last, filteredPoint)
-                    _logger.debug("Distance check, distance:${distance}m ? accuracy:${last.horizontalAccuracyMeters}m")
-                    if (distance > last.horizontalAccuracyMeters) {
+                    _logger.debug("Distance check, speed: ${filteredPoint.speedMetersPerSecond}[${point.speedMetersPerSecond}]m/s, distance:${distance}m ? accuracy:${last.horizontalAccuracyMeters}m")
+                    if (filteredPoint.speedMetersPerSecond > 0f && distance > last.horizontalAccuracyMeters) {
                         state.copy(
                             distance = state.distance + distance,
                             last = filteredPoint
@@ -58,7 +58,7 @@ internal class Tracker {
                     }
                 }
                 ?: run {
-                    _logger.debug(event = "Receive first point (filtered)")
+                    _logger.debug(event = "First point received")
                     _state.value = state.copy(last = filteredPoint)
                 }
         }
@@ -77,7 +77,7 @@ internal class Tracker {
     internal fun reset() {
         _stopwatch.reset()
         _location.unsub()
-        _kalmanFilter.reset()
+        _locationFilter.reset()
         _state.value = TrackerState()
     }
 
