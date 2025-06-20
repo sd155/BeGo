@@ -23,4 +23,14 @@ internal class BegoActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        AndroidTrackerModuleDi().onResumeActivity(activity = this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        AndroidTrackerModuleDi().onPauseActivity(activity = this)
+    }
 }

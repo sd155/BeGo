@@ -1,8 +1,10 @@
 package io.github.sd155.bego.tracker
 
 import android.Manifest
+import android.content.Context
 import android.content.IntentSender
 import android.location.Location
+import android.os.Build
 import android.os.Looper
 import androidx.activity.ComponentActivity
 import com.google.android.gms.common.api.ResolvableApiException
@@ -45,14 +47,20 @@ class GmsLocationProvider : LocationProvider() {
         _permissions.setup(activity)
     }
 
+    fun onLostForeground(context: Context) {
+        _onLocation.load()?.let {
+            TrackerForegroundService.startService(context)
+        }
+    }
+
+    fun onResumeForeground(context: Context) =
+        TrackerForegroundService.stopService(context)
+
     override suspend fun start(): Result<LocationError, Unit> {
         return withActivity { activity ->
             _permissions.checkAndRequest(
                 activity = activity,
-                permissions = arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
+                permissions = locationPermissions()
             )
                 .let { isPermissionsGranted ->
                     if (isPermissionsGranted) Unit.asSuccess()
@@ -65,6 +73,19 @@ class GmsLocationProvider : LocationProvider() {
                 }
         }
     }
+
+    private fun locationPermissions(): Array<String> =
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            )
+        else
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+            )
 
     private inline fun <S> withActivity(
         block: (ComponentActivity) -> Result<LocationError, S>
@@ -136,7 +157,7 @@ class GmsLocationProvider : LocationProvider() {
 
     override fun unsub() {
         withActivity { activity ->
-            _onLocation.load()?.let { listener ->
+            _onLocation.exchange(newValue = null)?.let { listener ->
                 LocationServices.getFusedLocationProviderClient(activity)
                     .removeLocationUpdates(listener)
             }

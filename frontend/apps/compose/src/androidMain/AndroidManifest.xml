@@ -30,18 +30,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".BegoForegroundService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="specialUse"
-            >
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="@string/foreground_service_explanation"
-                />
-        </service>
-
     </application>
 
 </manifest>
