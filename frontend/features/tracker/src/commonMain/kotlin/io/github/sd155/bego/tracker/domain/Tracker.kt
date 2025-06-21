@@ -52,8 +52,8 @@ internal class Tracker {
                             last = filteredPoint
                         )
                             .apply {
-                                if (this.distance >= 1000.0) stop()
                                 _state.value = this
+                                if (this.distance >= 1000.0) stop()
                             }
                     }
                 }
