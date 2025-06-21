@@ -44,23 +44,38 @@ internal fun TrackerView(
             BegoHeaderText(text = state.time)
             BegoBodyLargeText(text = state.distance)
         }
-        when (state.status) {
-            TrackerStatus.Initial ->
-                BegoAccentFilledButton(
-                    onClick = onStart,
-                    label = stringResource(Res.string.start_action),
-                )
-            TrackerStatus.Running ->
-                BegoWarningFilledButton(
-                    onClick = onStop,
-                    label = stringResource(Res.string.stop_action),
-                )
-            TrackerStatus.Finished ->
-                BegoPrimaryFilledButton(
-                    onClick = onReset,
-                    label = stringResource(Res.string.reset_action),
-                )
-        }
+        TrackerAction(
+            status = state.status,
+            onStart = onStart,
+            onStop = onStop,
+            onReset = onReset,
+        )
         Spacer(modifier = Modifier.height(BegoTheme.sizes.contentVerticalPadding))
+    }
+}
+
+@Composable
+private fun TrackerAction(
+    status: TrackerStatus,
+    onStart: () -> Unit,
+    onStop: () -> Unit,
+    onReset: () -> Unit,
+) {
+    when (status) {
+        TrackerStatus.Initial ->
+            BegoAccentFilledButton(
+                onClick = onStart,
+                label = stringResource(Res.string.start_action),
+            )
+        TrackerStatus.Running ->
+            BegoWarningFilledButton(
+                onClick = onStop,
+                label = stringResource(Res.string.stop_action),
+            )
+        TrackerStatus.Finished ->
+            BegoPrimaryFilledButton(
+                onClick = onReset,
+                label = stringResource(Res.string.reset_action),
+            )
     }
 }
