@@ -28,9 +28,9 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun TrackerView(
     state: TrackerViewState,
-    onStart: () -> Unit,
-    onStop: () -> Unit,
-    onReset: () -> Unit,
+    onStart: () -> Unit = {},
+    onStop: () -> Unit = {},
+    onReset: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
