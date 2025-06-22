@@ -10,7 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import bego.features.tracker.generated.resources.Res
+import bego.features.tracker.generated.resources.distance_template
+import bego.features.tracker.generated.resources.finish_template
+import bego.features.tracker.generated.resources.pace_template
 import bego.features.tracker.generated.resources.reset_action
+import bego.features.tracker.generated.resources.speed_template
 import bego.features.tracker.generated.resources.start_action
 import bego.features.tracker.generated.resources.stop_action
 import io.github.sd155.bego.theme.BegoAccentFilledButton
@@ -41,8 +45,15 @@ internal fun TrackerView(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            if (state.targetDistance.isNotBlank())
+                BegoBodyLargeText(text = stringResource(Res.string.finish_template, state.targetDistance))
             BegoHeaderText(text = state.time)
-            BegoBodyLargeText(text = state.distance)
+            if (state.pace.isNotBlank())
+                BegoBodyLargeText(text = stringResource(Res.string.pace_template, state.pace))
+            if (state.speed.isNotBlank())
+                BegoBodyLargeText(text = stringResource(Res.string.speed_template, state.speed))
+            if (state.distance.isNotBlank())
+                BegoBodyLargeText(text = stringResource(Res.string.distance_template, state.distance))
         }
         TrackerAction(
             status = state.status,

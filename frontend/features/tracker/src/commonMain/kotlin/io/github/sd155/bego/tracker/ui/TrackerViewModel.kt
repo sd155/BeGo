@@ -21,8 +21,11 @@ internal class TrackerViewModel : ViewModel() {
     private val _formatter by lazy { UiFormatter() }
     private val _state = MutableStateFlow(TrackerViewState(
         time = _formatter.format(timeMs = 0L),
-        distance = _formatter.format(distanceMeter = 0.0),
-        TrackerStatus.Initial
+        targetDistance = _formatter.format(distanceMeters = 0.0),
+        distance = _formatter.format(distanceMeters = 0.0),
+        pace = "",
+        speed = "",
+        status = TrackerStatus.Initial,
     ))
     internal val state: StateFlow<TrackerViewState> = _state.asStateFlow()
 
@@ -34,9 +37,17 @@ internal class TrackerViewModel : ViewModel() {
     }
 
     private fun collectTrackerState(state: TrackerState) {
+        val speed =
+            if (state.distance > 0.0 && state.time > 0L)
+                (state.distance.toFloat() / (state.time / 1000f)) * 3.6f
+            else 0f
+        val pace = if (speed > 0f) 60f / speed else 0f
         _state.value = _state.value.copy(
             time = _formatter.format(timeMs = state.time),
-            distance = _formatter.format(distanceMeter = state.distance),
+            targetDistance = _formatter.format(distanceMeters = state.finish),
+            distance = _formatter.format(distanceMeters = state.distance),
+            speed = _formatter.formatSpeed(speedKph = speed),
+            pace = _formatter.formatPace(paceMpk = pace),
             status =
                 if (state.running) TrackerStatus.Running
                 else if (state.time > 0L) TrackerStatus.Finished
@@ -64,8 +75,23 @@ internal class UiFormatter {
         return "%02d : %02d . %02d".format(minutes, seconds, centiSeconds)
     }
 
-    internal fun format(distanceMeter: Double): String {
-        val distance = distanceMeter.toInt()
-        return "$distance"
+    internal fun format(distanceMeters: Double): String {
+        val distance = distanceMeters.toInt()
+        return if (distance > 0) "$distance" else ""
+    }
+
+    internal fun formatSpeed(speedKph: Float): String {
+        return if (speedKph > 0f) "%.1f".format(speedKph) else ""
+    }
+
+    internal fun formatPace(paceMpk: Float): String {
+        return if (paceMpk > 0f) {
+            val minutes = paceMpk.toInt()
+            val seconds = ((paceMpk - minutes) * 60).toInt()
+            "%02d:%02d".format(minutes, seconds)
+        }
+        else {
+            ""
+        }
     }
 }

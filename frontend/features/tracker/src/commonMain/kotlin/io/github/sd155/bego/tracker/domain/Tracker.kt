@@ -14,6 +14,7 @@ import kotlin.math.cos
 import kotlin.math.sqrt
 
 internal class Tracker {
+    private val _targetDistance = 1000.0
     private val _logger by lazy { Inject.instance<Logger>(trackerModuleName) }
     private val _scope by lazy { CoroutineScope(Dispatchers.Default) }
     private val _stopwatch by lazy { Stopwatch() }
@@ -53,7 +54,7 @@ internal class Tracker {
                         )
                             .apply {
                                 _state.value = this
-                                if (this.distance >= 1000.0) stop()
+                                if (this.distance >= _targetDistance) stop()
                             }
                     }
                 }
@@ -67,6 +68,7 @@ internal class Tracker {
     internal suspend fun start() {
         _stopwatch.start()
         _location.sub(::handleTrackPoint)
+        _state.value = _state.value.copy(finish = _targetDistance)
     }
 
     internal fun stop() {
