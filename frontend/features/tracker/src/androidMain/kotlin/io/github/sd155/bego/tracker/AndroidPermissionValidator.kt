@@ -13,6 +13,10 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * Helper for checking and requesting Android runtime location permissions.
+ * Handles permission dialogs and result callbacks.
+ */
 @OptIn(ExperimentalAtomicApi::class)
 class AndroidPermissionValidator(
     private val logger: Logger? = null,
@@ -20,6 +24,9 @@ class AndroidPermissionValidator(
     private val _activityResultLauncher = AtomicReference<ActivityResultLauncher<Array<String>>?>(value = null)
     private val _request = AtomicReference<PermissionRequest?>(value = null)
 
+    /**
+     * Sets up the permission result launcher for the given activity.
+     */
     fun setup(activity: ComponentActivity) {
         _activityResultLauncher.store(
             newValue = activity.registerForActivityResult(
@@ -33,6 +40,9 @@ class AndroidPermissionValidator(
         _request.load()?.onResponse(results)
             ?: run { logger?.warn(event = "Called onActivityCallback with no request!") }
 
+    /**
+     * Checks if all given permissions are granted in the given context.
+     */
     fun check(
         context: Context,
         permissions: Array<String>,
@@ -44,6 +54,10 @@ class AndroidPermissionValidator(
         return true
     }
 
+    /**
+     * Checks and requests any missing permissions from the user.
+     * Suspends until the user responds.
+     */
     suspend fun checkAndRequest(
         activity: ComponentActivity,
         permissions: Array<String>,

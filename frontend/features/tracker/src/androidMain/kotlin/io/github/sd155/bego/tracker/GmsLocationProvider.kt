@@ -33,6 +33,10 @@ import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * Android implementation of LocationProvider using Google Play Services (Fused Location Provider).
+ * Handles permission checks, location settings, and delivers TrackPoint updates.
+ */
 @OptIn(ExperimentalAtomicApi::class)
 class GmsLocationProvider : LocationProvider() {
     private val _locationIntervalMs = 1000L
@@ -42,18 +46,18 @@ class GmsLocationProvider : LocationProvider() {
     private val _locationRequest = AtomicReference<LocationRequest?>(null)
     private val _onLocation = AtomicReference<GmsLocationListener?>(null)
 
-    fun setActivity(activity: ComponentActivity) {
+    internal fun setActivity(activity: ComponentActivity) {
         _activityRef.store(WeakReference(activity))
         _permissions.setup(activity)
     }
 
-    fun onLostForeground(context: Context) {
+    internal fun onLostForeground(context: Context) {
         _onLocation.load()?.let {
             TrackerForegroundService.startService(context)
         }
     }
 
-    fun onResumeForeground(context: Context) =
+    internal fun onResumeForeground(context: Context) =
         TrackerForegroundService.stopService(context)
 
     override suspend fun start(): Result<LocationError, Unit> {

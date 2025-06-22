@@ -4,11 +4,12 @@
 
 ## Purpose
 The application helps runners:
-- Track their running sessions with precise timing
-- Record total and lap times
+- Track their running sessions with precise timing and distance
+- View real-time distance speed and pace
 
 ## Functionality
-- **Stopwatch**: Precise stopwatch functionality with lap recording
+- **Running Tracker**: Accurate running session tracking with smoothed GPS, speed, and pace display
+- **Stopwatch**: Precise timing for running sessions
 
 ## Supported Platforms
 - **Android**: Full native support with Material Design 3
@@ -33,7 +34,7 @@ The application helps runners:
 ├── features/                     # KMP project features
 │   ├── di-kodein/                # Shared DI module (Kodein DI)
 │   ├── theme/                    # App theme module
-│   └── tracker/                    # Tracker feature module
+│   └── tracker/                  # Running tracker feature module
 │
 ├── gradle/                       # Gradle wrapper
 │   └── wrapper/
@@ -50,5 +51,5 @@ The application helps runners:
 ## Frontend Features
 
 - App theme system, [more details](./features/theme/README.md)
-- Tracker functionality, [more details](./features/tracker/README.md)
+- Running tracker with smoothed GPS, speed, and pace, [more details](./features/tracker/README.md)
 - Dependency injection system (Kodein DI), [more details](./features/di-kodein/README.md)
