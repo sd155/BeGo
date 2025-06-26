@@ -14,10 +14,11 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import io.github.sd155.bego.di.Inject
-import io.github.sd155.bego.result.Result
-import io.github.sd155.bego.result.asFailure
-import io.github.sd155.bego.result.asSuccess
-import io.github.sd155.bego.result.next
+import io.github.sd155.bego.utils.Result
+import io.github.sd155.bego.utils.SafeContinuation
+import io.github.sd155.bego.utils.asFailure
+import io.github.sd155.bego.utils.asSuccess
+import io.github.sd155.bego.utils.next
 import io.github.sd155.bego.tracker.di.trackerModuleName
 import io.github.sd155.bego.tracker.domain.LocationError
 import io.github.sd155.bego.tracker.domain.LocationProvider

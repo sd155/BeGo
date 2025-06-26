@@ -1,4 +1,4 @@
-# Result Module
+# Utils Module
 
 This module provides a typed result abstraction for handling success and failure cases in a type-safe, multiplatform way. It is used throughout the [BeGo frontend application](../../README.md) for error handling and functional-style result chaining.
 

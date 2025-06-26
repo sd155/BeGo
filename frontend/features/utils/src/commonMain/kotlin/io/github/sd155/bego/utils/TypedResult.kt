@@ -1,4 +1,4 @@
-package io.github.sd155.bego.result
+package io.github.sd155.bego.utils
 
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind

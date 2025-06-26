@@ -24,7 +24,7 @@ kotlin {
     sourceSets {        
         commonMain.dependencies {
             implementation(projects.features.diKodein)
-            implementation(projects.features.result)
+            implementation(projects.features.utils)
             implementation(projects.features.theme)
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.compose.android.lifecycle.viewmodel)

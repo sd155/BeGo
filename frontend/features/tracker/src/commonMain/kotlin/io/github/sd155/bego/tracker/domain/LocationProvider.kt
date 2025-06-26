@@ -1,6 +1,6 @@
 package io.github.sd155.bego.tracker.domain
 
-import io.github.sd155.bego.result.Result
+import io.github.sd155.bego.utils.Result
 
 /**
  * Abstract base class for platform-specific location providers.
