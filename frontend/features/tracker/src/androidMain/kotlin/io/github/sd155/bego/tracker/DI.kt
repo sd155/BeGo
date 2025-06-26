@@ -28,6 +28,17 @@ class AndroidTrackerModuleDi {
     fun onPauseActivity(activity: ComponentActivity) =
         locationProvider().onLostForeground(activity)
 
+    /**
+     * Call from Activity.onDestroy to handle activity destruction.
+     */
+    fun onDestroyActivity() = locationProvider().onActivityDestroyed()
+
+    /**
+     * Call from Activity.onActivityResult to handle location settings resolution.
+     */
+    fun onActivityResult(requestCode: Int, resultCode: Int) =
+        locationProvider().onActivityResult(requestCode, resultCode)
+
     private fun locationProvider(): GmsLocationProvider =
         Inject.instance<LocationProvider>()
             .let { instance ->

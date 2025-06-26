@@ -44,8 +44,23 @@ class GmsLocationProvider : LocationProvider() {
     private val _logger by lazy { Inject.instance<Logger>(tag = trackerModuleName) }
     private val _permissions by lazy { AndroidPermissionValidator(_logger) }
     private val _activityRef = AtomicReference<WeakReference<ComponentActivity>?>(null)
-    private val _locationRequest = AtomicReference<LocationRequest?>(null)
+    private val _locationRequest by lazy {
+        LocationRequest
+            .Builder(Priority.PRIORITY_HIGH_ACCURACY, _locationIntervalMs)
+            .setMinUpdateIntervalMillis(_locationIntervalMs)
+            .build()
+    }
     private val _onLocation = AtomicReference<GmsLocationListener?>(null)
+    private val _settingsContinuation by lazy {
+        SafeContinuation<Result<LocationError, Unit>>(
+            onAlreadyResumed = { _logger.warn(event = "System location settings continuation is already resumed!") },
+            onNotResumed = { continuation ->
+                _logger.warn(event = "System location settings continuation is not resumed yet! Resuming it with error to release..")
+                continuation.resume(LocationError.IllegalState.asFailure())
+            }
+        )
+    }
+    private val _settingsRequestCode = 123
 
     internal fun setActivity(activity: ComponentActivity) {
         _activityRef.store(WeakReference(activity))
@@ -61,8 +76,24 @@ class GmsLocationProvider : LocationProvider() {
     internal fun onResumeForeground(context: Context) =
         TrackerForegroundService.stopService(context)
 
-    override suspend fun start(): Result<LocationError, Unit> {
-        return withActivity { activity ->
+    internal fun onActivityDestroyed() {
+        _settingsContinuation.close()
+    }
+
+    internal fun onActivityResult(requestCode: Int, resultCode: Int) {
+        if (requestCode == _settingsRequestCode) {
+            if (resultCode == android.app.Activity.RESULT_OK) {
+                _logger.info(event = "Location settings resolution successful")
+                _settingsContinuation.resume(Unit.asSuccess())
+            } else {
+                _logger.info(event = "Location settings resolution cancelled by user")
+                _settingsContinuation.resume(LocationError.SettingsDeniedByUser.asFailure())
+            }
+        }
+    }
+
+    override suspend fun start(): Result<LocationError, Unit> =
+        withActivity { activity ->
             _permissions.checkAndRequest(
                 activity = activity,
                 permissions = locationPermissions()
@@ -72,12 +103,7 @@ class GmsLocationProvider : LocationProvider() {
                     else LocationError.PermissionsDeniedByUser.asFailure()
                 }
                 .next { checkLocationSettings(activity) }
-                .next { locationRequest ->
-                    _locationRequest.store(locationRequest)
-                    Unit.asSuccess()
-                }
         }
-    }
 
     private fun locationPermissions(): Array<String> =
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
@@ -102,15 +128,11 @@ class GmsLocationProvider : LocationProvider() {
             block(activity)
     }
 
-    private suspend fun checkLocationSettings(activity: ComponentActivity): Result<LocationError, LocationRequest> {
-        val request = LocationRequest
-            .Builder(Priority.PRIORITY_HIGH_ACCURACY, _locationIntervalMs)
-            .setMinUpdateIntervalMillis(_locationIntervalMs)
-            .build()
+    private suspend fun checkLocationSettings(activity: ComponentActivity): Result<LocationError, Unit> {
         return suspendCoroutine { continuation ->
             val settingsRequest = LocationSettingsRequest
                 .Builder()
-                .addLocationRequest(request)
+                .addLocationRequest(_locationRequest)
                 .build()
             LocationServices.getSettingsClient(activity)
                 .checkLocationSettings(settingsRequest)
@@ -118,8 +140,8 @@ class GmsLocationProvider : LocationProvider() {
                     if (e is ResolvableApiException) {
                         try {
                             _logger.info(event = "Location system settings are not relevant, trying to resolve..")
-                            val requestCode = 123
-                            e.startResolutionForResult(activity, requestCode)
+                            _settingsContinuation.store(continuation)
+                            e.startResolutionForResult(activity, _settingsRequestCode)
                         }
                         catch (sendEx: IntentSender.SendIntentException) {
                             _logger.warn(event = "Failed to start location settings resolution!", e = sendEx)
@@ -135,7 +157,6 @@ class GmsLocationProvider : LocationProvider() {
                     continuation.resume(Unit.asSuccess())
                 }
         }
-            .next { request.asSuccess() }
     }
 
     private class GmsLocationListener(
@@ -173,14 +194,12 @@ class GmsLocationProvider : LocationProvider() {
     override suspend fun sub(onUpdate: (TrackPoint) -> Unit): Result<LocationError, Unit> {
         return try {
             withActivity  { activity ->
-                val request = _locationRequest.load()
-                    ?: return LocationError.NotStarted.asFailure()
                 val listener = GmsLocationListener(onUpdate)
                 _onLocation.store(listener)
                 getExecutorOrNull()
                     ?.let { executor ->
                         LocationServices.getFusedLocationProviderClient(activity)
-                            .requestLocationUpdates(request, executor, listener)
+                            .requestLocationUpdates(_locationRequest, executor, listener)
                         Unit.asSuccess()
                     }
                     ?: let {
@@ -191,7 +210,7 @@ class GmsLocationProvider : LocationProvider() {
                                 return LocationError.IllegalState.asFailure()
                             }
                         LocationServices.getFusedLocationProviderClient(activity)
-                            .requestLocationUpdates(request, listener, looper)
+                            .requestLocationUpdates(_locationRequest, listener, looper)
                         Unit.asSuccess()
                     }
             }

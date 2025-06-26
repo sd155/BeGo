@@ -4,5 +4,4 @@ internal sealed class LocationError {
     data object IllegalState : LocationError()
     data object PermissionsDeniedByUser : LocationError()
     data object SettingsDeniedByUser : LocationError()
-    data object NotStarted : LocationError()
 }
