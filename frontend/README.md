@@ -35,7 +35,7 @@ The application helps runners:
 │   ├── di-kodein/                # Shared DI module (Kodein DI)
 │   ├── theme/                    # App theme module
 │   ├── tracker/                  # Running tracker feature module
-│   └── result/                   # Typed result/error handling module
+│   └── utils/                    # Multiplatform utilities: typed result, SafeContinuation, etc.
 │
 ├── gradle/                       # Gradle wrapper
 │   └── wrapper/
@@ -54,4 +54,4 @@ The application helps runners:
 - App theme system, [more details](./features/theme/README.md)
 - Running tracker with smoothed GPS, speed, and pace, [more details](./features/tracker/README.md)
 - Dependency injection system (Kodein DI), [more details](./features/di-kodein/README.md)
-- Typed result/error handling, [more details](./features/result/README.md)
+- Multiplatform utilities (typed result, SafeContinuation, etc.), [more details](./features/utils/README.md)
