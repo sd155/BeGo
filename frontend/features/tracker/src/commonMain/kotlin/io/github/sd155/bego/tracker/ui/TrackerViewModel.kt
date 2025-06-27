@@ -37,17 +37,12 @@ internal class TrackerViewModel : ViewModel() {
     }
 
     private fun collectTrackerState(state: TrackerState) {
-        val speed =
-            if (state.distance > 0.0 && state.time > 0L)
-                (state.distance.toFloat() / (state.time / 1000f)) * 3.6f
-            else 0f
-        val pace = if (speed > 0f) 60f / speed else 0f
         _state.value = _state.value.copy(
             time = _formatter.format(timeMs = state.time),
             targetDistance = _formatter.format(distanceMeters = state.finish),
             distance = _formatter.format(distanceMeters = state.distance),
-            speed = _formatter.formatSpeed(speedKph = speed),
-            pace = _formatter.formatPace(paceMpk = pace),
+            speed = _formatter.formatSpeed(speedKph = state.speed),
+            pace = _formatter.formatPace(paceMpk = state.pace),
             status =
                 if (state.running) TrackerStatus.Running
                 else if (state.time > 0L) TrackerStatus.Finished

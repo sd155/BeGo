@@ -48,8 +48,12 @@ internal class Tracker {
                     val distance = approximateDistance(last, filteredPoint)
                     _logger.debug("Distance check, speed: ${filteredPoint.speedMetersPerSecond}[${point.speedMetersPerSecond}]m/s, distance:${distance}m ? accuracy:${last.horizontalAccuracyMeters}m")
                     if (filteredPoint.speedMetersPerSecond > 0f && distance > last.horizontalAccuracyMeters) {
+                        val speed = (distance.toFloat() / (state.time / 1000f)) * 3.6f
+                        val pace = if (speed > 0f) 60f / speed else 0f
                         state.copy(
                             distance = state.distance + distance,
+                            speed = speed,
+                            pace = pace,
                             last = filteredPoint
                         )
                             .apply {
