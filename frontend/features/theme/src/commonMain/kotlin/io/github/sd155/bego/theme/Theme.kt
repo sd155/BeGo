@@ -3,6 +3,8 @@ package io.github.sd155.bego.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
  * Main theme composable for the Bego application.
@@ -16,6 +18,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 fun BegoTheme(
     screen: DeviceScreen = DeviceScreen.Small,
     isDarkTheme: Boolean = isSystemInDarkTheme(),
+    platformIcons: PlatformIcons,
     content: @Composable () -> Unit
 ) {
     val colors = begoPalette(isDarkTheme = isDarkTheme)
@@ -28,6 +31,7 @@ fun BegoTheme(
         LocalBegoTypography provides typography,
         LocalBegoShapes provides shapes,
         LocalBegoSizes provides sizes,
+        LocalPlatformIcons provides platformIcons,
         content = content
     )
 }
@@ -68,6 +72,10 @@ object BegoTheme {
     val sizes: BegoSizes
         @Composable
         get() = LocalBegoSizes.current
+
+    val platformIcons: PlatformIcons
+        @Composable
+        get() = LocalPlatformIcons.current
 }
 
 /**
@@ -79,4 +87,13 @@ enum class DeviceScreen {
     Small,
     /** Medium screen size (e.g., tablets) */
     Medium
+}
+
+interface PlatformIcons {
+    fun check(): ImageVector
+    fun dropDown(): ImageVector
+}
+
+internal val LocalPlatformIcons = staticCompositionLocalOf<PlatformIcons> {
+    error("No platform icons provided")
 }

@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
 import io.github.sd155.bego.di.Inject
+import io.github.sd155.bego.theme.AndroidPlatformIcons
 import io.github.sd155.bego.theme.screenSize
 import io.github.sd155.bego.tracker.AndroidTrackerModuleDi
 
@@ -22,6 +23,7 @@ internal class BegoActivity : ComponentActivity() {
             ) {
                 App(
                     screen = screenSize(),
+                    platformIcons = AndroidPlatformIcons()
                 )
             }
         }

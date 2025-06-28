@@ -1,6 +1,10 @@
 package io.github.sd155.bego.theme
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 
 /**
@@ -15,3 +19,9 @@ fun screenSize(): DeviceScreen =
         DeviceScreen.Small
     else
         DeviceScreen.Medium
+
+class AndroidPlatformIcons : PlatformIcons {
+
+    override fun check(): ImageVector = Icons.Default.Check
+    override fun dropDown(): ImageVector = Icons.Default.ArrowDropDown
+}

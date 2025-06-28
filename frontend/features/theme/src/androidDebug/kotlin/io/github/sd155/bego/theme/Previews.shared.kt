@@ -40,6 +40,7 @@ const val TV_SPEC = "spec:width=960dp,height=540dp,dpi=320,isRound=false,chinSiz
 fun ThemedPreview(content: @Composable () -> Unit) {
     BegoTheme(
         screen = screenSize(),
+        platformIcons = AndroidPlatformIcons(),
         content = content,
     )
 }
