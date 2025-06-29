@@ -1,6 +1,8 @@
 package io.github.sd155.bego.theme
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -8,9 +10,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -208,3 +217,62 @@ fun BegoBodyLargeText(
         style = BegoTheme.typography.bodyL,
     )
 }
+
+/**
+ * A composable dropdown menu for selecting from a list of items.
+ *
+ * Displays the currently selected item's text and an icon. When clicked, shows a dropdown menu with all available items.
+ * Selecting an item will call [onItemSelected] with the selected item and close the menu.
+ *
+ * @param dropdownItems The list of items to display in the dropdown menu.
+ * @param selectedItemText The text of the currently selected item to display in the field.
+ * @param onItemSelected Callback invoked when an item is selected.
+ */
+@Composable
+fun BegoDropDown(
+    dropdownItems: List<BegoDropDownItemData>,
+    selectedItemText: String,
+    onItemSelected: (BegoDropDownItemData) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Column {
+        Row {
+            BegoBodyLargeText(text = selectedItemText)
+            IconButton(
+                onClick = { expanded = true },
+            ) {
+                Icon(
+                    imageVector = BegoTheme.platformIcons.dropDown(),
+                    contentDescription = null,
+                    tint = BegoTheme.palette.primary,
+                )
+            }
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            dropdownItems.forEach { item ->
+                DropdownMenuItem(
+                    onClick = {
+                        onItemSelected(item)
+                        expanded = false
+                    }
+                ) {
+                    BegoBodyLargeText(text = item.text)
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Data class representing an item in the [BegoDropDown] menu.
+ *
+ * @param id Unique identifier for the item (can be used for selection logic).
+ * @param text The text to display for this item in the dropdown.
+ */
+data class BegoDropDownItemData(
+    val id: Int,
+    val text: String,
+)
