@@ -35,9 +35,13 @@ BegoTheme.sizes
 - **Typography**: Provides text styles for headers, labels, and body text
 - **Shapes**: Defines shapes for UI elements like buttons
 - **Sizes**: Manages consistent dimensions for icons, padding, and other UI elements
+- **PlatformIcons**: Interface for providing icons (e.g., checkmark, dropdown arrow) in a platform-agnostic way.
 
 ### Preview Utilities
 The module includes preview utilities for Android Studio (Android target):
 - Device specifications for different screen sizes and orientations
 - Locale constants for internationalization testing
 - `ThemedPreview` composable for previewing with the Bego theme applied
+
+### Platform Icons
+The theme system supports platform-specific icons via the [PlatformIcons] interface. This allows your UI to use native icons for each platform (Android, iOS, etc).

@@ -20,6 +20,10 @@ fun screenSize(): DeviceScreen =
     else
         DeviceScreen.Medium
 
+/**
+ * Android implementation of [PlatformIcons].
+ * Provides Material icons for checkmark and dropdown arrow.
+ */
 class AndroidPlatformIcons : PlatformIcons {
 
     override fun check(): ImageVector = Icons.Default.Check

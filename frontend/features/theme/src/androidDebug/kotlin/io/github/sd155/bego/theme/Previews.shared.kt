@@ -31,9 +31,10 @@ const val PHONE_PORT_SPEC = "spec:width=393dp,height=851dp,dpi=440,isRound=false
 const val TV_SPEC = "spec:width=960dp,height=540dp,dpi=320,isRound=false,chinSize=0dp,orientation=landscape,cutout=none,navigation=gesture"
 
 /**
- * A preview composable that wraps content with the Bego theme.
- * This is used for previewing composables in Android Studio with the correct theme applied.
- * 
+ * A preview composable that wraps content with the Bego theme and platform icons.
+ *
+ * Use this in Android Studio previews to ensure your composable is shown with the correct theme, icons, and device configuration.
+ *
  * @param content The composable content to be previewed with the theme applied
  */
 @Composable
