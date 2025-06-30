@@ -27,5 +27,6 @@ fun TrackerScreen() {
         onStart = { viewModel.onViewIntent(TrackerViewIntent.Start) },
         onStop = { viewModel.onViewIntent(TrackerViewIntent.Stop) },
         onReset = { viewModel.onViewIntent(TrackerViewIntent.Reset) },
+        onSetTarget = { viewModel.onViewIntent(TrackerViewIntent.SetTarget(it)) },
     )
 }

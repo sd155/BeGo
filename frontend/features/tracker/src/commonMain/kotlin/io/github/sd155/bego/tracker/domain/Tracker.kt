@@ -85,6 +85,12 @@ internal class Tracker {
         _state.value = TrackerState()
     }
 
+    internal fun setTargetDistance(distance: Double) {
+        if (!_state.value.running) {
+            _state.value = _state.value.copy(finish = distance)
+        }
+    }
+
     /**
      * That is simplified flat-Earth approximation.
      * That one has accuracy like Haversine but faster.

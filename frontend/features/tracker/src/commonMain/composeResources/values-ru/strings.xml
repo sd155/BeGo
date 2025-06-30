@@ -3,8 +3,8 @@
     <string name="start_action">Старт</string>
     <string name="stop_action">Стоп</string>
     <string name="reset_action">Сбросить</string>
-    <string name="finish_template">Цель: %1$sм</string>
-    <string name="distance_template">%1$sм</string>
+    <string name="finish_template">Цель: %1$d км</string>
+    <string name="distance_template">Дистанция: %1$s м</string>
     <string name="pace_template">Темп: %1$s мин/км</string>
     <string name="speed_template">Скорость: %1$s км/ч</string>
 </resources> 

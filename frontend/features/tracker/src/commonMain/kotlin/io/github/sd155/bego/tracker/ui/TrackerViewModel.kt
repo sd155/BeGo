@@ -14,41 +14,60 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 
 internal class TrackerViewModel : ViewModel() {
     private val _logger by lazy { Inject.instance<Logger>(tag = trackerModuleName) }
     private val _tracker by lazy { Inject.instance<Tracker>() }
     private val _formatter by lazy { UiFormatter() }
-    private val _state = MutableStateFlow(TrackerViewState(
-        time = _formatter.format(timeMs = 0L),
-        targetDistance = _formatter.format(distanceMeters = 0.0),
-        distance = _formatter.format(distanceMeters = 0.0),
-        pace = "",
-        speed = "",
-        status = TrackerStatus.Initial,
-    ))
+    private val _state = MutableStateFlow(buildInitialState())
     internal val state: StateFlow<TrackerViewState> = _state.asStateFlow()
+
+    companion object {
+        private val _targetsKm = listOf(1, 5, 10, 21, 42)
+    }
 
     init {
         _tracker.state
             .onEach(::collectTrackerState)
-            .launchIn(viewModelScope)
-        viewModelScope.launch(Dispatchers.Default) { _tracker.prepare() }
+            .launchIn(viewModelScope.plus(Dispatchers.Default))
+        viewModelScope.launch(Dispatchers.Default) {
+            _tracker.prepare()
+            _tracker.setTargetDistance(_targetsKm.first() * 1000.0)
+        }
     }
 
     private fun collectTrackerState(state: TrackerState) {
-        _state.value = _state.value.copy(
-            time = _formatter.format(timeMs = state.time),
-            targetDistance = _formatter.format(distanceMeters = state.finish),
-            distance = _formatter.format(distanceMeters = state.distance),
-            speed = _formatter.formatSpeed(speedKph = state.speed),
-            pace = _formatter.formatPace(paceMpk = state.pace),
-            status =
-                if (state.running) TrackerStatus.Running
-                else if (state.time > 0L) TrackerStatus.Finished
-                else TrackerStatus.Initial
-        )
+        _state.value =
+            if (state.running)
+                TrackerViewState.Running(
+                    target = _formatter.formatTarget(distanceMeters = state.finish),
+                    time = _formatter.formatTime(timeMs = state.time),
+                    pace = _formatter.formatPace(paceMpk = state.pace),
+                    speed = _formatter.formatSpeed(speedKph = state.speed),
+                    distance = _formatter.formatDistance(distanceMeters = state.distance),
+                )
+            else if (state.time > 0L)
+                TrackerViewState.Finished(
+                    time = _formatter.formatTime(timeMs = state.time),
+                    pace = _formatter.formatPace(paceMpk = state.pace),
+                    speed = _formatter.formatSpeed(speedKph = state.speed),
+                    distance = _formatter.formatDistance(distanceMeters = state.distance),
+                )
+            else if (state.finish > 0.0)
+                buildInitialState(target = state.finish.toInt() / 1000)
+            else
+                buildInitialState()
     }
+
+    private fun buildInitialState(
+        target: Int = _targetsKm.first()
+    ): TrackerViewState =
+        TrackerViewState.Initial(
+            time = _formatter.formatTime(timeMs = 0L),
+            targets = _targetsKm,
+            selectedTarget = _targetsKm.find { targetKm -> target == targetKm } ?: _targetsKm.first()
+        )
 
     internal fun onViewIntent(intent: TrackerViewIntent) = viewModelScope.launch(Dispatchers.Default) {
         _logger.trace(event = "VM received View Intent: $intent")
@@ -56,13 +75,14 @@ internal class TrackerViewModel : ViewModel() {
             TrackerViewIntent.Start -> _tracker.start()
             TrackerViewIntent.Stop -> _tracker.stop()
             TrackerViewIntent.Reset -> _tracker.reset()
+            is TrackerViewIntent.SetTarget -> _tracker.setTargetDistance(intent.targetKm * 1000.0)
         }
     }
 }
 
 internal class UiFormatter {
 
-    internal fun format(timeMs: Long = 0L): String {
+    internal fun formatTime(timeMs: Long = 0L): String {
         val totalSeconds = timeMs / 1000
         val minutes = totalSeconds / 60
         val seconds = totalSeconds % 60
@@ -70,9 +90,14 @@ internal class UiFormatter {
         return "%02d : %02d . %02d".format(minutes, seconds, centiSeconds)
     }
 
-    internal fun format(distanceMeters: Double): String {
+    internal fun formatDistance(distanceMeters: Double): String {
         val distance = distanceMeters.toInt()
         return if (distance > 0) "$distance" else ""
+    }
+
+    internal fun formatTarget(distanceMeters: Double): Int {
+        val distance = distanceMeters.toInt() / 1000
+        return if (distance > 0) distance else 0
     }
 
     internal fun formatSpeed(speedKph: Float): String {
