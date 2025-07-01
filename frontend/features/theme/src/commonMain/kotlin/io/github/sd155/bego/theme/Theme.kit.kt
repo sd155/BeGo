@@ -1,6 +1,7 @@
 package io.github.sd155.bego.theme
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -249,6 +250,8 @@ fun BegoDropDown(
             }
         }
         DropdownMenu(
+            modifier = Modifier
+                .background(color = BegoTheme.palette.background),
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
