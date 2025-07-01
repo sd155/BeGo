@@ -21,7 +21,7 @@ serialization = "1.8.1"
 coroutines = "1.10.2"
 compose-android-lifecycle = "2.9.0"
 ktor = "3.2.0"
-kmplogs = "0.0.4"
+kmplogs = "0.0.6"
 
 [libraries]
 #Multiplatform
