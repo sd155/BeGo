@@ -92,7 +92,7 @@ internal class UiFormatter {
 
     internal fun formatDistance(distanceMeters: Double): String {
         val distance = distanceMeters.toInt()
-        return if (distance > 0) "$distance" else ""
+        return if (distance > 0) "$distance" else "0"
     }
 
     internal fun formatTarget(distanceMeters: Double): Int {
@@ -101,7 +101,7 @@ internal class UiFormatter {
     }
 
     internal fun formatSpeed(speedKph: Float): String {
-        return if (speedKph > 0f) "%.1f".format(speedKph) else ""
+        return if (speedKph > 0f) "%.1f".format(speedKph) else "0.0"
     }
 
     internal fun formatPace(paceMpk: Float): String {
@@ -111,7 +111,7 @@ internal class UiFormatter {
             "%02d:%02d".format(minutes, seconds)
         }
         else {
-            ""
+            "00:00"
         }
     }
 }
