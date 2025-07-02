@@ -4,7 +4,7 @@
     <string name="stop_action">Stop</string>
     <string name="reset_action">Reset</string>
     <string name="finish_template">Target: %1$d km</string>
-    <string name="distance_template">Distance: %1$s m</string>
+    <string name="distance_template">Done: %1$s m</string>
     <string name="pace_template">Pace: %1$s min/km</string>
     <string name="speed_template">Speed: %1$s km/h</string>
 </resources> 
