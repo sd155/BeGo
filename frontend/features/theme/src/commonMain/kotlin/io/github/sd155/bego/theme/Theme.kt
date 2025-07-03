@@ -12,14 +12,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
  * Provides a consistent design system across the app including colors, typography, shapes, sizes, and platform icons.
  * Should wrap your app's content at the root level.
  *
- * @param screen The device screen size to adapt the theme for. Defaults to [DeviceScreen.Small].
+ * @param screen The device screen size to adapt the theme for. Defaults to [DeviceScreen.Compact].
  * @param isDarkTheme Whether to use dark theme. Defaults to system preference.
  * @param platformIcons The [PlatformIcons] implementation for the current platform.
  * @param content The content to be themed.
  */
 @Composable
 fun BegoTheme(
-    screen: DeviceScreen = DeviceScreen.Small,
+    screen: DeviceScreen = DeviceScreen.Compact,
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     platformIcons: PlatformIcons,
     content: @Composable () -> Unit
@@ -97,8 +97,8 @@ object BegoTheme {
  * Used to adapt the theme for different screen sizes.
  */
 enum class DeviceScreen {
-    /** Small screen size (e.g., phones) */
-    Small,
+    /** Compact screen size (e.g., phones) */
+    Compact,
     /** Medium screen size (e.g., tablets) */
     Medium
 }

@@ -22,7 +22,7 @@ class BegoTypography(
 )
 
 internal fun begoTypography(screen: DeviceScreen) = when (screen) {
-    DeviceScreen.Small ->
+    DeviceScreen.Compact ->
         BegoTypography(
             header = TextStyle(
                 fontWeight = FontWeight.W400,
