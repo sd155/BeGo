@@ -42,7 +42,7 @@ private fun TrackerRunningPreview() {
                 time = formatter.formatTime(timeMs = 35665L),
                 target = formatter.formatTarget(distanceMeters = 1000.0),
                 distance = formatter.formatDistance(distanceMeters = 123.0),
-                pace = formatter.formatPace(paceMpk = 3.55f),
+                pace = formatter.formatPace(paceMsPerKm = 1235L),
                 speed = formatter.formatSpeed(speedKph = 15.5f),
             ),
         )
@@ -60,7 +60,7 @@ private fun TrackerFinishedPreview() {
             state = TrackerViewState.Finished(
                 time = formatter.formatTime(timeMs = 155665L),
                 distance = formatter.formatDistance(distanceMeters = 1023.5),
-                pace = formatter.formatPace(paceMpk = 4.55f),
+                pace = formatter.formatPace(paceMsPerKm = 4567L),
                 speed = formatter.formatSpeed(speedKph = 11.5f),
             ),
         )
