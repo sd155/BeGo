@@ -47,8 +47,8 @@ internal class Tracker {
                     val distance = approximateDistance(last, filteredPoint)
                     _logger.debug("Distance check, speed: ${filteredPoint.speedMetersPerSecond}[${point.speedMetersPerSecond}]m/s, distance:${distance}m ? accuracy:${last.horizontalAccuracyMeters}m")
                     if (filteredPoint.speedMetersPerSecond > 0f && distance > last.horizontalAccuracyMeters) {
-                        val speed = (state.distance.toFloat() / (state.time / 1000f)) * 3.6f
-                        val pace = if (speed > 0f) 60f / speed else 0f
+                        val speed = calculateSpeedKph(state.distance, state.time)
+                        val pace = calculatePaceMsPerKm(state.distance, state.time)
                         state.copy(
                             distance = state.distance + distance,
                             speed = speed,
@@ -67,6 +67,18 @@ internal class Tracker {
                 }
         }
     }
+
+    private fun calculateSpeedKph(distanceMeters: Double, timeMs: Long): Float =
+        if (distanceMeters >= 0.0 && timeMs >= 0L)
+            (distanceMeters / (timeMs / 1000f) * 3.6).toFloat()
+        else
+            0f
+
+    private fun calculatePaceMsPerKm(distanceMeters: Double, timeMs: Long): Long =
+        if (distanceMeters >= 0.0 && timeMs >= 0L)
+            ((timeMs.toDouble() / distanceMeters) * 1000.0).toLong()
+        else
+            0L
 
     internal suspend fun start() {
         _stopwatch.start()

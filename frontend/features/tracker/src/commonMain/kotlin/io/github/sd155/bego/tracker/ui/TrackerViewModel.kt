@@ -43,14 +43,14 @@ internal class TrackerViewModel : ViewModel() {
                 TrackerViewState.Running(
                     target = _formatter.formatTarget(distanceMeters = state.finish),
                     time = _formatter.formatTime(timeMs = state.time),
-                    pace = _formatter.formatPace(paceMpk = state.pace),
+                    pace = _formatter.formatPace(paceMsPerKm = state.pace),
                     speed = _formatter.formatSpeed(speedKph = state.speed),
                     distance = _formatter.formatDistance(distanceMeters = state.distance),
                 )
             else if (state.time > 0L)
                 TrackerViewState.Finished(
                     time = _formatter.formatTime(timeMs = state.time),
-                    pace = _formatter.formatPace(paceMpk = state.pace),
+                    pace = _formatter.formatPace(paceMsPerKm = state.pace),
                     speed = _formatter.formatSpeed(speedKph = state.speed),
                     distance = _formatter.formatDistance(distanceMeters = state.distance),
                 )
@@ -104,10 +104,11 @@ internal class UiFormatter {
         return if (speedKph > 0f) "%.1f".format(speedKph) else "0.0"
     }
 
-    internal fun formatPace(paceMpk: Float): String {
-        return if (paceMpk > 0f) {
-            val minutes = paceMpk.toInt()
-            val seconds = ((paceMpk - minutes) * 60).toInt()
+    internal fun formatPace(paceMsPerKm: Long): String {
+        return if (paceMsPerKm > 0L) {
+            val totalSecondsPerKm = paceMsPerKm / 1000
+            val minutes = totalSecondsPerKm / 60
+            val seconds = totalSecondsPerKm % 60
             "%02d:%02d".format(minutes, seconds)
         }
         else {
