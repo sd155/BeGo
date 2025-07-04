@@ -44,13 +44,14 @@ internal class Tracker {
             val filteredPoint = _locationFilter.filter(point)
             state.last
                 ?.let { last ->
-                    val distance = approximateDistance(last, filteredPoint)
-                    _logger.debug("Distance check, speed: ${filteredPoint.speedMetersPerSecond}[${point.speedMetersPerSecond}]m/s, distance:${distance}m ? accuracy:${last.horizontalAccuracyMeters}m")
-                    if (filteredPoint.speedMetersPerSecond > 0f && distance > last.horizontalAccuracyMeters) {
-                        val speed = calculateSpeedKph(state.distance, state.time)
-                        val pace = calculatePaceMsPerKm(state.distance, state.time)
+                    val lastSegmentDistance = approximateDistance(last, filteredPoint)
+                    _logger.debug("Distance check, speed: ${filteredPoint.speedMetersPerSecond}[${point.speedMetersPerSecond}]m/s, distance:${state.distance}+${lastSegmentDistance}m ? accuracy:${last.horizontalAccuracyMeters}m")
+                    if (filteredPoint.speedMetersPerSecond > 0f && lastSegmentDistance > last.horizontalAccuracyMeters) {
+                        val distance = state.distance + lastSegmentDistance
+                        val speed = calculateSpeedKph(distance, state.time)
+                        val pace = calculatePaceMsPerKm(distance, state.time)
                         state.copy(
-                            distance = state.distance + distance,
+                            distance = distance,
                             speed = speed,
                             pace = pace,
                             last = filteredPoint
@@ -69,13 +70,13 @@ internal class Tracker {
     }
 
     private fun calculateSpeedKph(distanceMeters: Double, timeMs: Long): Float =
-        if (distanceMeters >= 0.0 && timeMs >= 0L)
+        if (distanceMeters > 0.0 && timeMs > 0L)
             (distanceMeters / (timeMs / 1000f) * 3.6).toFloat()
         else
             0f
 
     private fun calculatePaceMsPerKm(distanceMeters: Double, timeMs: Long): Long =
-        if (distanceMeters >= 0.0 && timeMs >= 0L)
+        if (distanceMeters > 0.0 && timeMs > 0L)
             ((timeMs.toDouble() / distanceMeters) * 1000.0).toLong()
         else
             0L
