@@ -74,7 +74,10 @@ internal class TrackerViewModel : ViewModel() {
         when (intent) {
             TrackerViewIntent.Start -> _tracker.start()
             TrackerViewIntent.Stop -> _tracker.stop()
-            TrackerViewIntent.Reset -> _tracker.reset()
+            TrackerViewIntent.Reset -> {
+                _tracker.reset()
+                _tracker.setTargetDistance(_targetsKm.first() * 1000.0)
+            }
             is TrackerViewIntent.SetTarget -> _tracker.setTargetDistance(intent.targetKm * 1000.0)
         }
     }
