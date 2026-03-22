@@ -2,19 +2,14 @@
 
 [BeGo](../README.md) is a running training application designed to help users track and improve their running performance. The frontend is built using Kotlin Multiplatform (KMP) technology, allowing for a consistent user experience across multiple platforms.
 
-## Purpose
-The application helps runners:
-- Track their running sessions with precise timing and distance
-- View real-time distance speed and pace
-
-## Functionality
-- **Running Tracker**: Accurate running session tracking with smoothed GPS, speed, and pace display
-- **Stopwatch**: Precise timing for running sessions
-
 ## Supported Platforms
 - **Android**: Full native support with Material Design 3
 - **Aurora**: In progress
 - **iOS**: In progress
+
+## Functionality
+- **Running Tracker**: Accurate running session tracking with smoothed GPS, speed, and pace display
+- **Stopwatch**: Precise timing for running sessions
 
 ## Frontend scheme
 ```text
@@ -24,8 +19,6 @@ The application helps runners:
 │   │   ├── src/                     
 │   │   │   ├── commonMain/    # Shared code across platforms
 │   │   │   ├── androidMain/   # Android-specific code
-│   │   │   ├── desktopMain/   # Desktop-specific code (JVM) (In progress)
-│   │   │   ├── wasmJsMain/   # Web-specific code (WASM/JS) (In progress)
 │   │   │   └── iosMain/       # iOS-specific code (In progress)
 │   │   └── build.gradle.kts   # KMP app module build configuration
 │   │
