@@ -1,7 +1,7 @@
 package io.github.sd155.bego.tracker.domain
 
 import io.github.sd155.bego.di.Inject
-import io.github.sd155.bego.tracker.di.trackerModuleName
+import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.logs.api.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

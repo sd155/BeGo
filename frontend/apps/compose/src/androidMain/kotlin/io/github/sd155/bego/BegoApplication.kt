@@ -3,7 +3,7 @@ package io.github.sd155.bego
 import android.app.Application
 import android.content.pm.ApplicationInfo
 import io.github.sd155.bego.tracker.GmsLocationProvider
-import io.github.sd155.bego.tracker.di.trackerModule
+import io.github.sd155.bego.tracker.app.trackerModule
 import io.github.sd155.logs.AndroidLoggerConfigurator
 import io.github.sd155.logs.createAndroidLogger
 

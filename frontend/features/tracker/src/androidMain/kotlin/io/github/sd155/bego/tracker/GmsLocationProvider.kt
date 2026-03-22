@@ -19,7 +19,7 @@ import io.github.sd155.bego.utils.SafeContinuation
 import io.github.sd155.bego.utils.asFailure
 import io.github.sd155.bego.utils.asSuccess
 import io.github.sd155.bego.utils.next
-import io.github.sd155.bego.tracker.di.trackerModuleName
+import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.bego.tracker.domain.LocationError
 import io.github.sd155.bego.tracker.domain.LocationProvider
 import io.github.sd155.bego.tracker.domain.TrackPoint

@@ -3,7 +3,7 @@ package io.github.sd155.bego.tracker.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.sd155.bego.di.Inject
-import io.github.sd155.bego.tracker.di.trackerModuleName
+import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.bego.tracker.domain.Tracker
 import io.github.sd155.bego.tracker.domain.TrackerState
 import io.github.sd155.logs.api.Logger

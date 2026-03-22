@@ -1,4 +1,4 @@
-package io.github.sd155.bego.tracker.di
+package io.github.sd155.bego.tracker.app
 
 import io.github.sd155.bego.tracker.domain.LocationProvider
 import io.github.sd155.bego.tracker.domain.Tracker

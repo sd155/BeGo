@@ -13,7 +13,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import io.github.sd155.bego.di.Inject
-import io.github.sd155.bego.tracker.di.trackerModuleName
+import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.logs.api.Logger
 
 internal class TrackerForegroundService : Service() {
