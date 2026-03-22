@@ -1,16 +1,71 @@
 # App Theme Module
 
-The theme module provides a comprehensive design system for the [Bego frontend application](../../README.md). It implements a Material Design-based theming system using Jetpack Compose.
+Comprehensive design system. It implements a Material Design-based theming system using Compose Multiplatform.  
+Back to the [BeGo frontend application](../../README.md)
 
-## Key Components
+## Features
+- **Dark mode**: Supports both light and dark themes.
+- **Screen sizes**: Adapts to different screen sizes (Small and Medium).
+- **Design system**:
+  - **Colors**: Defines the app's color palette with primary, secondary, accent, and semantic colors
+  - **Typography**: Provides text styles for headers, labels, and body text
+  - **Shapes**: Defines shapes for UI elements like buttons
+  - **Sizes**: Manages consistent dimensions for icons, padding, and other UI elements
+  - **PlatformIcons**: Provides platform-specific icons. This allows UI to use native icons for each platform.
+- **Preview Utilities**: Includes preview utilities for Android Studio (Android target)
 
-### BegoTheme composable
-   - Main theme composable that provides consistent design across the app
-   - Supports both light and dark themes
-   - Adapts to different screen sizes (Small and Medium)
+## API
+- Common 
+  - enum `DeviceScreen`
+  - class `BegoPalette`
+    - `.primary: Color`
+    - `.secondary: Color`
+    - `.background: Color`
+    - `.accent: Color`
+    - `.onAccent: Color`
+    - `.warning: Color`
+  - class `BegoTypography`
+    - `.header: TextStyle`
+    - `.label: TextStyle`
+    - `.bodyL: TextStyle`
+    - `.bodyM: TextStyle`
+  - class `BegoShapes`
+    - `.button: Shape`
+  - class `BegoSizes`
+    - `.screen: DeviceScreen`
+    - `.icon: Dp`
+    - `.buttonWidth: Dp`
+    - `.paddingVertical: Dp`
+    - `.paddingHorizontal: Dp`
+    - `.contentVerticalPadding: Dp`
+  - interface `PlatformIcons`
+    - `.check(): ImageVector`
+    - `.dropDown(): ImageVector`
+  - composable `BegoTheme.palette: BegoPalette`
+  - composable `BegoTheme.typography: BegoTypography`
+  - composable `BegoTheme.shapes: BegoShapes`
+  - composable `BegoTheme.sizes: BegoSizes`
+  - composable `BegoTheme.platformIcons: PlatformIcons`
+  - composable `BegoTheme(..): Unit`  
+  - composable `BegoAccentFilledButton(..): Unit`
+  - composable `BegoWarningFilledButton(..): Unit`
+  - composable `BegoPrimaryFilledButton(..): Unit`
+  - composable `BegoHeaderText(..): Unit`
+  - composable `BegoBodyLargeText(..): Unit`
+  - composable `BegoDropDown(..): Unit`
+  - data class `BegoDropDownItemData`
+- Android
+  - composable `screenSize(): DeviceScreen`
+  - `AndroidPlatformIcons` : PlatformIcons
+- Android.debug
+  - `LOCALE_EN`
+  - `LOCALE_RU`
+  - `PHONE_LAND_SPEC`
+  - `PHONE_PORT_SPEC`
+  - composable `ThemedPreview(..): Unit`
 
-### BegoTheme object
-Provides access to theme values:
+#### Usage
+Access to theme values:
 ```kotlin
 // Get theme colors
 BegoTheme.palette
@@ -21,27 +76,3 @@ BegoTheme.shapes
 // Get theme size styles
 BegoTheme.sizes
 ```
-
-### UI Components
-- **BegoAccentFilledButton**: A filled button with accent color for primary actions
-- **BegoWarningFilledButton**: A filled button with warning color for destructive actions
-- **BegoPrimaryFilledButton**: A filled button with primary color for standard actions
-- **BegoHeaderText**: Text component for main headings and titles
-- **BegoBodyLargeText**: Text component for large body text
-- **BegoDropDown**: A composable dropdown menu for selecting from a list of items. Accepts a list of [BegoDropDownItemData], displays the selected item, and invokes a callback when an item is selected.
-
-### Design System Elements
-- **Colors**: Defines the app's color palette with primary, secondary, accent, and semantic colors
-- **Typography**: Provides text styles for headers, labels, and body text
-- **Shapes**: Defines shapes for UI elements like buttons
-- **Sizes**: Manages consistent dimensions for icons, padding, and other UI elements
-- **PlatformIcons**: Interface for providing icons (e.g., checkmark, dropdown arrow) in a platform-agnostic way.
-
-### Preview Utilities
-The module includes preview utilities for Android Studio (Android target):
-- Device specifications for different screen sizes and orientations
-- Locale constants for internationalization testing
-- `ThemedPreview` composable for previewing with the Bego theme applied
-
-### Platform Icons
-The theme system supports platform-specific icons via the [PlatformIcons] interface. This allows your UI to use native icons for each platform (Android, iOS, etc).

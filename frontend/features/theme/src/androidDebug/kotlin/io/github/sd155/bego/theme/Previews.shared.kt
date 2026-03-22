@@ -11,24 +11,24 @@ import androidx.compose.runtime.Composable
 /** English locale identifier */
 const val LOCALE_EN = "en"
 /** Spanish locale identifier */
-const val LOCALE_ES = "es"
+//const val LOCALE_ES = "es"
 /** French locale identifier */
-const val LOCALE_FR = "fr"
+//const val LOCALE_FR = "fr"
 /** Brazilian Portuguese locale identifier */
-const val LOCALE_PTrBR = "pt-rBR"
+//const val LOCALE_PTrBR = "pt-rBR"
 /** Russian locale identifier */
 const val LOCALE_RU = "ru"
 
 /** Device specification for tablet in landscape orientation */
-const val TAB_LAND_SPEC = "spec:width=1280dp,height=800dp,dpi=320,isRound=false,chinSize=0dp,orientation=landscape,cutout=none,navigation=gesture"
+//const val TAB_LAND_SPEC = "spec:width=1280dp,height=800dp,dpi=320,isRound=false,chinSize=0dp,orientation=landscape,cutout=none,navigation=gesture"
 /** Device specification for tablet in portrait orientation */
-const val TAB_PORT_SPEC = "spec:width=1280dp,height=800dp,dpi=320,isRound=false,chinSize=0dp,orientation=portrait,cutout=none,navigation=gesture"
+//const val TAB_PORT_SPEC = "spec:width=1280dp,height=800dp,dpi=320,isRound=false,chinSize=0dp,orientation=portrait,cutout=none,navigation=gesture"
 /** Device specification for phone in landscape orientation */
 const val PHONE_LAND_SPEC = "spec:width=393dp,height=851dp,dpi=440,isRound=false,chinSize=0dp,orientation=landscape,cutout=none,navigation=gesture"
 /** Device specification for phone in portrait orientation */
 const val PHONE_PORT_SPEC = "spec:width=393dp,height=851dp,dpi=440,isRound=false,chinSize=0dp,orientation=portrait,cutout=none,navigation=gesture"
 /** Device specification for TV */
-const val TV_SPEC = "spec:width=960dp,height=540dp,dpi=320,isRound=false,chinSize=0dp,orientation=landscape,cutout=none,navigation=gesture"
+//const val TV_SPEC = "spec:width=960dp,height=540dp,dpi=320,isRound=false,chinSize=0dp,orientation=landscape,cutout=none,navigation=gesture"
 
 /**
  * A preview composable that wraps content with the Bego theme and platform icons.
