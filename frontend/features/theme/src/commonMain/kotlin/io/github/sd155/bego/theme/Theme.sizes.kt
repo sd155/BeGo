@@ -23,7 +23,7 @@ class BegoSizes(
 )
 
 internal fun begoSizes(screen: DeviceScreen) = when (screen) {
-    DeviceScreen.Small ->
+    DeviceScreen.Compact ->
         BegoSizes(
             screen = screen,
             icon = 32.dp,
