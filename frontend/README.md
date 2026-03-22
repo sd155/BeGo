@@ -43,8 +43,7 @@
 ```
 
 ## Frontend Features
-
-- App theme system, [more details](./features/theme/README.md)
-- Running tracker with smoothed GPS, speed, and pace, [more details](./features/tracker/README.md)
-- Dependency injection system (Kodein DI), [more details](./features/di-kodein/README.md)
-- Multiplatform utilities (typed result, SafeContinuation, etc.), [more details](./features/utils/README.md)
+- `di-kodein`: Dependency injection system (Kodein DI), [more details](./features/di-kodein/README.md)
+- `theme`: App theme system, [more details](./features/theme/README.md)
+- `tracker`: Running tracker with smoothed GPS, speed, and pace, [more details](./features/tracker/README.md)
+- `utils`: Multiplatform utilities (typed result, SafeContinuation, etc.), [more details](./features/utils/README.md)
