@@ -20,6 +20,18 @@ Follow the existing code style strictly:
 - **String literals**: Avoid unnecessary spaces inside strings.
 - **Comments**: Use sparingly; prefer self-explanatory code. Log meaningful messages for ops/debugging.
 
+### Visibility Rules
+- Access modifiers are part of the architecture, not a style preference.
+- `public` is used only for the module API and for instantiating internal platform-split components from outside the module.
+- `internal` is used for everything that must stay inside the module boundary, even if the owning type is `public`.
+- If a type is `public` only to allow platform-specific construction or DI wiring, this should be reflected in the module documentation.
+
+### Logging Rules
+- Logging is performed at the point where the error or noteworthy event originates.
+- The same failure must not be logged again by upstream callers that only receive and route the error.
+- Upstream layers should react to failures by choosing the correct control-flow or UI scenario, not by duplicating logs.
+
+
 ## Git Workflow & Conventional Commits
 - Branches:
     - `master`: production-ready, always deployable.

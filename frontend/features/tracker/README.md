@@ -29,16 +29,11 @@ Back to the [BeGo frontend application](../../README.md)
   - `AndroidPermissionValidator.check(Context, Array<String>): Boolean`
   - suspend `AndroidPermissionValidator.checkAndRequest(Context, Array<String>): Boolean`
 
-## Visibility Rules
-- Access modifiers are architectural in this module.
-- `public` is allowed only for the tracker module API and for platform-specific entry points that must be instantiated from another module, such as Android wiring classes passed into DI.
-- `internal` is the default for runtime logic, UI state, domain services, and operational methods that must not leak through the module boundary.
-- A `public` type may still have `internal` members when the type itself must be created from outside the module, but its behavior is intended to be consumed only inside the module.
-
 ## Structure
 
 The codebase is primarily structured by platform or purpose (e.g., debug, test).  
-Secondly, the codebase is structured by layers: application, domain, UI.
+Secondly, the codebase is structured by layers: application, domain, UI.  
+Access modifiers are part of the architecture, not a style preference (see [project specification](../../../PROJECT.md)).
 
 ### Common code
 

@@ -47,9 +47,3 @@
 - `theme`: App theme system, [more details](./features/theme/README.md)
 - `tracker`: Running tracker with smoothed GPS, speed, and pace, [more details](./features/tracker/README.md)
 - `utils`: Multiplatform utilities (typed result, SafeContinuation, etc.), [more details](./features/utils/README.md)
-
-## Visibility Rules
-- Access modifiers are part of the frontend architecture, not a style preference.
-- `public` is used only for the module API and for instantiating internal platform-split components from outside the module.
-- `internal` is used for everything that must stay inside the module boundary, even if the owning type is `public`.
-- If a type is `public` only to allow platform-specific construction or DI wiring, this should be reflected in the module documentation.
