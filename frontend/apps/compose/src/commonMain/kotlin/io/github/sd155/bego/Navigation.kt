@@ -7,8 +7,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.github.sd155.bego.tracker.ui.TrackerScreen
-import io.github.sd155.bego.tracker.ui.TrackerScreenRoute
+import io.github.sd155.bego.tracker.app.TrackerScreen
+import io.github.sd155.bego.tracker.app.TrackerScreenRoute
 
 internal val LocalNavHost = staticCompositionLocalOf<NavHostController> { error("No default implementation") }
 

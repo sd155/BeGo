@@ -7,13 +7,13 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import io.github.sd155.bego.di.Inject
-import io.github.sd155.bego.tracker.AndroidTrackerPrerequisites.Companion.LOCATION_INTERVAL_MS
+import io.github.sd155.bego.tracker.AndroidLocationPrerequisites.Companion.LOCATION_INTERVAL_MS
 import io.github.sd155.bego.utils.Result
 import io.github.sd155.bego.utils.asFailure
 import io.github.sd155.bego.utils.asSuccess
 import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.bego.tracker.domain.LocationError
-import io.github.sd155.bego.tracker.domain.LocationProvider
+import io.github.sd155.bego.tracker.app.LocationProvider
 import io.github.sd155.bego.tracker.domain.TrackPoint
 import io.github.sd155.logs.api.Logger
 import kotlin.concurrent.atomics.AtomicReference
@@ -25,9 +25,9 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
  */
 @OptIn(ExperimentalAtomicApi::class)
 class GmsLocationProvider(
-    context: Context,
+    applicationContext: Context,
 ) : LocationProvider() {
-    private val _context = context.applicationContext
+    private val _context = applicationContext
     private val _logger by lazy { Inject.instance<Logger>(tag = trackerModuleName) }
     private val _locationRequest by lazy {
         LocationRequest

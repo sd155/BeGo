@@ -1,6 +1,7 @@
 package io.github.sd155.bego.tracker.domain
 
 import io.github.sd155.bego.di.Inject
+import io.github.sd155.bego.tracker.app.LocationProvider
 import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.bego.utils.Result
 import io.github.sd155.logs.api.Logger

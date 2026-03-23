@@ -1,11 +1,14 @@
-package io.github.sd155.bego.tracker.ui
+package io.github.sd155.bego.tracker.app
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.github.sd155.bego.tracker.app.rememberTrackerPrerequisites
+import io.github.sd155.bego.di.Inject
+import io.github.sd155.bego.tracker.ui.TrackerView
+import io.github.sd155.bego.tracker.ui.TrackerViewIntent
+import io.github.sd155.bego.tracker.ui.TrackerViewModel
 import io.github.sd155.bego.utils.Result
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable

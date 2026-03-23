@@ -5,11 +5,8 @@ import android.app.Activity
 import android.content.IntentSender
 import android.os.Build
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalActivity
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.gms.common.api.ResolvableApiException
@@ -17,9 +14,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
-import io.github.sd155.bego.di.Inject
-import io.github.sd155.bego.tracker.app.TrackerPrerequisites
-import io.github.sd155.bego.tracker.app.trackerModuleName
+import io.github.sd155.bego.tracker.app.LocationPrerequisites
 import io.github.sd155.bego.tracker.domain.LocationError
 import io.github.sd155.bego.utils.Result
 import io.github.sd155.bego.utils.SafeContinuation
@@ -30,10 +25,10 @@ import io.github.sd155.logs.api.Logger
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-internal class AndroidTrackerPrerequisites(
+internal class AndroidLocationPrerequisites(
     private val activity: ComponentActivity,
     private val logger: Logger,
-) : TrackerPrerequisites, DefaultLifecycleObserver {
+) : LocationPrerequisites(), DefaultLifecycleObserver {
     private val permissions = AndroidPermissionValidator(activity = activity, logger = logger)
     private val locationRequest = LocationRequest
         .Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_INTERVAL_MS)
