@@ -31,10 +31,7 @@ internal class TrackerViewModel : ViewModel() {
         _tracker.state
             .onEach(::collectTrackerState)
             .launchIn(viewModelScope.plus(Dispatchers.Default))
-        viewModelScope.launch(Dispatchers.Default) {
-            _tracker.prepare()
-            _tracker.setTargetDistance(_targetsKm.first() * 1000.0)
-        }
+        _tracker.setTargetDistance(_targetsKm.first() * 1000.0)
     }
 
     private fun collectTrackerState(state: TrackerState) {

@@ -33,7 +33,9 @@ kotlin {
             implementation(compose.components.resources)
         }
         androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
             implementation(libs.google.gms.location)
+            implementation(libs.lifecycle.process)
         }
     }
 }

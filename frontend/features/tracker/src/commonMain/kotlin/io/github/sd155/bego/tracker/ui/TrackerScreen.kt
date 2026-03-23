@@ -3,7 +3,11 @@ package io.github.sd155.bego.tracker.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.sd155.bego.tracker.app.rememberTrackerPrerequisites
+import io.github.sd155.bego.utils.Result
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 /**
@@ -21,10 +25,18 @@ object TrackerScreenRoute
 fun TrackerScreen() {
     val viewModel: TrackerViewModel = viewModel { TrackerViewModel() }
     val state by viewModel.state.collectAsState()
+    val prerequisites = rememberTrackerPrerequisites()
+    val scope = rememberCoroutineScope()
 
     TrackerView(
         state = state,
-        onStart = { viewModel.onViewIntent(TrackerViewIntent.Start) },
+        onStart = {
+            scope.launch {
+                if (prerequisites.ensureReady() is Result.Success) {
+                    viewModel.onViewIntent(TrackerViewIntent.Start)
+                }
+            }
+        },
         onStop = { viewModel.onViewIntent(TrackerViewIntent.Stop) },
         onReset = { viewModel.onViewIntent(TrackerViewIntent.Reset) },
         onSetTarget = { viewModel.onViewIntent(TrackerViewIntent.SetTarget(it)) },

@@ -20,13 +20,8 @@ Back to the [BeGo frontend application](../../README.md)
   - `trackerModule((String) -> Logger, LocationProvider): DI.Module`
 - Android
   - `GmsLocationProvider`
-  - `AndroidTrackerModuleDi.onCreateActivity(ComponentActivity): Unit`
-  - `AndroidTrackerModuleDi.onResumeActivity(ComponentActivity): Unit`
-  - `AndroidTrackerModuleDi.onPauseActivity(ComponentActivity): Unit`
-  - `AndroidTrackerModuleDi.onDestroyActivity(): Unit`
-  - `AndroidTrackerModuleDi.onActivityResult(Int, Int): Unit`
-  - `AndroidPermissionValidator(Logger?)`
-  - `AndroidPermissionValidator.setup(ComponentActivity): Unit`
+  - `initializeAndroidTrackerRuntime(Context): Unit`
+  - `AndroidPermissionValidator(ComponentActivity, Logger?)`
   - `AndroidPermissionValidator.check(Context, Array<String>): Boolean`
   - suspend `AndroidPermissionValidator.checkAndRequest(Context, Array<String>): Boolean`
 
@@ -52,6 +47,7 @@ Secondly, the codebase is structured by layers: application, domain, UI.
 
 ### Android platform
 - `GmsLocationProvider`: Implementation of **LocationProvider** for Android platform backed by GMS location services.
-- `TrackerForegroundService`: Implementation of Android foreground service to track session while in background.
+- `AndroidTrackerPrerequisites`: Activity-scoped permissions and settings coordinator used before starting tracking.
+- `AndroidTrackerRuntime`: Process lifecycle observer that manages background foreground-service state for active tracking sessions.
+- `TrackerForegroundService`: Android foreground service used when tracking continues in background.
 - `AndroidPermissionValidator`: Helper for checking and requesting Android runtime location permissions.
-- `AndroidTrackerModuleDi`: Android DI helper for wiring up the tracker module with the current activity.

@@ -3,6 +3,7 @@ package io.github.sd155.bego
 import android.app.Application
 import android.content.pm.ApplicationInfo
 import io.github.sd155.bego.tracker.GmsLocationProvider
+import io.github.sd155.bego.tracker.initializeAndroidTrackerRuntime
 import io.github.sd155.bego.tracker.app.trackerModule
 import io.github.sd155.logs.AndroidLoggerConfigurator
 import io.github.sd155.logs.createAndroidLogger
@@ -21,8 +22,11 @@ internal class BegoApplication : Application() {
             ),
             trackerModule = trackerModule(
                 loggerProvider = ::createAndroidLogger,
-                locationProvider = GmsLocationProvider(),
+                locationProvider = GmsLocationProvider(applicationContext),
             )
+        )
+        initializeAndroidTrackerRuntime(
+            context = applicationContext,
         )
         AndroidLoggerConfigurator().apply {
             if (isDebuggable()) {

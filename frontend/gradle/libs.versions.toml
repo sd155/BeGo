@@ -8,7 +8,7 @@ android-minSdk = "28"
 android-targetSdk = "36"
 application-name = "BeGo"
 application-namespace = "io.github.sd155.bego"
-application-version-name = "0.2.14"
+application-version-name = "0.2.15"
 application-version-code = "2"
 # library-name = ""
 # library-description = ""
@@ -54,6 +54,7 @@ androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.16.0" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.1" }
 google-android-material = { module = "com.google.android.material:material", version = "1.12.0" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.11.0-rc01" } # Jetpak compose integration with Activity
+lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version = "2.10.0" } # Android ProcessLifecycleOwner
 androidx-security-crypto = { module = "androidx.security:security-crypto", version = "1.0.0" } # Jetpack security
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version = "1.8.2" } # Jetpack compose tooling
 google-gms-location = { module = "com.google.android.gms:play-services-location", version = "21.3.0" }

@@ -19,22 +19,16 @@ import kotlin.coroutines.suspendCoroutine
  */
 @OptIn(ExperimentalAtomicApi::class)
 class AndroidPermissionValidator(
+    activity: ComponentActivity,
     private val logger: Logger? = null,
 ) {
-    private val _activityResultLauncher = AtomicReference<ActivityResultLauncher<Array<String>>?>(value = null)
-    private val _request = AtomicReference<PermissionRequest?>(value = null)
-
-    /**
-     * Sets up the permission result launcher for the given activity.
-     */
-    fun setup(activity: ComponentActivity) {
-        _activityResultLauncher.store(
-            newValue = activity.registerForActivityResult(
-                ActivityResultContracts.RequestMultiplePermissions(),
-                ::onActivityCallback
-            )
+    private val _activityResultLauncher = AtomicReference<ActivityResultLauncher<Array<String>>?>(
+        value = activity.registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions(),
+            ::onActivityCallback
         )
-    }
+    )
+    private val _request = AtomicReference<PermissionRequest?>(value = null)
 
     private fun onActivityCallback(results: Map<String, Boolean>) =
         _request.load()?.onResponse(results)
@@ -59,11 +53,11 @@ class AndroidPermissionValidator(
      * Suspends until the user responds.
      */
     suspend fun checkAndRequest(
-        activity: ComponentActivity,
+        context: Context,
         permissions: Array<String>,
     ): Boolean =
         permissions
-            .filter { permission -> checkNotGranted(activity, permission) }
+            .filter { permission -> checkNotGranted(context, permission) }
             .toTypedArray()
             .let { notGrantedPermissions -> request(notGrantedPermissions) }
 

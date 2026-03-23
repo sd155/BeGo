@@ -7,7 +7,6 @@ import io.github.sd155.bego.utils.Result
  * Implementations should provide location updates as TrackPoint objects.
  */
 abstract class LocationProvider {
-    internal abstract suspend fun start(): Result<LocationError, Unit>
     internal abstract suspend fun sub(onUpdate: (TrackPoint) -> Unit): Result<LocationError, Unit>
     internal abstract fun unsub()
 }

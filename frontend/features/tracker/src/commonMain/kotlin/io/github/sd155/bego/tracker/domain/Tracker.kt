@@ -2,6 +2,7 @@ package io.github.sd155.bego.tracker.domain
 
 import io.github.sd155.bego.di.Inject
 import io.github.sd155.bego.tracker.app.trackerModuleName
+import io.github.sd155.bego.utils.Result
 import io.github.sd155.logs.api.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,10 +27,6 @@ internal class Tracker {
         _stopwatch.state
             .onEach(::handleStopwatchState)
             .launchIn(_scope)
-    }
-
-    internal suspend fun prepare() {
-        _location.start()
     }
 
     private fun handleStopwatchState(state: StopwatchState) {
@@ -82,8 +79,9 @@ internal class Tracker {
             0L
 
     internal suspend fun start() {
-        _stopwatch.start()
-        _location.sub(::handleTrackPoint)
+        if (_location.sub(::handleTrackPoint) is Result.Success) {
+            _stopwatch.start()
+        }
     }
 
     internal fun stop() {
