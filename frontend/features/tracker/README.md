@@ -15,15 +15,25 @@ Back to the [BeGo frontend application](../../README.md)
 ## API
 - Common  
   - `LocationProvider`  
+  - `LocationPrerequisites`
+  - `PlatformTrackerRememberer`
   - `TrackerScreenRoute`
-  - composable `TrackerScreen(): Unit`
-  - `trackerModule((String) -> Logger, LocationProvider): DI.Module`
+  - composable `TrackerScreen()`
+  - `trackerModule((String) -> Logger, LocationProvider, PlatformTrackerRememberer): DI.Module`
 - Android
   - `GmsLocationProvider`
   - `initializeAndroidTrackerRuntime(Context): Unit`
+  - `AndroidLocationPrerequisites(ComponentActivity, Logger)`
+  - `AndroidTrackerRememberer()`
   - `AndroidPermissionValidator(ComponentActivity, Logger?)`
   - `AndroidPermissionValidator.check(Context, Array<String>): Boolean`
   - suspend `AndroidPermissionValidator.checkAndRequest(Context, Array<String>): Boolean`
+
+## Visibility Rules
+- Access modifiers are architectural in this module.
+- `public` is allowed only for the tracker module API and for platform-specific entry points that must be instantiated from another module, such as Android wiring classes passed into DI.
+- `internal` is the default for runtime logic, UI state, domain services, and operational methods that must not leak through the module boundary.
+- A `public` type may still have `internal` members when the type itself must be created from outside the module, but its behavior is intended to be consumed only inside the module.
 
 ## Structure
 
