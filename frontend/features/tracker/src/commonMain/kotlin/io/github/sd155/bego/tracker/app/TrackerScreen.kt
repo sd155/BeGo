@@ -25,7 +25,7 @@ object TrackerScreenRoute
 fun TrackerScreen() {
     val viewModel: TrackerViewModel = viewModel { TrackerViewModel() }
     val state by viewModel.state.collectAsState()
-    val prerequisites = rememberTrackerPrerequisites()
+    val prerequisites = Inject.instance<PlatformTrackerRememberer>().rememberLocationPrerequisites()
     val scope = rememberCoroutineScope()
 
     TrackerView(
@@ -41,4 +41,9 @@ fun TrackerScreen() {
         onReset = { viewModel.onViewIntent(TrackerViewIntent.Reset) },
         onSetTarget = { viewModel.onViewIntent(TrackerViewIntent.SetTarget(it)) },
     )
+}
+
+abstract class PlatformTrackerRememberer {
+    @Composable
+    internal abstract fun rememberLocationPrerequisites(): LocationPrerequisites
 }

@@ -1,6 +1,5 @@
 package io.github.sd155.bego.tracker.app
 
-import io.github.sd155.bego.tracker.domain.LocationProvider
 import io.github.sd155.bego.tracker.domain.Tracker
 import io.github.sd155.logs.api.Logger
 import org.kodein.di.bind
@@ -18,9 +17,11 @@ import org.kodein.di.singleton
 fun trackerModule(
     loggerProvider: (source: String) -> Logger,
     locationProvider: LocationProvider,
+    rememberer: PlatformTrackerRememberer,
 ) = DI.Module(name = trackerModuleName) {
     bind<Logger>(trackerModuleName) with singleton { loggerProvider("Tracker") }
     bind<LocationProvider>() with singleton { locationProvider }
+    bind<PlatformTrackerRememberer>() with singleton { rememberer }
     bind<Tracker>() with singleton { Tracker() }
 }
 
