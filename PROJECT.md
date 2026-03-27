@@ -18,6 +18,7 @@ Follow the existing code style strictly:
 - **Line breaks**: Prefer short lines (<120 chars). Break long argument lists or chained calls with one item per line if needed.
 - **Serialization**: Use `kotlinx.serialization` with explicit `@Serializable` and `@SerialName`. Prefer typed data models over raw JSON.
 - **String literals**: Avoid unnecessary spaces inside strings.
+- **UI text**: User-facing UI text must be stored in resources, not hardcoded in composables or view models.
 - **Comments**: Use sparingly; prefer self-explanatory code. Log meaningful messages for ops/debugging.
 
 ### Visibility Rules
