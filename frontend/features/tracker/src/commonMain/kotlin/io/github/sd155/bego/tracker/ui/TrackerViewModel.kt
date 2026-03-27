@@ -3,9 +3,12 @@ package io.github.sd155.bego.tracker.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.sd155.bego.di.Inject
+import io.github.sd155.bego.tracker.app.LocationPrerequisites
 import io.github.sd155.bego.tracker.app.trackerModuleName
+import io.github.sd155.bego.tracker.domain.LocationError
 import io.github.sd155.bego.tracker.domain.Tracker
 import io.github.sd155.bego.tracker.domain.TrackerState
+import io.github.sd155.bego.utils.Result
 import io.github.sd155.logs.api.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +23,7 @@ internal class TrackerViewModel : ViewModel() {
     private val _logger by lazy { Inject.instance<Logger>(tag = trackerModuleName) }
     private val _tracker by lazy { Inject.instance<Tracker>() }
     private val _formatter by lazy { UiFormatter() }
-    private val _state = MutableStateFlow(buildInitialState())
+    private val _state = MutableStateFlow<TrackerViewState>(TrackerViewState.Initialization)
     internal val state: StateFlow<TrackerViewState> = _state.asStateFlow()
 
     companion object {
@@ -35,26 +38,32 @@ internal class TrackerViewModel : ViewModel() {
     }
 
     private fun collectTrackerState(state: TrackerState) {
-        _state.value =
-            if (state.running)
-                TrackerViewState.Running(
-                    target = _formatter.formatTarget(distanceMeters = state.finish),
-                    time = _formatter.formatTime(timeMs = state.time),
-                    pace = _formatter.formatPace(paceMsPerKm = state.pace),
-                    speed = _formatter.formatSpeed(speedKph = state.speed),
-                    distance = _formatter.formatDistance(distanceMeters = state.distance),
-                )
-            else if (state.time > 0L)
-                TrackerViewState.Finished(
-                    time = _formatter.formatTime(timeMs = state.time),
-                    pace = _formatter.formatPace(paceMsPerKm = state.pace),
-                    speed = _formatter.formatSpeed(speedKph = state.speed),
-                    distance = _formatter.formatDistance(distanceMeters = state.distance),
-                )
-            else if (state.finish > 0.0)
-                buildInitialState(target = state.finish.toInt() / 1000)
-            else
-                buildInitialState()
+        when (_state.value) {
+            TrackerViewState.Initialization,
+            TrackerViewState.FatalInitializationError,
+            is TrackerViewState.NotReady -> Unit
+            else ->
+                _state.value =
+                    if (state.running)
+                        TrackerViewState.Running(
+                            target = _formatter.formatTarget(distanceMeters = state.finish),
+                            time = _formatter.formatTime(timeMs = state.time),
+                            pace = _formatter.formatPace(paceMsPerKm = state.pace),
+                            speed = _formatter.formatSpeed(speedKph = state.speed),
+                            distance = _formatter.formatDistance(distanceMeters = state.distance),
+                        )
+                    else if (state.time > 0L)
+                        TrackerViewState.Finished(
+                            time = _formatter.formatTime(timeMs = state.time),
+                            pace = _formatter.formatPace(paceMsPerKm = state.pace),
+                            speed = _formatter.formatSpeed(speedKph = state.speed),
+                            distance = _formatter.formatDistance(distanceMeters = state.distance),
+                        )
+                    else if (state.finish > 0.0)
+                        buildInitialState(target = state.finish.toInt() / 1000)
+                    else
+                        buildInitialState()
+        }
     }
 
     private fun buildInitialState(
@@ -66,9 +75,24 @@ internal class TrackerViewModel : ViewModel() {
             selectedTarget = _targetsKm.find { targetKm -> target == targetKm } ?: _targetsKm.first()
         )
 
+    private suspend fun initialize(prerequisites: LocationPrerequisites) {
+        _state.value = TrackerViewState.Initialization
+        when (val result = prerequisites.ensureReady()) {
+            is Result.Success ->
+                _state.value = buildInitialState()
+            is Result.Failure ->
+                _state.value = when (result.error) {
+                    LocationError.IllegalState -> TrackerViewState.FatalInitializationError
+                    LocationError.PermissionsDeniedByUser,
+                    LocationError.SettingsDeniedByUser -> TrackerViewState.NotReady(result.error)
+                }
+        }
+    }
+
     internal fun onViewIntent(intent: TrackerViewIntent) = viewModelScope.launch(Dispatchers.Default) {
         _logger.trace(event = "VM received View Intent: $intent")
         when (intent) {
+            is TrackerViewIntent.Initialization -> initialize(intent.prerequisites)
             TrackerViewIntent.Start -> _tracker.start()
             TrackerViewIntent.Stop -> _tracker.stop()
             TrackerViewIntent.Reset -> {

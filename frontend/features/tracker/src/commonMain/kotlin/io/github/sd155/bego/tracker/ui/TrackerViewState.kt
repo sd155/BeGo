@@ -1,10 +1,17 @@
 package io.github.sd155.bego.tracker.ui
 
+import io.github.sd155.bego.tracker.domain.LocationError
+
 internal sealed class TrackerViewState {
+    data object Initialization : TrackerViewState()
+    data object FatalInitializationError : TrackerViewState()
     data class Initial(
         val time: String,
         val targets: List<Int>,
         val selectedTarget: Int,
+    ) : TrackerViewState()
+    data class NotReady(
+        val error: LocationError,
     ) : TrackerViewState()
     data class Running(
         val time: String,

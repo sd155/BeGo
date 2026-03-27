@@ -10,10 +10,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import bego.features.tracker.generated.resources.Res
+import bego.features.tracker.generated.resources.checking_readiness_hint
 import bego.features.tracker.generated.resources.distance_template
 import bego.features.tracker.generated.resources.finish_template
+import bego.features.tracker.generated.resources.fatal_preparation_error_hint
 import bego.features.tracker.generated.resources.pace_template
 import bego.features.tracker.generated.resources.reset_action
+import bego.features.tracker.generated.resources.retry_action
 import bego.features.tracker.generated.resources.speed_template
 import bego.features.tracker.generated.resources.start_action
 import bego.features.tracker.generated.resources.stop_action
@@ -33,6 +36,7 @@ internal fun TrackerView(
     onStart: () -> Unit = {},
     onStop: () -> Unit = {},
     onReset: () -> Unit = {},
+    onRetryInitialization: () -> Unit = {},
     onSetTarget: (Int) -> Unit = {},
 ) {
     Column(
@@ -43,6 +47,31 @@ internal fun TrackerView(
         verticalArrangement = Arrangement.Bottom,
     ) {
         when (state) {
+            TrackerViewState.Initialization -> {
+                Column(
+                    modifier = Modifier
+                        .weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    BegoBodyLargeText(text = stringResource(Res.string.checking_readiness_hint))
+                }
+            }
+            TrackerViewState.FatalInitializationError -> {
+                Column(
+                    modifier = Modifier
+                        .weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    BegoBodyLargeText(text = stringResource(Res.string.fatal_preparation_error_hint))
+                }
+                BegoPrimaryFilledButton(
+                    onClick = onRetryInitialization,
+                    label = stringResource(Res.string.retry_action),
+                )
+                Spacer(modifier = Modifier.height(BegoTheme.sizes.contentVerticalPadding))
+            }
             is TrackerViewState.Initial -> {
                 Column(
                     modifier = Modifier
@@ -86,6 +115,7 @@ internal fun TrackerView(
                 )
                 Spacer(modifier = Modifier.height(BegoTheme.sizes.contentVerticalPadding))
             }
+            is TrackerViewState.NotReady -> TODO()
             is TrackerViewState.Running -> {
                 Column(
                     modifier = Modifier

@@ -1,16 +1,14 @@
 package io.github.sd155.bego.tracker.app
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.sd155.bego.di.Inject
 import io.github.sd155.bego.tracker.ui.TrackerView
 import io.github.sd155.bego.tracker.ui.TrackerViewIntent
 import io.github.sd155.bego.tracker.ui.TrackerViewModel
-import io.github.sd155.bego.utils.Result
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 /**
@@ -29,19 +27,16 @@ fun TrackerScreen() {
     val viewModel: TrackerViewModel = viewModel { TrackerViewModel() }
     val state by viewModel.state.collectAsState()
     val prerequisites = Inject.instance<PlatformTrackerRememberer>().rememberLocationPrerequisites()
-    val scope = rememberCoroutineScope()
+    LaunchedEffect(prerequisites) {
+        viewModel.onViewIntent(TrackerViewIntent.Initialization(prerequisites))
+    }
 
     TrackerView(
         state = state,
-        onStart = {
-            scope.launch {
-                if (prerequisites.ensureReady() is Result.Success) {
-                    viewModel.onViewIntent(TrackerViewIntent.Start)
-                }
-            }
-        },
+        onStart = { viewModel.onViewIntent(TrackerViewIntent.Start) },
         onStop = { viewModel.onViewIntent(TrackerViewIntent.Stop) },
         onReset = { viewModel.onViewIntent(TrackerViewIntent.Reset) },
+        onRetryInitialization = { viewModel.onViewIntent(TrackerViewIntent.Initialization(prerequisites)) },
         onSetTarget = { viewModel.onViewIntent(TrackerViewIntent.SetTarget(it)) },
     )
 }

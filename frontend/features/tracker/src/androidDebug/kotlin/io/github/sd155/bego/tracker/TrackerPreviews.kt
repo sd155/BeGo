@@ -18,6 +18,32 @@ private val formatter = UiFormatter()
 @Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
 @Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
 @Composable
+private fun TrackerCheckingReadinessPreview() {
+    ThemedPreview {
+        TrackerView(
+            state = TrackerViewState.Initialization
+        )
+    }
+}
+
+@Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
+@Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
+@Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
+@Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
+@Composable
+private fun TrackerFatalPreview() {
+    ThemedPreview {
+        TrackerView(
+            state = TrackerViewState.FatalInitializationError
+        )
+    }
+}
+
+@Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
+@Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
+@Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
+@Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
+@Composable
 private fun TrackerInitialPreview() {
     ThemedPreview {
         TrackerView(
