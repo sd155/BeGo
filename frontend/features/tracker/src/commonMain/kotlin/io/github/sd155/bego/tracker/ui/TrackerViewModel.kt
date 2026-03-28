@@ -8,7 +8,7 @@ import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.bego.tracker.domain.LocationError
 import io.github.sd155.bego.tracker.domain.Tracker
 import io.github.sd155.bego.tracker.domain.TrackerState
-import io.github.sd155.bego.utils.Result
+import io.github.sd155.bego.utils.fold
 import io.github.sd155.logs.api.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,14 +77,17 @@ internal class TrackerViewModel : ViewModel() {
 
     private suspend fun initialize(prerequisites: LocationPrerequisites) {
         _state.value = TrackerViewState.Initialization
-        when (val result = prerequisites.ensureReady()) {
-            is Result.Success ->
-                _state.value = buildInitialState()
-            is Result.Failure ->
-                _state.value = when (val error = result.error) {
-                    LocationError.IllegalState -> TrackerViewState.FatalInitializationError
-                    is LocationError.PlatformFailure -> TrackerViewState.PlatformNotReady(error.reason)
-                }
+        prerequisites.ensureReady()
+            .fold(
+                onSuccess = { _state.value = buildInitialState() },
+                onFailure = ::handleLocationError
+            )
+    }
+
+    private fun handleLocationError(error: LocationError) {
+        _state.value = when (error) {
+            LocationError.IllegalState -> TrackerViewState.FatalInitializationError
+            is LocationError.PlatformFailure -> TrackerViewState.PlatformNotReady(error.reason)
         }
     }
 
@@ -92,7 +95,9 @@ internal class TrackerViewModel : ViewModel() {
         _logger.trace(event = "VM received View Intent: $intent")
         when (intent) {
             is TrackerViewIntent.Initialization -> initialize(intent.prerequisites)
-            TrackerViewIntent.Start -> _tracker.start()
+            TrackerViewIntent.Start ->
+                _tracker.start()
+                    .withFailure(::handleLocationError)
             TrackerViewIntent.Stop -> _tracker.stop()
             TrackerViewIntent.Reset -> {
                 _tracker.reset()

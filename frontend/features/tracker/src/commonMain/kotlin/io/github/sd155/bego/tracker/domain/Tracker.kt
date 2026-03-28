@@ -79,11 +79,9 @@ internal class Tracker {
         else
             0L
 
-    internal suspend fun start() {
-        if (_location.sub(::handleTrackPoint) is Result.Success) {
-            _stopwatch.start()
-        }
-    }
+    internal suspend fun start(): Result<LocationError, Unit> =
+        _location.sub(onUpdate = ::handleTrackPoint)
+            .withSuccess { _stopwatch.start() }
 
     internal fun stop() {
         _stopwatch.stop()

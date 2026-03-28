@@ -58,24 +58,20 @@ internal fun TrackerView(
                     BegoBodyLargeText(text = stringResource(Res.string.checking_readiness_hint))
                 }
             }
-            TrackerViewState.FatalInitializationError -> {
-                Column(
+            TrackerViewState.FatalInitializationError ->
+                FatalInitializationErrorView(
                     modifier = Modifier
                         .weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    BegoBodyLargeText(text = stringResource(Res.string.fatal_preparation_error_hint))
-                }
-                BegoPrimaryFilledButton(
-                    onClick = onRetryInitialization,
-                    label = stringResource(Res.string.retry_action),
+                    onRetry = onRetryInitialization,
                 )
-                Spacer(modifier = Modifier.height(BegoTheme.sizes.contentVerticalPadding))
-            }
-            is TrackerViewState.PlatformNotReady -> {
+            is TrackerViewState.PlatformNotReady ->
                 notReadyContent?.invoke()
-            }
+                    ?:
+                    FatalInitializationErrorView(
+                        modifier = Modifier
+                            .weight(1f),
+                        onRetry = onRetryInitialization,
+                    )
             is TrackerViewState.Initial -> {
                 Column(
                     modifier = Modifier
@@ -140,4 +136,23 @@ internal fun TrackerView(
             }
         }
     }
+}
+
+@Composable
+private fun FatalInitializationErrorView(
+    modifier: Modifier = Modifier,
+    onRetry: () -> Unit,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        BegoBodyLargeText(text = stringResource(Res.string.fatal_preparation_error_hint))
+    }
+    BegoPrimaryFilledButton(
+        onClick = onRetry,
+        label = stringResource(Res.string.retry_action),
+    )
+    Spacer(modifier = Modifier.height(BegoTheme.sizes.contentVerticalPadding))
 }
