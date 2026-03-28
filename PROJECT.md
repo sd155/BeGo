@@ -27,6 +27,12 @@ Follow the existing code style strictly:
 - `internal` is used for everything that must stay inside the module boundary, even if the owning type is `public`.
 - If a type is `public` only to allow platform-specific construction or DI wiring, this should be reflected in the module documentation.
 
+### UI Composition Rules
+- Application-level composables are binding layers: they resolve dependencies, collect state, and route intents, but should avoid embedding extra UI orchestration or repeated control-flow that can live in view models or dedicated hooks.
+- Common UI state should expose narrowed UI-facing reasons for platform branches. Do not pass broad domain errors into platform-specific rendering when a smaller UI contract is sufficient.
+- Common shell composables own layout structure, spacing, and parent modifiers. Platform-specific hooks should render content for their slot and should not be responsible for parent layout policy unless that is explicitly the purpose of the API.
+- If a composable exposes a platform/content slot, prefer content-oriented contracts over leaking layout responsibilities through modifier plumbing.
+
 ### Logging Rules
 - Logging is performed at the point where the error or noteworthy event originates.
 - The same failure must not be logged again by upstream callers that only receive and route the error.
