@@ -41,7 +41,7 @@ internal class TrackerViewModel : ViewModel() {
         when (_state.value) {
             TrackerViewState.Initialization,
             TrackerViewState.FatalInitializationError,
-            is TrackerViewState.NotReady -> Unit
+            is TrackerViewState.PlatformNotReady -> Unit
             else ->
                 _state.value =
                     if (state.running)
@@ -81,10 +81,9 @@ internal class TrackerViewModel : ViewModel() {
             is Result.Success ->
                 _state.value = buildInitialState()
             is Result.Failure ->
-                _state.value = when (result.error) {
+                _state.value = when (val error = result.error) {
                     LocationError.IllegalState -> TrackerViewState.FatalInitializationError
-                    LocationError.PermissionsDeniedByUser,
-                    LocationError.SettingsDeniedByUser -> TrackerViewState.NotReady(result.error)
+                    is LocationError.PlatformFailure -> TrackerViewState.PlatformNotReady(error.reason)
                 }
         }
     }

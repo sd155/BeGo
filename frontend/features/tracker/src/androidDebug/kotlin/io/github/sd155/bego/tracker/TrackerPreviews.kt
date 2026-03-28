@@ -7,6 +7,7 @@ import io.github.sd155.bego.theme.LOCALE_EN
 import io.github.sd155.bego.theme.LOCALE_RU
 import io.github.sd155.bego.theme.PHONE_PORT_SPEC
 import io.github.sd155.bego.theme.ThemedPreview
+import io.github.sd155.bego.tracker.domain.PlatformReason
 import io.github.sd155.bego.tracker.ui.TrackerView
 import io.github.sd155.bego.tracker.ui.TrackerViewState
 import io.github.sd155.bego.tracker.ui.UiFormatter
@@ -35,6 +36,44 @@ private fun TrackerFatalPreview() {
     ThemedPreview {
         TrackerView(
             state = TrackerViewState.FatalInitializationError
+        )
+    }
+}
+
+@Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
+@Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
+@Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
+@Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
+@Composable
+private fun TrackerPlatformNotReadyPermissionsPreview() {
+    ThemedPreview {
+        val hooks = AndroidTrackerPlatformHooks()
+        TrackerView(
+            state = TrackerViewState.PlatformNotReady(reason = PlatformReason.Permissions),
+            notReadyView = { reason ->
+                hooks.PlatformNotReadyView(
+                    reason = reason,
+                )
+            }
+        )
+    }
+}
+
+@Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
+@Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
+@Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
+@Preview(showSystemUi = false, uiMode = UI_MODE_NIGHT_YES, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
+@Composable
+private fun TrackerPlatformNotReadySettingsPreview() {
+    ThemedPreview {
+        val hooks = AndroidTrackerPlatformHooks()
+        TrackerView(
+            state = TrackerViewState.PlatformNotReady(reason = PlatformReason.Settings),
+            notReadyView = { reason ->
+                hooks.PlatformNotReadyView(
+                    reason = reason,
+                )
+            }
         )
     }
 }

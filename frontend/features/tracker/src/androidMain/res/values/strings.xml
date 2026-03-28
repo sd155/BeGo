@@ -2,4 +2,7 @@
 <resources>
     <string name="notification_title">BeGo tracker</string>
     <string name="notification_content">Tracking your running session…</string>
+    <string name="permissions_denied_hint">Location permission is required to use the tracker.</string>
+    <string name="settings_denied_hint">Location services must be enabled to use the tracker.</string>
+    <string name="retry_action">Retry</string>
 </resources>

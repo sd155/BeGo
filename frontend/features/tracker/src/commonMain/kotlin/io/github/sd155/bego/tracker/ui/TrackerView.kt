@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import bego.features.tracker.generated.resources.Res
@@ -28,6 +28,7 @@ import io.github.sd155.bego.theme.BegoHeaderText
 import io.github.sd155.bego.theme.BegoPrimaryFilledButton
 import io.github.sd155.bego.theme.BegoTheme
 import io.github.sd155.bego.theme.BegoWarningFilledButton
+import io.github.sd155.bego.tracker.domain.PlatformReason
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -38,6 +39,7 @@ internal fun TrackerView(
     onReset: () -> Unit = {},
     onRetryInitialization: () -> Unit = {},
     onSetTarget: (Int) -> Unit = {},
+    notReadyView: @Composable (PlatformReason) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -71,6 +73,9 @@ internal fun TrackerView(
                     label = stringResource(Res.string.retry_action),
                 )
                 Spacer(modifier = Modifier.height(BegoTheme.sizes.contentVerticalPadding))
+            }
+            is TrackerViewState.PlatformNotReady -> {
+                notReadyView(state.reason)
             }
             is TrackerViewState.Initial -> {
                 Column(
@@ -115,7 +120,6 @@ internal fun TrackerView(
                 )
                 Spacer(modifier = Modifier.height(BegoTheme.sizes.contentVerticalPadding))
             }
-            is TrackerViewState.NotReady -> TODO()
             is TrackerViewState.Running -> {
                 Column(
                     modifier = Modifier

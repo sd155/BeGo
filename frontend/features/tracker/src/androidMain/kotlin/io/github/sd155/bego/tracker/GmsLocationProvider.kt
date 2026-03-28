@@ -14,6 +14,7 @@ import io.github.sd155.bego.utils.asSuccess
 import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.bego.tracker.domain.LocationError
 import io.github.sd155.bego.tracker.app.LocationProvider
+import io.github.sd155.bego.tracker.domain.PlatformReason
 import io.github.sd155.bego.tracker.domain.TrackPoint
 import io.github.sd155.logs.api.Logger
 import kotlin.concurrent.atomics.AtomicReference
@@ -75,7 +76,7 @@ class GmsLocationProvider(
         }
         catch (e: SecurityException) {
             _logger.warn(event = "Location subscription denied due to missing permission", e = e)
-            LocationError.PermissionsDeniedByUser.asFailure()
+            LocationError.PlatformFailure(reason = PlatformReason.Permissions).asFailure()
         }
     }
 }

@@ -6,6 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.sd155.bego.di.Inject
+import io.github.sd155.bego.tracker.domain.PlatformReason
 import io.github.sd155.bego.tracker.ui.TrackerView
 import io.github.sd155.bego.tracker.ui.TrackerViewIntent
 import io.github.sd155.bego.tracker.ui.TrackerViewModel
@@ -26,9 +27,11 @@ object TrackerScreenRoute
 fun TrackerScreen() {
     val viewModel: TrackerViewModel = viewModel { TrackerViewModel() }
     val state by viewModel.state.collectAsState()
-    val prerequisites = Inject.instance<PlatformTrackerRememberer>().rememberLocationPrerequisites()
+    val platformHooks = Inject.instance<TrackerPlatformHooks>()
+    val prerequisites = platformHooks.rememberLocationPrerequisites()
+    val emitInitializationIntent: () -> Unit = { viewModel.onViewIntent(TrackerViewIntent.Initialization(prerequisites)) }
     LaunchedEffect(prerequisites) {
-        viewModel.onViewIntent(TrackerViewIntent.Initialization(prerequisites))
+        emitInitializationIntent()
     }
 
     TrackerView(
@@ -36,12 +39,24 @@ fun TrackerScreen() {
         onStart = { viewModel.onViewIntent(TrackerViewIntent.Start) },
         onStop = { viewModel.onViewIntent(TrackerViewIntent.Stop) },
         onReset = { viewModel.onViewIntent(TrackerViewIntent.Reset) },
-        onRetryInitialization = { viewModel.onViewIntent(TrackerViewIntent.Initialization(prerequisites)) },
+        onRetryInitialization = emitInitializationIntent,
         onSetTarget = { viewModel.onViewIntent(TrackerViewIntent.SetTarget(it)) },
+        notReadyView = { reason ->
+            platformHooks.PlatformNotReadyView(
+                reason = reason,
+                onRetryInitialization = emitInitializationIntent,
+            )
+        }
     )
 }
 
-abstract class PlatformTrackerRememberer {
+abstract class TrackerPlatformHooks {
     @Composable
     internal abstract fun rememberLocationPrerequisites(): LocationPrerequisites
+
+    @Composable
+    internal abstract fun PlatformNotReadyView(
+        reason: PlatformReason,
+        onRetryInitialization: () -> Unit = {},
+    )
 }

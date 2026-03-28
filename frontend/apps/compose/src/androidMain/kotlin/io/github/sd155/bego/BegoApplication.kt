@@ -2,7 +2,7 @@ package io.github.sd155.bego
 
 import android.app.Application
 import android.content.pm.ApplicationInfo
-import io.github.sd155.bego.tracker.AndroidTrackerRememberer
+import io.github.sd155.bego.tracker.AndroidTrackerPlatformHooks
 import io.github.sd155.bego.tracker.GmsLocationProvider
 import io.github.sd155.bego.tracker.initializeAndroidTrackerRuntime
 import io.github.sd155.bego.tracker.app.trackerModule
@@ -24,7 +24,7 @@ internal class BegoApplication : Application() {
             trackerModule = trackerModule(
                 loggerProvider = ::createAndroidLogger,
                 locationProvider = GmsLocationProvider(applicationContext),
-                rememberer = AndroidTrackerRememberer(),
+                platformHooks = AndroidTrackerPlatformHooks(),
             )
         )
         initializeAndroidTrackerRuntime(

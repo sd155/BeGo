@@ -17,11 +17,11 @@ import org.kodein.di.singleton
 fun trackerModule(
     loggerProvider: (source: String) -> Logger,
     locationProvider: LocationProvider,
-    rememberer: PlatformTrackerRememberer,
+    platformHooks: TrackerPlatformHooks,
 ) = DI.Module(name = trackerModuleName) {
     bind<Logger>(trackerModuleName) with singleton { loggerProvider("Tracker") }
     bind<LocationProvider>() with singleton { locationProvider }
-    bind<PlatformTrackerRememberer>() with singleton { rememberer }
+    bind<TrackerPlatformHooks>() with singleton { platformHooks }
     bind<Tracker>() with singleton { Tracker() }
 }
 

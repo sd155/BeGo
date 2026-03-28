@@ -16,6 +16,7 @@ import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import io.github.sd155.bego.tracker.app.LocationPrerequisites
 import io.github.sd155.bego.tracker.domain.LocationError
+import io.github.sd155.bego.tracker.domain.PlatformReason
 import io.github.sd155.bego.utils.Result
 import io.github.sd155.bego.utils.SafeContinuation
 import io.github.sd155.bego.utils.asFailure
@@ -49,7 +50,7 @@ internal class AndroidLocationPrerequisites(
             settingsContinuation.resume(Unit.asSuccess())
         } else {
             logger.info(event = "Location settings resolution cancelled by user")
-            settingsContinuation.resume(LocationError.SettingsDeniedByUser.asFailure())
+            settingsContinuation.resume(LocationError.PlatformFailure(reason = PlatformReason.Settings).asFailure())
         }
     }
 
@@ -73,7 +74,7 @@ internal class AndroidLocationPrerequisites(
         )
             .let { isPermissionsGranted ->
                 if (isPermissionsGranted) Unit.asSuccess()
-                else LocationError.PermissionsDeniedByUser.asFailure()
+                else LocationError.PlatformFailure(reason = PlatformReason.Permissions).asFailure()
             }
             .next { checkLocationSettings() }
 
@@ -109,11 +110,11 @@ internal class AndroidLocationPrerequisites(
                         }
                         catch (sendEx: IntentSender.SendIntentException) {
                             logger.warn(event = "Failed to start location settings resolution!", e = sendEx)
-                            continuation.resume(LocationError.SettingsDeniedByUser.asFailure())
+                            continuation.resume(LocationError.PlatformFailure(reason = PlatformReason.Settings).asFailure())
                         }
                     } else {
                         logger.warn(event = "Location system settings are not relevant, and cannot be resolved", e = error)
-                        continuation.resume(LocationError.SettingsDeniedByUser.asFailure())
+                        continuation.resume(LocationError.PlatformFailure(reason = PlatformReason.Settings).asFailure())
                     }
                 }
                 .addOnSuccessListener {

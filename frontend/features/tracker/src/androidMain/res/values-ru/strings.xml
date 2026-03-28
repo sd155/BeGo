@@ -2,4 +2,7 @@
 <resources>
     <string name="notification_title">BeGo трекер</string>
     <string name="notification_content">Записываю Ваш забег…</string>
+    <string name="permissions_denied_hint">Для работы трекера требуется доступ к геолокации.</string>
+    <string name="settings_denied_hint">Для работы трекера необходимо включить геолокацию на устройстве.</string>
+    <string name="retry_action">Повторить</string>
 </resources>
