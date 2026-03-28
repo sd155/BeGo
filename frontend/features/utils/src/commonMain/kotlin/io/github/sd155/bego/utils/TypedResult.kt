@@ -27,6 +27,12 @@ sealed class Result<out F, out S> private constructor() {
             block(value)
         return this
     }
+
+    fun withFailure(block: (F) -> Unit): Result<F, S> {
+        if (this is Failure)
+            block(error)
+        return this
+    }
 }
 
 /**
