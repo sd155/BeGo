@@ -2,9 +2,7 @@ package io.github.sd155.bego.tracker
 
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import io.github.sd155.logs.api.Logger
 import kotlin.concurrent.atomics.AtomicReference
@@ -19,20 +17,13 @@ import kotlin.coroutines.suspendCoroutine
  */
 @OptIn(ExperimentalAtomicApi::class)
 class AndroidPermissionValidator(
-    activity: ComponentActivity,
+    private val activityResultLauncher: ActivityResultLauncher<Array<String>>,
     private val logger: Logger? = null,
 ) {
-    private val _activityResultLauncher = AtomicReference<ActivityResultLauncher<Array<String>>?>(
-        value = activity.registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions(),
-            ::onActivityCallback
-        )
-    )
-    private val _request = AtomicReference<PermissionRequest?>(value = null)
+    private val requestCoordinator = PermissionRequestCoordinator(logger = logger)
 
-    private fun onActivityCallback(results: Map<String, Boolean>) =
-        _request.load()?.onResponse(results)
-            ?: run { logger?.warn(event = "Called onActivityCallback with no request!") }
+    fun onActivityCallback(results: Map<String, Boolean>) =
+        requestCoordinator.onActivityCallback(results)
 
     /**
      * Checks if all given permissions are granted in the given context.
@@ -70,17 +61,27 @@ class AndroidPermissionValidator(
     }
 
     private suspend inline fun request(permissions: Array<String>): Boolean {
-        val launcher = _activityResultLauncher.load()
-            ?: run {
-                logger?.error(event = "Permissions request failed due to unset ActivityResultLauncher!")
-                return false
-            }
-        return PermissionRequest(permissions, launcher, logger)
+        return PermissionRequest(permissions, activityResultLauncher, logger)
             .let { request ->
-                _request.store(request)
+                requestCoordinator.store(request)
                 request.launch()
             }
     }
+}
+
+@OptIn(ExperimentalAtomicApi::class)
+private class PermissionRequestCoordinator(
+    private val logger: Logger? = null,
+) {
+    private val request = AtomicReference<PermissionRequest?>(value = null)
+
+    fun store(permissionRequest: PermissionRequest) {
+        request.store(permissionRequest)
+    }
+
+    fun onActivityCallback(results: Map<String, Boolean>) =
+        request.load()?.onResponse(results)
+            ?: run { logger?.warn(event = "Called onActivityCallback with no request!") }
 }
 
 private class PermissionRequest(

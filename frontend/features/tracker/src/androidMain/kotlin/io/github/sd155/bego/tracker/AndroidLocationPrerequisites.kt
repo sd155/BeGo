@@ -5,8 +5,8 @@ import android.app.Activity
 import android.content.IntentSender
 import android.os.Build
 import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.gms.common.api.ResolvableApiException
@@ -29,8 +29,9 @@ import kotlin.coroutines.suspendCoroutine
 internal class AndroidLocationPrerequisites(
     private val activity: ComponentActivity,
     private val logger: Logger,
+    private val permissions: AndroidPermissionValidator,
+    private val settingsLauncher: ActivityResultLauncher<IntentSenderRequest>,
 ) : LocationPrerequisites(), DefaultLifecycleObserver {
-    private val permissions = AndroidPermissionValidator(activity = activity, logger = logger)
     private val locationRequest = LocationRequest
         .Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_INTERVAL_MS)
         .setMinUpdateIntervalMillis(LOCATION_INTERVAL_MS)
@@ -42,24 +43,22 @@ internal class AndroidLocationPrerequisites(
             continuation.resume(LocationError.IllegalState.asFailure())
         }
     )
-    private val settingsLauncher = activity.registerForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            logger.info(event = "Location settings resolution successful")
-            settingsContinuation.resume(Unit.asSuccess())
-        } else {
-            logger.info(event = "Location settings resolution cancelled by user")
-            settingsContinuation.resume(LocationError.PlatformFailure(reason = PlatformReason.Settings).asFailure())
-        }
-    }
-
     internal companion object {
         internal const val LOCATION_INTERVAL_MS = 1000L
     }
 
     init {
         activity.lifecycle.addObserver(this)
+    }
+
+    fun onSettingsResolutionResult(resultCode: Int) {
+        if (resultCode == Activity.RESULT_OK) {
+            logger.info(event = "Location settings resolution successful")
+            settingsContinuation.resume(Unit.asSuccess())
+        } else {
+            logger.info(event = "Location settings resolution cancelled by user")
+            settingsContinuation.resume(LocationError.PlatformFailure(reason = PlatformReason.Settings).asFailure())
+        }
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
