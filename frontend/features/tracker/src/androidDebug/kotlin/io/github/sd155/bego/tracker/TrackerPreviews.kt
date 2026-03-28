@@ -13,6 +13,7 @@ import io.github.sd155.bego.tracker.ui.TrackerViewState
 import io.github.sd155.bego.tracker.ui.UiFormatter
 
 private val formatter = UiFormatter()
+private val hooks = AndroidTrackerPlatformHooks()
 
 @Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
 @Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_RU)
@@ -47,14 +48,10 @@ private fun TrackerFatalPreview() {
 @Composable
 private fun TrackerPlatformNotReadyPermissionsPreview() {
     ThemedPreview {
-        val hooks = AndroidTrackerPlatformHooks()
+        val reason = PlatformReason.Permissions
         TrackerView(
-            state = TrackerViewState.PlatformNotReady(reason = PlatformReason.Permissions),
-            notReadyView = { reason ->
-                hooks.PlatformNotReadyView(
-                    reason = reason,
-                )
-            }
+            state = TrackerViewState.PlatformNotReady(reason),
+            notReadyContent = { hooks.PlatformNotReadyView(reason) }
         )
     }
 }
@@ -66,14 +63,10 @@ private fun TrackerPlatformNotReadyPermissionsPreview() {
 @Composable
 private fun TrackerPlatformNotReadySettingsPreview() {
     ThemedPreview {
-        val hooks = AndroidTrackerPlatformHooks()
+        val reason = PlatformReason.Settings
         TrackerView(
-            state = TrackerViewState.PlatformNotReady(reason = PlatformReason.Settings),
-            notReadyView = { reason ->
-                hooks.PlatformNotReadyView(
-                    reason = reason,
-                )
-            }
+            state = TrackerViewState.PlatformNotReady(reason),
+            notReadyContent = { hooks.PlatformNotReadyView(reason) }
         )
     }
 }

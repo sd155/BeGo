@@ -10,6 +10,7 @@ import io.github.sd155.bego.tracker.domain.PlatformReason
 import io.github.sd155.bego.tracker.ui.TrackerView
 import io.github.sd155.bego.tracker.ui.TrackerViewIntent
 import io.github.sd155.bego.tracker.ui.TrackerViewModel
+import io.github.sd155.bego.tracker.ui.TrackerViewState
 import kotlinx.serialization.Serializable
 
 /**
@@ -30,6 +31,15 @@ fun TrackerScreen() {
     val platformHooks = Inject.instance<TrackerPlatformHooks>()
     val prerequisites = platformHooks.rememberLocationPrerequisites()
     val emitInitializationIntent: () -> Unit = { viewModel.onViewIntent(TrackerViewIntent.Initialization(prerequisites)) }
+    val platformNotReadyContent: (@Composable () -> Unit)? =
+        (state as? TrackerViewState.PlatformNotReady)?.let { notReadyState ->
+            {
+                platformHooks.PlatformNotReadyView(
+                    reason = notReadyState.reason,
+                    onRetryInitialization = emitInitializationIntent,
+                )
+            }
+        }
     LaunchedEffect(prerequisites) {
         emitInitializationIntent()
     }
@@ -41,12 +51,7 @@ fun TrackerScreen() {
         onReset = { viewModel.onViewIntent(TrackerViewIntent.Reset) },
         onRetryInitialization = emitInitializationIntent,
         onSetTarget = { viewModel.onViewIntent(TrackerViewIntent.SetTarget(it)) },
-        notReadyView = { reason ->
-            platformHooks.PlatformNotReadyView(
-                reason = reason,
-                onRetryInitialization = emitInitializationIntent,
-            )
-        }
+        notReadyContent = platformNotReadyContent,
     )
 }
 

@@ -28,7 +28,6 @@ import io.github.sd155.bego.theme.BegoHeaderText
 import io.github.sd155.bego.theme.BegoPrimaryFilledButton
 import io.github.sd155.bego.theme.BegoTheme
 import io.github.sd155.bego.theme.BegoWarningFilledButton
-import io.github.sd155.bego.tracker.domain.PlatformReason
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -39,7 +38,7 @@ internal fun TrackerView(
     onReset: () -> Unit = {},
     onRetryInitialization: () -> Unit = {},
     onSetTarget: (Int) -> Unit = {},
-    notReadyView: @Composable (PlatformReason) -> Unit = {},
+    notReadyContent: @Composable (() -> Unit)? = null,
 ) {
     Column(
         modifier = Modifier
@@ -75,7 +74,7 @@ internal fun TrackerView(
                 Spacer(modifier = Modifier.height(BegoTheme.sizes.contentVerticalPadding))
             }
             is TrackerViewState.PlatformNotReady -> {
-                notReadyView(state.reason)
+                notReadyContent?.invoke()
             }
             is TrackerViewState.Initial -> {
                 Column(
