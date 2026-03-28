@@ -32,6 +32,7 @@ Follow the existing code style strictly:
 - Common UI state should expose narrowed UI-facing reasons for platform branches. Do not pass broad domain errors into platform-specific rendering when a smaller UI contract is sufficient.
 - Common shell composables own layout structure, spacing, and parent modifiers. Platform-specific hooks should render content for their slot and should not be responsible for parent layout policy unless that is explicitly the purpose of the API.
 - If a composable exposes a platform/content slot, prefer content-oriented contracts over leaking layout responsibilities through modifier plumbing.
+- If a UI state branch requires external content to render correctly, model that content as required for that branch or provide an explicit fallback. Do not silently render nothing for a reachable state.
 
 ### Logging Rules
 - Logging is performed at the point where the error or noteworthy event originates.
