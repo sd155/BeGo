@@ -1,10 +1,9 @@
 package io.github.sd155.bego.tracker.app
 
+import io.github.sd155.bego.di.DiModule
+import io.github.sd155.bego.di.diModule
 import io.github.sd155.bego.tracker.domain.Tracker
 import io.github.sd155.logs.api.Logger
-import org.kodein.di.bind
-import org.kodein.di.DI
-import org.kodein.di.singleton
 
 /**
  * Creates a dependency injection module for the tracker feature.
@@ -18,11 +17,11 @@ fun trackerModule(
     loggerProvider: (source: String) -> Logger,
     locationProvider: LocationProvider,
     platformHooks: TrackerPlatformHooks,
-) = DI.Module(name = trackerModuleName) {
-    bind<Logger>(trackerModuleName) with singleton { loggerProvider("Tracker") }
-    bind<LocationProvider>() with singleton { locationProvider }
-    bind<TrackerPlatformHooks>() with singleton { platformHooks }
-    bind<Tracker>() with singleton { Tracker() }
+): DiModule = diModule(name = trackerModuleName) {
+    bindSingleton<Logger>(tag = trackerModuleName) { loggerProvider("Tracker") }
+    bindSingleton<LocationProvider> { locationProvider }
+    bindSingleton<TrackerPlatformHooks> { platformHooks }
+    bindSingleton<Tracker> { Tracker() }
 }
 
 internal const val trackerModuleName = "tracker"

@@ -1,8 +1,5 @@
 package io.github.sd155.bego.di
 
-import org.kodein.di.DirectDI
-import org.kodein.di.instance
-
 /**
  * Singleton object for managing dependency injection using Kodein DI in the BeGo frontend.
  *
@@ -10,18 +7,20 @@ import org.kodein.di.instance
  */
 object Inject {
 
-    private var _di: DirectDI? = null
+    private var _di: DiTree? = null
 
     /**
-     * The [DirectDI] instance used for dependency resolution.
+     * The [DiTree] instance used for dependency resolution.
      *
      * This property provides access to the configured dependency injection tree.
      * It should only be accessed after dependencies have been initialized.
      *
      * @throws IllegalStateException if dependencies have not been initialized via [createDependencies].
      */
-    val di: DirectDI
-        get() = requireNotNull(_di)
+    val di: DiTree
+        get() = requireNotNull(_di) {
+            "Dependencies are not initialized. Call Inject.createDependencies(...) during app startup."
+        }
 
     /**
      * Initializes the dependency injection tree.
@@ -30,10 +29,13 @@ object Inject {
      * dependency injection system. It configures the DI tree that will be used
      * for resolving dependencies throughout the application lifecycle.
      *
-     * @param tree The [DirectDI] tree to use for dependency resolution.
+     * @param tree The [DiTree] to use for dependency resolution.
      * @throws IllegalStateException if dependencies have already been initialized.
      */
-    fun createDependencies(tree: DirectDI) {
+    fun createDependencies(tree: DiTree) {
+        check(_di == null) {
+            "Dependencies are already initialized."
+        }
         _di = tree
     }
 

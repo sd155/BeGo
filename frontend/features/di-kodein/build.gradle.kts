@@ -9,7 +9,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(libs.kodein.di)
+            implementation(libs.kodein.di)
         }
     }
 }

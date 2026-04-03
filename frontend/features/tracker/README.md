@@ -19,7 +19,7 @@ Back to the [BeGo frontend application](../../README.md)
   - `PlatformTrackerRememberer`
   - `TrackerScreenRoute`
   - composable `TrackerScreen()`
-  - `trackerModule((String) -> Logger, LocationProvider, PlatformTrackerRememberer): DI.Module`
+  - `trackerModule((String) -> Logger, LocationProvider, PlatformTrackerRememberer): DiModule`
 - Android
   - `GmsLocationProvider`
   - `initializeAndroidTrackerRuntime(Context): Unit`

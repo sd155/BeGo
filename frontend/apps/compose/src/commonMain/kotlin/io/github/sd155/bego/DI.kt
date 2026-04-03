@@ -1,25 +1,24 @@
 package io.github.sd155.bego
 
+import io.github.sd155.bego.di.DiModule
 import io.github.sd155.bego.di.Inject
+import io.github.sd155.bego.di.diModule
+import io.github.sd155.bego.di.diTree
 import io.github.sd155.logs.api.Logger
-import org.kodein.di.DI
-import org.kodein.di.bind
-import org.kodein.di.direct
-import org.kodein.di.singleton
 
 internal const val applicationModuleName: String = "application"
 
 internal fun initApplicationDi(
-    applicationModule: DI.Module,
-    trackerModule: DI.Module,
+    applicationModule: DiModule,
+    trackerModule: DiModule,
 ) {
     Inject.createDependencies(
-        DI {
+        diTree {
             importAll(
                 applicationModule,
                 trackerModule
             )
-        }.direct
+        }
     )
 }
 
@@ -27,7 +26,7 @@ internal fun applicationModule(
     appName: AppName,
     loggerProvider: (source: String) -> Logger,
 ) =
-    DI.Module(name = applicationModuleName) {
-        bind<AppName>() with singleton { appName }
-        bind<Logger>(applicationModuleName) with singleton { loggerProvider("APP") }
+    diModule(name = applicationModuleName) {
+        bindSingleton<AppName> { appName }
+        bindSingleton<Logger>(tag = applicationModuleName) { loggerProvider("APP") }
     }
