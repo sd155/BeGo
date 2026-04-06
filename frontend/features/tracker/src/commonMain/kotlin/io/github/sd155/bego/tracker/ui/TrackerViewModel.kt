@@ -2,9 +2,7 @@ package io.github.sd155.bego.tracker.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.sd155.bego.di.Inject
 import io.github.sd155.bego.tracker.app.LocationPrerequisites
-import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.bego.tracker.domain.LocationError
 import io.github.sd155.bego.tracker.domain.Tracker
 import io.github.sd155.bego.tracker.domain.TrackerState
@@ -19,9 +17,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
-internal class TrackerViewModel : ViewModel() {
-    private val _logger by lazy { Inject.instance<Logger>(tag = trackerModuleName) }
-    private val _tracker by lazy { Inject.instance<Tracker>() }
+internal class TrackerViewModel(
+    private val tracker: Tracker,
+    private val logger: Logger,
+) : ViewModel() {
     private val _formatter by lazy { UiFormatter() }
     private val _state = MutableStateFlow<TrackerViewState>(TrackerViewState.Initialization)
     internal val state: StateFlow<TrackerViewState> = _state.asStateFlow()
@@ -31,10 +30,10 @@ internal class TrackerViewModel : ViewModel() {
     }
 
     init {
-        _tracker.state
+        tracker.state
             .onEach(::collectTrackerState)
             .launchIn(viewModelScope.plus(Dispatchers.Default))
-        _tracker.setTargetDistance(_targetsKm.first() * 1000.0)
+        tracker.setTargetDistance(_targetsKm.first() * 1000.0)
     }
 
     private fun collectTrackerState(state: TrackerState) {
@@ -92,18 +91,18 @@ internal class TrackerViewModel : ViewModel() {
     }
 
     internal fun onViewIntent(intent: TrackerViewIntent) = viewModelScope.launch(Dispatchers.Default) {
-        _logger.trace(event = "VM received View Intent: $intent")
+        logger.trace(event = "VM received View Intent: $intent")
         when (intent) {
             is TrackerViewIntent.Initialization -> initialize(intent.prerequisites)
             TrackerViewIntent.Start ->
-                _tracker.start()
+                tracker.start()
                     .withFailure(::handleLocationError)
-            TrackerViewIntent.Stop -> _tracker.stop()
+            TrackerViewIntent.Stop -> tracker.stop()
             TrackerViewIntent.Reset -> {
-                _tracker.reset()
-                _tracker.setTargetDistance(_targetsKm.first() * 1000.0)
+                tracker.reset()
+                tracker.setTargetDistance(_targetsKm.first() * 1000.0)
             }
-            is TrackerViewIntent.SetTarget -> _tracker.setTargetDistance(intent.targetKm * 1000.0)
+            is TrackerViewIntent.SetTarget -> tracker.setTargetDistance(intent.targetKm * 1000.0)
         }
     }
 }

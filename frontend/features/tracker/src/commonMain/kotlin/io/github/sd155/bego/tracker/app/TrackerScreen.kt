@@ -7,10 +7,12 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.sd155.bego.di.Inject
 import io.github.sd155.bego.tracker.domain.PlatformReason
+import io.github.sd155.bego.tracker.domain.Tracker
 import io.github.sd155.bego.tracker.ui.TrackerView
 import io.github.sd155.bego.tracker.ui.TrackerViewIntent
 import io.github.sd155.bego.tracker.ui.TrackerViewModel
 import io.github.sd155.bego.tracker.ui.TrackerViewState
+import io.github.sd155.logs.api.Logger
 import kotlinx.serialization.Serializable
 
 /**
@@ -26,7 +28,12 @@ object TrackerScreenRoute
  */
 @Composable
 fun TrackerScreen() {
-    val viewModel: TrackerViewModel = viewModel { TrackerViewModel() }
+    val viewModel: TrackerViewModel = viewModel {
+        TrackerViewModel(
+            tracker = Inject.instance<Tracker>(),
+            logger = Inject.instance<Logger>(tag = trackerModuleName),
+        )
+    }
     val state by viewModel.state.collectAsState()
     val platformHooks = Inject.instance<TrackerPlatformHooks>()
     val prerequisites = platformHooks.rememberLocationPrerequisites()
