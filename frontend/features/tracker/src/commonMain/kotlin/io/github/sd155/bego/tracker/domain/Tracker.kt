@@ -1,8 +1,6 @@
 package io.github.sd155.bego.tracker.domain
 
-import io.github.sd155.bego.di.Inject
 import io.github.sd155.bego.tracker.app.LocationProvider
-import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.bego.utils.Result
 import io.github.sd155.logs.api.Logger
 import kotlinx.coroutines.CoroutineScope
@@ -15,11 +13,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlin.math.cos
 import kotlin.math.sqrt
 
-internal class Tracker {
-    private val _logger by lazy { Inject.instance<Logger>(trackerModuleName) }
+internal class Tracker(
+    private val logger: Logger,
+    private val locationProvider: LocationProvider,
+) {
     private val _scope by lazy { CoroutineScope(Dispatchers.Default) }
     private val _stopwatch by lazy { Stopwatch() }
-    private val _location by lazy { Inject.instance<LocationProvider>() }
     private val _locationFilter by lazy { KalmanLocationFilter(processNoise = 1.0) }
     private val _state = MutableStateFlow(TrackerState())
     internal val state: StateFlow<TrackerState> = _state.asStateFlow()
@@ -43,7 +42,7 @@ internal class Tracker {
             state.last
                 ?.let { last ->
                     val lastSegmentDistance = approximateDistance(last, filteredPoint)
-                    _logger.debug("Distance check, speed: ${filteredPoint.speedMetersPerSecond}[${point.speedMetersPerSecond}]m/s, distance:${state.distance}+${lastSegmentDistance}m ? accuracy:${last.horizontalAccuracyMeters}m")
+                    logger.debug("Distance check, speed: ${filteredPoint.speedMetersPerSecond}[${point.speedMetersPerSecond}]m/s, distance:${state.distance}+${lastSegmentDistance}m ? accuracy:${last.horizontalAccuracyMeters}m")
                     if (filteredPoint.speedMetersPerSecond > 0f && lastSegmentDistance > last.horizontalAccuracyMeters) {
                         val distance = state.distance + lastSegmentDistance
                         val speed = calculateSpeedKph(distance, state.time)
@@ -61,7 +60,7 @@ internal class Tracker {
                     }
                 }
                 ?: run {
-                    _logger.debug(event = "First point received")
+                    logger.debug(event = "First point received")
                     _state.value = state.copy(last = filteredPoint)
                 }
         }
@@ -80,17 +79,17 @@ internal class Tracker {
             0L
 
     internal suspend fun start(): Result<LocationError, Unit> =
-        _location.sub(onUpdate = ::handleTrackPoint)
+        locationProvider.sub(onUpdate = ::handleTrackPoint)
             .withSuccess { _stopwatch.start() }
 
     internal fun stop() {
         _stopwatch.stop()
-        _location.unsub()
+        locationProvider.unsub()
     }
 
     internal fun reset() {
         _stopwatch.reset()
-        _location.unsub()
+        locationProvider.unsub()
         _locationFilter.reset()
         _state.value = TrackerState()
     }

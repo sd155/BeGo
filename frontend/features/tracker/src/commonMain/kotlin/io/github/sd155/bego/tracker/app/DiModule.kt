@@ -21,7 +21,12 @@ fun trackerModule(
     bindSingleton<Logger>(tag = trackerModuleName) { loggerProvider("Tracker") }
     bindSingleton<LocationProvider> { locationProvider }
     bindSingleton<TrackerPlatformHooks> { platformHooks }
-    bindSingleton<Tracker> { Tracker() }
+    bindSingleton<Tracker> {
+        Tracker(
+            logger = instance(tag = trackerModuleName),
+            locationProvider = instance(),
+        )
+    }
 }
 
 internal const val trackerModuleName = "tracker"
