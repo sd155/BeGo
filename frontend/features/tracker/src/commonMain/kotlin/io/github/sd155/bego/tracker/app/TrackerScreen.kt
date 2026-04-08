@@ -24,8 +24,8 @@ import kotlinx.serialization.Serializable
 object TrackerScreenRoute
 
 class TrackerScreenBindings internal constructor(
-    val platformHooks: TrackerPlatformHooks,
-    val viewModelFactory: ViewModelProvider.Factory,
+    internal val platformHooks: TrackerPlatformHooks,
+    internal val viewModelFactory: ViewModelProvider.Factory,
 )
 
 fun trackerScreenBindings(
