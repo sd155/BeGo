@@ -11,9 +11,12 @@ import io.github.sd155.logs.createAndroidLogger
 
 internal class BegoApplication : Application() {
 
+    internal lateinit var dependencies: AppDependencies
+        private set
+
     override fun onCreate() {
         super.onCreate()
-        initApplicationDi(
+        dependencies = initApplicationDi(
             applicationModule = applicationModule(
                 appName = AppName(
                     name = applicationContext.resources.getString(R.string.app_name),

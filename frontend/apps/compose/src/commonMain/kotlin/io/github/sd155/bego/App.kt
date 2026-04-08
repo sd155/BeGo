@@ -9,11 +9,18 @@ import io.github.sd155.bego.theme.PlatformIcons
 internal fun App(
     screen: DeviceScreen,
     platformIcons: PlatformIcons,
+    dependencies: AppDependencies,
 ) {
-    BegoTheme(
-        screen = screen,
-        platformIcons = platformIcons,
+    CompositionLocalProvider(
+        LocalAppName provides dependencies.appName,
     ) {
-        AppNavGraph()
+        BegoTheme(
+            screen = screen,
+            platformIcons = platformIcons,
+        ) {
+            AppNavGraph(
+                trackerScreenBindings = dependencies.trackerScreenBindings,
+            )
+        }
     }
 }
