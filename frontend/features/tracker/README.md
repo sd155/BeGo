@@ -18,7 +18,9 @@ Back to the [BeGo frontend application](../../README.md)
   - `LocationPrerequisites`
   - `PlatformTrackerRememberer`
   - `TrackerScreenRoute`
-  - composable `TrackerScreen()`
+  - `TrackerScreenBindings`
+  - `trackerScreenBindings(DiTree): TrackerScreenBindings`
+  - composable `TrackerScreen(TrackerScreenBindings)`
   - `trackerModule((String) -> Logger, LocationProvider, PlatformTrackerRememberer): DiModule`
 - Android
   - `GmsLocationProvider`
@@ -38,7 +40,7 @@ Access modifiers are part of the architecture, not a style preference (see [proj
 ### Common code
 
 #### UI Layer
-- `TrackerScreen`: Main entry point composable for the tracker feature.
+- `TrackerScreen`: Main entry point composable for the tracker feature. Receives prebuilt screen bindings from the outer binding layer.
 - `TrackerViewModel`: ViewModel handling tracker state and user intents.
 - `TrackerViewState`: Immutable state representing the complete UI state.
 - `TrackerView`: View rendering UI state.

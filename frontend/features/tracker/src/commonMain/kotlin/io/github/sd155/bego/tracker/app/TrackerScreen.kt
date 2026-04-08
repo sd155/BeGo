@@ -4,8 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.github.sd155.bego.di.Inject
+import io.github.sd155.bego.di.DiTree
 import io.github.sd155.bego.tracker.domain.PlatformReason
 import io.github.sd155.bego.tracker.domain.Tracker
 import io.github.sd155.bego.tracker.ui.TrackerView
@@ -22,26 +23,44 @@ import kotlinx.serialization.Serializable
 @Serializable
 object TrackerScreenRoute
 
+class TrackerScreenBindings internal constructor(
+    val platformHooks: TrackerPlatformHooks,
+    val viewModelFactory: ViewModelProvider.Factory,
+)
+
+fun trackerScreenBindings(
+    di: DiTree,
+): TrackerScreenBindings =
+    TrackerScreenBindings(
+        platformHooks = di.instance(),
+        viewModelFactory = object : ViewModelProvider.Factory {
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                require(modelClass == TrackerViewModel::class.java)
+                @Suppress("UNCHECKED_CAST")
+                return TrackerViewModel(
+                    tracker = di.instance<Tracker>(),
+                    logger = di.instance<Logger>(tag = trackerModuleName),
+                ) as T
+            }
+        }
+    )
+
 /**
  * Main entry point composable for the tracker feature.
  * Displays the tracker UI and handles user interaction.
  */
 @Composable
-fun TrackerScreen() {
-    val viewModel: TrackerViewModel = viewModel {
-        TrackerViewModel(
-            tracker = Inject.instance<Tracker>(),
-            logger = Inject.instance<Logger>(tag = trackerModuleName),
-        )
-    }
+fun TrackerScreen(
+    bindings: TrackerScreenBindings,
+) {
+    val viewModel: TrackerViewModel = viewModel(factory = bindings.viewModelFactory)
     val state by viewModel.state.collectAsState()
-    val platformHooks = Inject.instance<TrackerPlatformHooks>()
-    val prerequisites = platformHooks.rememberLocationPrerequisites()
+    val prerequisites = bindings.platformHooks.rememberLocationPrerequisites()
     val emitInitializationIntent: () -> Unit = { viewModel.onViewIntent(TrackerViewIntent.Initialization(prerequisites)) }
     val platformNotReadyContent: (@Composable () -> Unit)? =
         (state as? TrackerViewState.PlatformNotReady)?.let { notReadyState ->
             {
-                platformHooks.PlatformNotReadyView(
+                bindings.platformHooks.PlatformNotReadyView(
                     reason = notReadyState.reason,
                     onRetryInitialization = emitInitializationIntent,
                 )

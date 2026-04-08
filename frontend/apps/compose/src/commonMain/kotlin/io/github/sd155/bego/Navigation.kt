@@ -7,8 +7,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.github.sd155.bego.di.Inject
 import io.github.sd155.bego.tracker.app.TrackerScreen
 import io.github.sd155.bego.tracker.app.TrackerScreenRoute
+import io.github.sd155.bego.tracker.app.trackerScreenBindings
 
 internal val LocalNavHost = staticCompositionLocalOf<NavHostController> { error("No default implementation") }
 
@@ -23,7 +25,7 @@ internal fun AppNavGraph() {
             startDestination = TrackerScreenRoute
         ) {
             composable<TrackerScreenRoute> {
-                TrackerScreen()
+                TrackerScreen(bindings = trackerScreenBindings(di = Inject.di))
             }
         }
     }
