@@ -47,3 +47,8 @@
 - `theme`: App theme system, [more details](./features/theme/README.md)
 - `tracker`: Running tracker with smoothed GPS, speed, and pace, [more details](./features/tracker/README.md)
 - `utils`: Multiplatform utilities (typed result, SafeContinuation, etc.), [more details](./features/utils/README.md)
+
+## Dependency Injection
+- `apps/compose` owns the app composition root. It assembles feature modules, initializes the shared DI tree once, and passes explicit `AppDependencies` to UI entry points.
+- Feature modules expose small wiring APIs, such as `trackerModule(...)` and `trackerScreenBindings(...)`, instead of exposing Kodein types or internal implementation classes.
+- `Inject` is kept only as a transition bridge for code that has not yet moved to explicit wiring.

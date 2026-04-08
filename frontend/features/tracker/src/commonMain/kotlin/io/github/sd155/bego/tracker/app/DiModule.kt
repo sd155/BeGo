@@ -11,6 +11,7 @@ import io.github.sd155.logs.api.Logger
  *
  * @param loggerProvider A function that creates a logger instance for the tracker feature
  * @param locationProvider The platform-specific location provider to use
+ * @param platformHooks The platform-specific tracker screen integration hooks
  * @return A DI module containing the tracker feature dependencies
  */
 fun trackerModule(

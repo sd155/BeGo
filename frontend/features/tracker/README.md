@@ -14,28 +14,34 @@ Back to the [BeGo frontend application](../../README.md)
 
 ## API
 - Common  
-  - `LocationProvider`  
+  - `LocationProvider`
   - `LocationPrerequisites`
-  - `PlatformTrackerRememberer`
+  - `TrackerPlatformHooks`
   - `TrackerScreenRoute`
   - `TrackerScreenBindings`
   - `trackerScreenBindings(DiTree): TrackerScreenBindings`
   - composable `TrackerScreen(TrackerScreenBindings)`
-  - `trackerModule((String) -> Logger, LocationProvider, PlatformTrackerRememberer): DiModule`
+  - `trackerModule((String) -> Logger, LocationProvider, TrackerPlatformHooks): DiModule`
 - Android
   - `GmsLocationProvider`
+  - `AndroidTrackerPlatformHooks`
   - `initializeAndroidTrackerRuntime(Context): Unit`
-  - `AndroidLocationPrerequisites(ComponentActivity, Logger)`
-  - `AndroidTrackerRememberer()`
-  - `AndroidPermissionValidator(ComponentActivity, Logger?)`
+  - `AndroidPermissionValidator(ActivityResultLauncher<Array<String>>, Logger)`
   - `AndroidPermissionValidator.check(Context, Array<String>): Boolean`
-  - suspend `AndroidPermissionValidator.checkAndRequest(Context, Array<String>): Boolean`
+
+## DI wiring contract
+- The tracker module exports `trackerModule(...)` so the app composition root can register tracker dependencies in the shared DI tree.
+- The tracker module exports `trackerScreenBindings(DiTree)` so app-level navigation can pass prebuilt screen dependencies to `TrackerScreen` without exposing internal UI or domain types.
+- `TrackerScreenBindings` is public only for app-to-feature wiring. Its contents stay module-internal.
+- `TrackerPlatformHooks` is public only for platform-specific construction and DI wiring. Its rendering and prerequisite methods are module-internal.
+- Domain and UI implementation types such as `Tracker`, `TrackerViewModel`, `TrackerView`, `TrackerState`, and `TrackPoint` are internal.
 
 ## Structure
 
 The codebase is primarily structured by platform or purpose (e.g., debug, test).  
 Secondly, the codebase is structured by layers: application, domain, UI.  
 Access modifiers are part of the architecture, not a style preference (see [project specification](../../../PROJECT.md)).
+Types exposed only for platform wiring or DI composition are documented in the DI wiring contract above.
 
 ### Common code
 

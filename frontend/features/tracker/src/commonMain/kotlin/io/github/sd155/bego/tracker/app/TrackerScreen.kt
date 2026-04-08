@@ -23,11 +23,21 @@ import kotlinx.serialization.Serializable
 @Serializable
 object TrackerScreenRoute
 
+/**
+ * Screen-level dependencies prepared by the application composition root.
+ *
+ * This type is public only so the app module can pass tracker wiring into [TrackerScreen].
+ */
 class TrackerScreenBindings internal constructor(
     internal val platformHooks: TrackerPlatformHooks,
     internal val viewModelFactory: ViewModelProvider.Factory,
 )
 
+/**
+ * Builds tracker screen bindings from the application DI tree.
+ *
+ * This keeps internal tracker types, such as [Tracker] and [TrackerViewModel], inside the tracker module boundary.
+ */
 fun trackerScreenBindings(
     di: DiTree,
 ): TrackerScreenBindings =
@@ -48,6 +58,8 @@ fun trackerScreenBindings(
 /**
  * Main entry point composable for the tracker feature.
  * Displays the tracker UI and handles user interaction.
+ *
+ * Dependencies are supplied by [TrackerScreenBindings] so the composable does not resolve from DI directly.
  */
 @Composable
 fun TrackerScreen(
@@ -81,6 +93,11 @@ fun TrackerScreen(
     )
 }
 
+/**
+ * Platform integration hooks needed by the tracker screen.
+ *
+ * This type is public only to allow platform-specific construction and DI wiring from the app module.
+ */
 abstract class TrackerPlatformHooks {
     @Composable
     internal abstract fun rememberLocationPrerequisites(): LocationPrerequisites

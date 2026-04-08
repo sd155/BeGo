@@ -5,14 +5,15 @@ Back to the [BeGo frontend application](../../README.md)
 
 ## Features
 - **Thin wrapper**: Feature modules depend on `DiModule` and `DiTree`, not on Kodein types
-- **Root composition**: The application root assembles modules into a single DI tree
+- **Root composition**: The app composition root assembles modules into a single DI tree and converts it into app-level dependencies
 - **Transition support**: `Inject` remains available as a temporary global entry point during migration away from service locator usage
 
 ## Target model
 - `di-kodein` is infrastructure only. It owns the DI engine integration and exposes the BeGo DI API.
 - Feature modules define registrations through `DiModule`, but do not import `org.kodein.*`.
-- The app composition root assembles modules and initializes the shared DI tree once during startup.
-- UI and domain code should move toward explicit constructor/factory dependencies instead of resolving from `Inject`.
+- The app composition root assembles modules, initializes the shared DI tree once during startup, and passes explicit app dependencies to UI entry points.
+- UI and domain code should use explicit constructor/factory dependencies instead of resolving from `Inject`.
+- `Inject` is a transition bridge for Android platform/runtime code that has not yet moved to explicit wiring.
 
 ## API
 - Common
@@ -34,11 +35,11 @@ val tree = diTree {
     importAll(appModule)
 }
 
-// Initialize dependencies once at app startup
+// Initialize dependencies once at app startup.
 Inject.createDependencies(tree)
 
-// Retrieve an instance of a dependency
-val myService: MyService = Inject.instance()
+// Prefer resolving root dependencies from the tree and passing them explicitly.
+val appName: AppName = tree.instance()
 ```
 
 ## Dependencies
