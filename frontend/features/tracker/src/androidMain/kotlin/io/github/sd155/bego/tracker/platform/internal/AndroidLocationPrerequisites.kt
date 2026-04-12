@@ -1,4 +1,4 @@
-package io.github.sd155.bego.tracker
+package io.github.sd155.bego.tracker.platform.internal
 
 import android.Manifest
 import android.app.Activity
@@ -14,6 +14,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
+import io.github.sd155.bego.tracker.platform.utils.AndroidPermissionValidator
 import io.github.sd155.bego.tracker.app.LocationPrerequisites
 import io.github.sd155.bego.tracker.domain.LocationError
 import io.github.sd155.bego.tracker.domain.PlatformReason
@@ -111,7 +112,8 @@ internal class AndroidLocationPrerequisites(
                             logger.warn(event = "Failed to start location settings resolution!", e = sendEx)
                             continuation.resume(LocationError.PlatformFailure(reason = PlatformReason.Settings).asFailure())
                         }
-                    } else {
+                    }
+                    else {
                         logger.warn(event = "Location system settings are not relevant, and cannot be resolved", e = error)
                         continuation.resume(LocationError.PlatformFailure(reason = PlatformReason.Settings).asFailure())
                     }

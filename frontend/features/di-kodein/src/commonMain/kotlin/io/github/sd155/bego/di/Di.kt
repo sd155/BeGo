@@ -8,6 +8,13 @@ import org.kodein.di.instance
 import org.kodein.di.singleton
 
 /**
+ * Android-facing contract for framework-created entry points that need access to the shared root DI tree.
+ */
+interface DiTreeHolder {
+    val diTree: DiTree
+}
+
+/**
  * Thin wrapper over the underlying DI engine.
  *
  * Feature modules depend on these abstractions instead of importing Kodein types directly.

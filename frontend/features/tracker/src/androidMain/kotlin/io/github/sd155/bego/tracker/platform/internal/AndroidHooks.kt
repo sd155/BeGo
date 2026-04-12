@@ -1,4 +1,4 @@
-package io.github.sd155.bego.tracker
+package io.github.sd155.bego.tracker.platform.internal
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,24 +15,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import io.github.sd155.bego.di.Inject
-import io.github.sd155.bego.tracker.app.LocationPrerequisites
-import io.github.sd155.bego.tracker.app.TrackerPlatformHooks
-import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.bego.theme.BegoBodyLargeText
 import io.github.sd155.bego.theme.BegoPrimaryFilledButton
 import io.github.sd155.bego.theme.BegoTheme
+import io.github.sd155.bego.tracker.R
+import io.github.sd155.bego.tracker.app.LocationPrerequisites
+import io.github.sd155.bego.tracker.app.PlatformHooks
 import io.github.sd155.bego.tracker.domain.PlatformReason
+import io.github.sd155.bego.tracker.platform.utils.AndroidPermissionValidator
 import io.github.sd155.logs.api.Logger
 
-class AndroidTrackerPlatformHooks : TrackerPlatformHooks() {
+internal class AndroidHooks(
+    private val logger: Logger,
+) : PlatformHooks() {
 
     @Composable
     override fun rememberLocationPrerequisites(): LocationPrerequisites {
         val activity = requireNotNull(LocalActivity.current as? ComponentActivity) {
             "Tracker prerequisites require ComponentActivity"
         }
-        val logger = remember { Inject.instance<Logger>(tag = trackerModuleName) }
         val permissionCallback = remember {
             PermissionResultCallback(logger = logger)
         }

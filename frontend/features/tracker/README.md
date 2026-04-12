@@ -16,24 +16,22 @@ Back to the [BeGo frontend application](../../README.md)
 - Common  
   - `LocationProvider`
   - `LocationPrerequisites`
-  - `TrackerPlatformHooks`
+  - `PlatformHooks`
   - `TrackerScreenRoute`
-  - `TrackerScreenBindings`
-  - `trackerScreenBindings(DiTree): TrackerScreenBindings`
-  - composable `TrackerScreen(TrackerScreenBindings)`
-  - `trackerModule((String) -> Logger, LocationProvider, TrackerPlatformHooks): DiModule`
+  - composable `TrackerScreen(DiTree)`
+  - `TrackerCommonComponents`
+  - `trackerModule((String) -> Logger, (Logger) -> LocationProvider, (Logger) -> PlatformHooks, DiModuleBuilder.(TrackerCommonComponents) -> Unit): DiModule`
 - Android
-  - `GmsLocationProvider`
-  - `AndroidTrackerPlatformHooks`
-  - `initializeAndroidTrackerRuntime(Context): Unit`
+  - `TrackerAndroidComponentsBuilder`
+  - `DiTreeHolder`
   - `AndroidPermissionValidator(ActivityResultLauncher<Array<String>>, Logger)`
   - `AndroidPermissionValidator.check(Context, Array<String>): Boolean`
 
 ## DI wiring contract
 - The tracker module exports `trackerModule(...)` so the app composition root can register tracker dependencies in the shared DI tree.
-- The tracker module exports `trackerScreenBindings(DiTree)` so app-level navigation can pass prebuilt screen dependencies to `TrackerScreen` without exposing internal UI or domain types.
-- `TrackerScreenBindings` is public only for app-to-feature wiring. Its contents stay module-internal.
-- `TrackerPlatformHooks` is public only for platform-specific construction and DI wiring. Its rendering and prerequisite methods are module-internal.
+- The tracker module exports `TrackerCommonComponents` so platform-specific binding code can extend the feature module using already-created common dependencies.
+- `PlatformHooks` is public only for platform-specific construction and DI wiring. Its rendering and prerequisite methods are module-internal.
+- `TrackerScreen` is the feature app-layer and resolves its own bindings from the provided `DiTree`.
 - Domain and UI implementation types such as `Tracker`, `TrackerViewModel`, `TrackerView`, `TrackerState`, and `TrackPoint` are internal.
 
 ## Structure
@@ -46,7 +44,7 @@ Types exposed only for platform wiring or DI composition are documented in the D
 ### Common code
 
 #### UI Layer
-- `TrackerScreen`: Main entry point composable for the tracker feature. Receives prebuilt screen bindings from the outer binding layer.
+- `TrackerScreen`: Main entry point composable for the tracker feature. Resolves its bindings from the provided DI tree.
 - `TrackerViewModel`: ViewModel handling tracker state and user intents.
 - `TrackerViewState`: Immutable state representing the complete UI state.
 - `TrackerView`: View rendering UI state.
@@ -59,8 +57,9 @@ Types exposed only for platform wiring or DI composition are documented in the D
 - `KalmanLocationFilter`: Kalman filter for smoothing GPS data using position, speed, and bearing.
 
 ### Android platform
-- `GmsLocationProvider`: Implementation of **LocationProvider** for Android platform backed by GMS location services.
-- `AndroidTrackerPrerequisites`: Activity-scoped permissions and settings coordinator used before starting tracking.
-- `AndroidTrackerRuntime`: Process lifecycle observer that manages background foreground-service state for active tracking sessions.
-- `TrackerForegroundService`: Android foreground service used when tracking continues in background.
+- `TrackerAndroidComponentsBuilder`: Public Android wiring helper that creates platform implementations and binds Android runtime components.
+- `AndroidGmsLocationProvider`: Implementation of **LocationProvider** for Android platform backed by GMS location services.
+- `AndroidLocationPrerequisites`: Activity-scoped permissions and settings coordinator used before starting tracking.
+- `AndroidRuntime`: Process lifecycle observer that manages background foreground-service state for active tracking sessions.
+- `AndroidForegroundService`: Android foreground service used when tracking continues in background.
 - `AndroidPermissionValidator`: Helper for checking and requesting Android runtime location permissions.

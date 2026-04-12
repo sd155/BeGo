@@ -1,6 +1,7 @@
 package io.github.sd155.bego
 
 import androidx.compose.runtime.*
+import io.github.sd155.bego.di.DiTree
 import io.github.sd155.bego.theme.BegoTheme
 import io.github.sd155.bego.theme.DeviceScreen
 import io.github.sd155.bego.theme.PlatformIcons
@@ -9,18 +10,16 @@ import io.github.sd155.bego.theme.PlatformIcons
 internal fun App(
     screen: DeviceScreen,
     platformIcons: PlatformIcons,
-    dependencies: AppDependencies,
+    diTree: DiTree,
 ) {
     CompositionLocalProvider(
-        LocalAppName provides dependencies.appName,
+        LocalAppName provides diTree.instance<AppName>(),
     ) {
         BegoTheme(
             screen = screen,
             platformIcons = platformIcons,
         ) {
-            AppNavGraph(
-                trackerScreenBindings = dependencies.trackerScreenBindings,
-            )
+            AppNavGraph(diTree)
         }
     }
 }

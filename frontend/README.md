@@ -49,6 +49,6 @@
 - `utils`: Multiplatform utilities (typed result, SafeContinuation, etc.), [more details](./features/utils/README.md)
 
 ## Dependency Injection
-- `apps/compose` owns the app composition root. It assembles feature modules, initializes the shared DI tree once, and passes explicit `AppDependencies` to UI entry points.
-- Feature modules expose small wiring APIs, such as `trackerModule(...)` and `trackerScreenBindings(...)`, instead of exposing Kodein types or internal implementation classes.
-- `Inject` is kept only as a transition bridge for code that has not yet moved to explicit wiring.
+- `apps/compose` owns the app composition root. It assembles feature modules into a single shared `DiTree`.
+- Feature modules expose small wiring APIs, such as `trackerModule(...)`, instead of exposing Kodein types directly.
+- Android framework entry points that cannot use constructor injection access the shared root through `DiTreeHolder` implemented by the app `Application`.

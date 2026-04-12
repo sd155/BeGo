@@ -7,13 +7,15 @@ import io.github.sd155.bego.theme.LOCALE_EN
 import io.github.sd155.bego.theme.LOCALE_RU
 import io.github.sd155.bego.theme.PHONE_PORT_SPEC
 import io.github.sd155.bego.theme.ThemedPreview
+import io.github.sd155.bego.tracker.platform.internal.AndroidHooks
 import io.github.sd155.bego.tracker.domain.PlatformReason
 import io.github.sd155.bego.tracker.ui.TrackerView
 import io.github.sd155.bego.tracker.ui.TrackerViewState
 import io.github.sd155.bego.tracker.ui.UiFormatter
+import io.github.sd155.logs.createAndroidLogger
 
 private val formatter = UiFormatter()
-private val hooks = AndroidTrackerPlatformHooks()
+private val hooks = AndroidHooks(logger = createAndroidLogger(sourceTag = "PREVIEW"))
 
 @Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_EN)
 @Preview(showSystemUi = false, device = PHONE_PORT_SPEC, locale = LOCALE_RU)

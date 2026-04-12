@@ -67,5 +67,6 @@ android {
     }
     dependencies {
         debugImplementation(libs.androidx.ui.tooling)
+        debugImplementation(libs.sd155.kmplogs.core)
     }
 } 

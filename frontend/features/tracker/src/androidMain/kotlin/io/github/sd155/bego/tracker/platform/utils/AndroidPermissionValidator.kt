@@ -1,4 +1,4 @@
-package io.github.sd155.bego.tracker
+package io.github.sd155.bego.tracker.platform.utils
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -16,7 +16,7 @@ import kotlin.coroutines.suspendCoroutine
  * Handles permission dialogs and result callbacks.
  */
 @OptIn(ExperimentalAtomicApi::class)
-class AndroidPermissionValidator(
+internal class AndroidPermissionValidator(
     private val activityResultLauncher: ActivityResultLauncher<Array<String>>,
     private val logger: Logger? = null,
 ) {

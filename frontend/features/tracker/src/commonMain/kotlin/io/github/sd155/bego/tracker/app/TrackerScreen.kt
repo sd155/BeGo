@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.sd155.bego.di.DiTree
@@ -24,55 +25,36 @@ import kotlinx.serialization.Serializable
 object TrackerScreenRoute
 
 /**
- * Screen-level dependencies prepared by the application composition root.
+ * Main entry point composable for the tracker feature.
+ * Displays the tracker UI and handles user interaction.
  *
- * This type is public only so the app module can pass tracker wiring into [TrackerScreen].
+ * This is the feature app-layer composable. It resolves feature bindings from the provided [DiTree]
+ * and keeps the lower UI and domain layers free from direct DI access.
  */
-class TrackerScreenBindings internal constructor(
-    internal val platformHooks: TrackerPlatformHooks,
-    internal val viewModelFactory: ViewModelProvider.Factory,
-)
-
-/**
- * Builds tracker screen bindings from the application DI tree.
- *
- * This keeps internal tracker types, such as [Tracker] and [TrackerViewModel], inside the tracker module boundary.
- */
-fun trackerScreenBindings(
-    di: DiTree,
-): TrackerScreenBindings =
-    TrackerScreenBindings(
-        platformHooks = di.instance(),
-        viewModelFactory = object : ViewModelProvider.Factory {
+@Composable
+fun TrackerScreen(
+    diTree: DiTree,
+) {
+    val viewModel: TrackerViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                 require(modelClass == TrackerViewModel::class.java)
                 @Suppress("UNCHECKED_CAST")
                 return TrackerViewModel(
-                    tracker = di.instance<Tracker>(),
-                    logger = di.instance<Logger>(tag = trackerModuleName),
+                    tracker = diTree.instance<Tracker>(),
+                    logger = diTree.instance<Logger>(tag = trackerModuleName),
                 ) as T
             }
         }
     )
-
-/**
- * Main entry point composable for the tracker feature.
- * Displays the tracker UI and handles user interaction.
- *
- * Dependencies are supplied by [TrackerScreenBindings] so the composable does not resolve from DI directly.
- */
-@Composable
-fun TrackerScreen(
-    bindings: TrackerScreenBindings,
-) {
-    val viewModel: TrackerViewModel = viewModel(factory = bindings.viewModelFactory)
     val state by viewModel.state.collectAsState()
-    val prerequisites = bindings.platformHooks.rememberLocationPrerequisites()
+    val hooks = remember { diTree.instance<PlatformHooks>() }
+    val prerequisites = hooks.rememberLocationPrerequisites()
     val emitInitializationIntent: () -> Unit = { viewModel.onViewIntent(TrackerViewIntent.Initialization(prerequisites)) }
     val platformNotReadyContent: (@Composable () -> Unit)? =
         (state as? TrackerViewState.PlatformNotReady)?.let { notReadyState ->
             {
-                bindings.platformHooks.PlatformNotReadyView(
+                hooks.PlatformNotReadyView(
                     reason = notReadyState.reason,
                     onRetryInitialization = emitInitializationIntent,
                 )
@@ -98,7 +80,7 @@ fun TrackerScreen(
  *
  * This type is public only to allow platform-specific construction and DI wiring from the app module.
  */
-abstract class TrackerPlatformHooks {
+abstract class PlatformHooks {
     @Composable
     internal abstract fun rememberLocationPrerequisites(): LocationPrerequisites
 

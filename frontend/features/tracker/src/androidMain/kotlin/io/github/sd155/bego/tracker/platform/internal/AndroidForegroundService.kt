@@ -1,4 +1,4 @@
-package io.github.sd155.bego.tracker
+package io.github.sd155.bego.tracker.platform.internal
 
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
@@ -12,24 +12,28 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
-import io.github.sd155.bego.di.Inject
+import io.github.sd155.bego.di.DiTreeHolder
+import io.github.sd155.bego.tracker.R
 import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.logs.api.Logger
 
-internal class TrackerForegroundService : Service() {
-    private val _logger by lazy { Inject.instance<Logger>(tag = trackerModuleName) }
+internal class AndroidForegroundService : Service() {
+    private val _logger by lazy {
+        (application as? DiTreeHolder)?.diTree?.instance<Logger>(tag = trackerModuleName)
+            ?: error("Application must implement DiTreeProvider")
+    }
 
     companion object {
         private const val CHANNEL_ID = "BegoTrackerForegroundServiceChannel"
         private const val NOTIFICATION_ID = 1
 
         fun startService(context: Context) {
-            val intent = Intent(context, TrackerForegroundService::class.java)
+            val intent = Intent(context, AndroidForegroundService::class.java)
             context.startForegroundService(intent)
         }
 
         fun stopService(context: Context) {
-            val intent = Intent(context, TrackerForegroundService::class.java)
+            val intent = Intent(context, AndroidForegroundService::class.java)
             context.stopService(intent)
         }
     }

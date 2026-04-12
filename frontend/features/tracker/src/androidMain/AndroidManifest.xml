@@ -10,7 +10,7 @@
 
     <application>
         <service
-            android:name=".TrackerForegroundService"
+            android:name=".platform.internal.AndroidForegroundService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location"
