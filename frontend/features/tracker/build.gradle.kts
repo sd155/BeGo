@@ -32,6 +32,9 @@ kotlin {
             implementation(libs.sd155.kmplogs.api)
             implementation(compose.components.resources)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.google.gms.location)

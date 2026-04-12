@@ -1,0 +1,143 @@
+package io.github.sd155.bego.tracker.domain
+
+import io.github.sd155.bego.tracker.app.LocationProvider
+import io.github.sd155.bego.utils.Result
+import io.github.sd155.bego.utils.asFailure
+import io.github.sd155.bego.utils.asSuccess
+import io.github.sd155.logs.api.Logger
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertIs
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
+
+class TrackerTest {
+    @Test
+    fun setTargetDistanceTest() {
+        val tracker = Tracker(
+            logger = TestLogger(),
+            locationProvider = TestLocationProvider(),
+        )
+
+        tracker.setTargetDistance(5000.0)
+
+        assertEquals(5000.0, tracker.state.value.finish)
+    }
+
+    @Test
+    fun startTrackerLocationFailureTest() = runBlocking {
+        val tracker = Tracker(
+            logger = TestLogger(),
+            locationProvider = TestLocationProvider(
+                subResult = LocationError.IllegalState.asFailure(),
+            ),
+        )
+
+        val result = tracker.start()
+
+        assertIs<Result.Failure<LocationError>>(result)
+        assertEquals(LocationError.IllegalState, result.error)
+        assertFalse(tracker.state.value.running)
+    }
+
+    @Test
+    fun resetTrackerTest() = runBlocking {
+        val locationProvider = TestLocationProvider()
+        val tracker = Tracker(
+            logger = TestLogger(),
+            locationProvider = locationProvider,
+        )
+
+        tracker.setTargetDistance(1000.0)
+        tracker.start()
+        awaitState(tracker) { it.running }
+
+        locationProvider.emit(point(latitude = 60.1699, longitude = 24.9384))
+        locationProvider.emit(point(latitude = 60.1709, longitude = 24.9384))
+        awaitState(tracker) { it.distance > 0.0 }
+
+        tracker.reset()
+        awaitState(tracker) { !it.running && it.time == 0L && it.distance == 0.0 && it.finish == 0.0 && it.last == null }
+
+        assertEquals(1, locationProvider.unsubCalls)
+        assertNull(tracker.state.value.last)
+    }
+
+    @Test
+    fun setTargetDistanceWhileRunningTest() = runBlocking {
+        val tracker = Tracker(
+            logger = TestLogger(),
+            locationProvider = TestLocationProvider(),
+        )
+
+        tracker.setTargetDistance(1000.0)
+        tracker.start()
+        awaitState(tracker) { it.running }
+
+        tracker.setTargetDistance(5000.0)
+
+        assertEquals(1000.0, tracker.state.value.finish)
+        tracker.stop()
+    }
+
+    private suspend fun awaitState(
+        tracker: Tracker,
+        predicate: (TrackerState) -> Boolean,
+    ) {
+        repeat(100) {
+            if (predicate(tracker.state.value)) return
+            delay(10)
+        }
+        assertTrue(predicate(tracker.state.value), "Timed out waiting for tracker state: ${tracker.state.value}")
+    }
+
+    private fun point(
+        latitude: Double,
+        longitude: Double,
+    ) = TrackPoint(
+        timeMs = 0L,
+        latitudeDegrees = latitude,
+        longitudeDegrees = longitude,
+        horizontalAccuracyMeters = 1f,
+        altitudeMeters = 0.0,
+        altitudeAccuracyMeters = 1f,
+        speedMetersPerSecond = 3f,
+        speedAccuracyMeterPerSecond = 1f,
+        bearingDegrees = 0f,
+        bearingAccuracyDegrees = 1f,
+    )
+
+    private class TestLocationProvider(
+        private val subResult: Result<LocationError, Unit> = Unit.asSuccess(),
+    ) : LocationProvider() {
+        private var onUpdate: ((TrackPoint) -> Unit)? = null
+        var unsubCalls: Int = 0
+            private set
+
+        override suspend fun sub(onUpdate: (TrackPoint) -> Unit): Result<LocationError, Unit> {
+            this.onUpdate = onUpdate
+            return subResult
+        }
+
+        override fun unsub() {
+            unsubCalls += 1
+            onUpdate = null
+        }
+
+        fun emit(point: TrackPoint) {
+            onUpdate?.invoke(point)
+        }
+    }
+
+    private class TestLogger : Logger {
+        override fun trace(event: String, diagnostics: List<Any>) = Unit
+        override fun debug(event: String, diagnostics: List<Any>) = Unit
+        override fun info(event: String, diagnostics: List<Any>) = Unit
+        override fun warn(event: String, e: Throwable?, diagnostics: List<Any>) = Unit
+        override fun error(event: String, e: Throwable?, diagnostics: List<Any>) = Unit
+        override fun fatal(event: String, e: Throwable?, diagnostics: List<Any>) = Unit
+    }
+}
