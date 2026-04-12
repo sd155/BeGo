@@ -24,6 +24,7 @@ internal class AndroidRuntime(
     private val _processLifecycle = ProcessLifecycleOwner.get().lifecycle
     private var _isAppInForeground = _processLifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
     private var _isTracking = tracker.state.value.running
+    private var _isForegroundServiceRunning = false
 
     init {
         _processLifecycle.addObserver(this)
@@ -46,7 +47,12 @@ internal class AndroidRuntime(
     }
 
     private fun updateForegroundService() {
-        if (_isTracking && !_isAppInForeground) {
+        val shouldRunForegroundService = _isTracking && !_isAppInForeground
+        if (_isForegroundServiceRunning == shouldRunForegroundService) {
+            return
+        }
+        _isForegroundServiceRunning = shouldRunForegroundService
+        if (shouldRunForegroundService) {
             _logger.debug(event = "Tracker moved to background, starting foreground service")
             AndroidForegroundService.startService(_appContext)
         }
