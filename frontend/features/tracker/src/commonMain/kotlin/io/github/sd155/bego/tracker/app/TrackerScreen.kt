@@ -35,8 +35,8 @@ object TrackerScreenRoute
 fun TrackerScreen(
     diTree: DiTree,
 ) {
-    val viewModel: TrackerViewModel = viewModel(
-        factory = object : ViewModelProvider.Factory {
+    val viewModelFactory = remember(diTree) {
+        object : ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                 require(modelClass == TrackerViewModel::class.java)
                 @Suppress("UNCHECKED_CAST")
@@ -46,9 +46,12 @@ fun TrackerScreen(
                 ) as T
             }
         }
+    }
+    val viewModel: TrackerViewModel = viewModel(
+        factory = viewModelFactory
     )
     val state by viewModel.state.collectAsState()
-    val hooks = remember { diTree.instance<PlatformHooks>() }
+    val hooks = remember(diTree) { diTree.instance<PlatformHooks>() }
     val prerequisites = hooks.rememberLocationPrerequisites()
     val emitInitializationIntent: () -> Unit = { viewModel.onViewIntent(TrackerViewIntent.Initialization(prerequisites)) }
     val platformNotReadyContent: (@Composable () -> Unit)? =

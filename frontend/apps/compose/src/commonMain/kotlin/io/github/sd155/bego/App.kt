@@ -12,8 +12,9 @@ internal fun App(
     platformIcons: PlatformIcons,
     diTree: DiTree,
 ) {
+    val appName = remember(diTree) { diTree.instance<AppName>() }
     CompositionLocalProvider(
-        LocalAppName provides diTree.instance<AppName>(),
+        LocalAppName provides appName,
     ) {
         BegoTheme(
             screen = screen,
