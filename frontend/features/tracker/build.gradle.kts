@@ -37,6 +37,10 @@ kotlin {
             implementation(libs.google.gms.location)
             implementation(libs.lifecycle.process)
         }
+        androidUnitTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlin.test.junit)
+        }
     }
 }
 
