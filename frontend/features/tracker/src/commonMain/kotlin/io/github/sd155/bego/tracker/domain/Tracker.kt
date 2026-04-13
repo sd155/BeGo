@@ -20,6 +20,8 @@ internal class Tracker(
 ) {
     private val _minPlausibleSegmentMeters = 0.25
     private val _minSpeedDistanceMultiplier = 0.3
+    private val _minHighSpeedDistanceMultiplier = 0.5
+    private val _highSpeedThresholdMetersPerSecond = 3.0f
     private val _maxSpeedDistanceMultiplier = 2.5
     private val _maxSpeedDistanceSlackMeters = 1.0
     private val _scope by lazy { CoroutineScope(Dispatchers.Default) }
@@ -104,9 +106,12 @@ internal class Tracker(
         deltaTimeSeconds: Double,
     ): Double {
         if (speedMetersPerSecond <= 0f || deltaTimeSeconds <= 0.0) return _minPlausibleSegmentMeters
+        val speedDistanceMultiplier =
+            if (speedMetersPerSecond >= _highSpeedThresholdMetersPerSecond) _minHighSpeedDistanceMultiplier
+            else _minSpeedDistanceMultiplier
         return max(
             _minPlausibleSegmentMeters,
-            speedMetersPerSecond * deltaTimeSeconds * _minSpeedDistanceMultiplier
+            speedMetersPerSecond * deltaTimeSeconds * speedDistanceMultiplier
         )
     }
 
