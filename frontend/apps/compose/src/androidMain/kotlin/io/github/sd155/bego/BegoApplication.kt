@@ -51,6 +51,10 @@ internal class BegoApplication : Application(), DiTreeHolder {
         AndroidLoggerConfigurator().apply {
             if (isDebuggable()) {
                 enableLogcatLogging()
+                enableFileLogging(
+                    appContext = applicationContext,
+                    external = true,
+                )
                 enableTraceLogging()
                 enableDebugLogging()
             }
