@@ -55,8 +55,9 @@ class TrackerTest {
         tracker.start()
         awaitState(tracker) { it.running }
 
-        locationProvider.emit(point(latitude = 60.1699, longitude = 24.9384))
-        locationProvider.emit(point(latitude = 60.1709, longitude = 24.9384))
+        locationProvider.emit(point(timeMs = 1_000L, latitude = 60.16990, longitude = 24.9384))
+        locationProvider.emit(point(timeMs = 2_000L, latitude = 60.16992, longitude = 24.9384))
+        locationProvider.emit(point(timeMs = 3_000L, latitude = 60.16994, longitude = 24.9384))
         awaitState(tracker) { it.distance > 0.0 }
 
         tracker.reset()
@@ -83,6 +84,71 @@ class TrackerTest {
         tracker.stop()
     }
 
+    @Test
+    fun rejectedPointStillAdvancesLastPointTest() = runBlocking {
+        val locationProvider = TestLocationProvider()
+        val tracker = Tracker(
+            logger = TestLogger(),
+            locationProvider = locationProvider,
+        )
+
+        tracker.start()
+        awaitState(tracker) { it.running }
+
+        locationProvider.emit(point(timeMs = 1_000L, latitude = 60.1699, longitude = 24.9384, speedMetersPerSecond = 0f))
+        locationProvider.emit(point(timeMs = 2_000L, latitude = 60.1699, longitude = 24.9384, speedMetersPerSecond = 0f))
+
+        awaitState(tracker) { it.last?.timeMs == 2_000L }
+
+        assertEquals(0.0, tracker.state.value.distance)
+        tracker.stop()
+    }
+
+    @Test
+    fun stationarySpeedSpikeDoesNotAccumulateDistanceTest() = runBlocking {
+        val locationProvider = TestLocationProvider()
+        val tracker = Tracker(
+            logger = TestLogger(),
+            locationProvider = locationProvider,
+        )
+
+        tracker.start()
+        awaitState(tracker) { it.running }
+
+        locationProvider.emit(point(timeMs = 1_000L, latitude = 60.1699, longitude = 24.9384, speedMetersPerSecond = 0f, horizontalAccuracyMeters = 11.651f))
+        locationProvider.emit(point(timeMs = 2_000L, latitude = 60.1699, longitude = 24.9384, speedMetersPerSecond = 0f, horizontalAccuracyMeters = 11.651f))
+        locationProvider.emit(point(timeMs = 3_000L, latitude = 60.1699, longitude = 24.9384, speedMetersPerSecond = 5.61f, horizontalAccuracyMeters = 11.651f))
+        locationProvider.emit(point(timeMs = 9_000L, latitude = 60.1699, longitude = 24.9384, speedMetersPerSecond = 0.189f, horizontalAccuracyMeters = 11.651f))
+        locationProvider.emit(point(timeMs = 15_000L, latitude = 60.1699, longitude = 24.9384, speedMetersPerSecond = 0f, horizontalAccuracyMeters = 11.651f))
+
+        delay(50)
+
+        assertEquals(0.0, tracker.state.value.distance)
+        tracker.stop()
+    }
+
+    @Test
+    fun tinyDriftWithLargeSpeedSpikeDoesNotAccumulateDistanceTest() = runBlocking {
+        val locationProvider = TestLocationProvider()
+        val tracker = Tracker(
+            logger = TestLogger(),
+            locationProvider = locationProvider,
+        )
+
+        tracker.start()
+        awaitState(tracker) { it.running }
+
+        locationProvider.emit(point(timeMs = 1_000L, latitude = 60.1699000, longitude = 24.9384000, speedMetersPerSecond = 0f))
+        locationProvider.emit(point(timeMs = 2_000L, latitude = 60.1699004, longitude = 24.9384000, speedMetersPerSecond = 8f))
+        locationProvider.emit(point(timeMs = 3_000L, latitude = 60.1699008, longitude = 24.9384000, speedMetersPerSecond = 9f))
+        locationProvider.emit(point(timeMs = 4_000L, latitude = 60.1699012, longitude = 24.9384000, speedMetersPerSecond = 8.5f))
+
+        delay(50)
+
+        assertEquals(0.0, tracker.state.value.distance)
+        tracker.stop()
+    }
+
     private suspend fun awaitState(
         tracker: Tracker,
         predicate: (TrackerState) -> Boolean,
@@ -95,16 +161,19 @@ class TrackerTest {
     }
 
     private fun point(
+        timeMs: Long = 0L,
         latitude: Double,
         longitude: Double,
+        horizontalAccuracyMeters: Float = 1f,
+        speedMetersPerSecond: Float = 3f,
     ) = TrackPoint(
-        timeMs = 0L,
+        timeMs = timeMs,
         latitudeDegrees = latitude,
         longitudeDegrees = longitude,
-        horizontalAccuracyMeters = 1f,
+        horizontalAccuracyMeters = horizontalAccuracyMeters,
         altitudeMeters = 0.0,
         altitudeAccuracyMeters = 1f,
-        speedMetersPerSecond = 3f,
+        speedMetersPerSecond = speedMetersPerSecond,
         speedAccuracyMeterPerSecond = 1f,
         bearingDegrees = 0f,
         bearingAccuracyDegrees = 1f,
