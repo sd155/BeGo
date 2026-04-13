@@ -4,6 +4,7 @@ import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -15,13 +16,29 @@ import androidx.core.app.ServiceCompat
 import io.github.sd155.bego.di.DiTreeHolder
 import io.github.sd155.bego.tracker.R
 import io.github.sd155.bego.tracker.app.trackerModuleName
+import io.github.sd155.bego.tracker.domain.Tracker
+import io.github.sd155.bego.tracker.ui.UiFormatter
 import io.github.sd155.logs.api.Logger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 internal class AndroidForegroundService : Service() {
     private val _logger by lazy {
         (application as? DiTreeHolder)?.diTree?.instance<Logger>(tag = trackerModuleName)
             ?: error("Application must implement DiTreeProvider")
     }
+    private val _tracker by lazy {
+        (application as? DiTreeHolder)?.diTree?.instance<Tracker>()
+            ?: error("Application must implement DiTreeProvider")
+    }
+    private val _formatter = UiFormatter()
+    private val _scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val _notificationManager by lazy { getSystemService(NotificationManager::class.java) }
+    private val _contentIntent by lazy { createContentIntent() }
 
     companion object {
         private const val CHANNEL_ID = "BegoTrackerForegroundServiceChannel"
@@ -41,6 +58,11 @@ internal class AndroidForegroundService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        _tracker.state
+            .onEach { state ->
+                _notificationManager.notify(NOTIFICATION_ID, createNotification(state.distance, state.pace))
+            }
+            .launchIn(_scope)
     }
 
     private fun createNotificationChannel() {
@@ -84,13 +106,51 @@ internal class AndroidForegroundService : Service() {
         }
     }
 
-    private fun createNotification(): Notification {
+    private fun createNotification(
+        distanceMeters: Double = _tracker.state.value.distance,
+        paceMsPerKm: Long = _tracker.state.value.pace,
+    ): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.foreground_service_icon)
             .setContentTitle(getString(R.string.notification_title))
-            .setContentText(getString(R.string.notification_content))
+            .setContentText(
+                getString(
+                    R.string.notification_content,
+                    _formatter.formatDistance(distanceMeters),
+                    _formatter.formatPace(paceMsPerKm),
+                )
+            )
             .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setOnlyAlertOnce(true)
+            .setOngoing(true)
+            .setContentIntent(_contentIntent)
+            .setStyle(
+                NotificationCompat.BigTextStyle().bigText(
+                    getString(
+                        R.string.notification_content,
+                        _formatter.formatDistance(distanceMeters),
+                        _formatter.formatPace(paceMsPerKm),
+                    )
+                )
+            )
             .build()
+    }
+
+    private fun createContentIntent(): PendingIntent? {
+        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
+            ?.apply {
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            ?: return null
+        val flags =
+            PendingIntent.FLAG_UPDATE_CURRENT or
+                    PendingIntent.FLAG_IMMUTABLE
+        return PendingIntent.getActivity(this, 0, launchIntent, flags)
+    }
+
+    override fun onDestroy() {
+        _scope.cancel()
+        super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null

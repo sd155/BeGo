@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="notification_title">BeGo трекер</string>
-    <string name="notification_content">Записываю Ваш забег…</string>
+    <string name="notification_content">Пройдено: %1$s м • Темп: %2$s мин/км</string>
     <string name="permissions_denied_hint">Для работы трекера требуется доступ к геолокации.</string>
     <string name="settings_denied_hint">Для работы трекера необходимо включить геолокацию на устройстве.</string>
     <string name="retry_action">Повторить</string>
