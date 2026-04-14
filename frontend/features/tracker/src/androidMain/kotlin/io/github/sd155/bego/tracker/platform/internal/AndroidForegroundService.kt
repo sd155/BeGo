@@ -13,6 +13,8 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
 import io.github.sd155.bego.di.DiTreeHolder
 import io.github.sd155.bego.tracker.R
 import io.github.sd155.bego.tracker.app.trackerModuleName
@@ -43,23 +45,37 @@ internal class AndroidForegroundService : Service() {
     companion object {
         private const val CHANNEL_ID = "BegoTrackerForegroundServiceChannel"
         private const val NOTIFICATION_ID = 1
+        private const val ACTION_START = "io.github.sd155.bego.tracker.action.START_FOREGROUND"
+        private const val ACTION_STOP = "io.github.sd155.bego.tracker.action.STOP_FOREGROUND"
+        @Volatile
+        internal var isRunning: Boolean = false
+            private set
 
         fun startService(context: Context) {
-            val intent = Intent(context, AndroidForegroundService::class.java)
+            val intent = Intent(context, AndroidForegroundService::class.java).apply {
+                action = ACTION_START
+            }
             context.startForegroundService(intent)
         }
 
         fun stopService(context: Context) {
-            val intent = Intent(context, AndroidForegroundService::class.java)
-            context.stopService(intent)
+            val intent = Intent(context, AndroidForegroundService::class.java).apply {
+                action = ACTION_STOP
+            }
+            context.startService(intent)
         }
     }
 
     override fun onCreate() {
         super.onCreate()
+        isRunning = true
         createNotificationChannel()
         _tracker.state
             .onEach { state ->
+                if (!shouldRunForegroundService()) {
+                    stopForegroundService()
+                    return@onEach
+                }
                 _notificationManager.notify(NOTIFICATION_ID, createNotification(state.distance, state.pace))
             }
             .launchIn(_scope)
@@ -79,6 +95,14 @@ internal class AndroidForegroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_STOP) {
+            stopForegroundService()
+            return START_NOT_STICKY
+        }
+        if (!shouldRunForegroundService()) {
+            stopForegroundService()
+            return START_NOT_STICKY
+        }
         startForeground()
         return START_NOT_STICKY
     }
@@ -148,7 +172,27 @@ internal class AndroidForegroundService : Service() {
         return PendingIntent.getActivity(this, 0, launchIntent, flags)
     }
 
+    private fun stopForegroundService() {
+        if (!isRunning) {
+            stopSelf()
+            return
+        }
+        stopForegroundAndNotification()
+        stopSelf()
+    }
+
+    private fun stopForegroundAndNotification() {
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        _notificationManager.cancel(NOTIFICATION_ID)
+    }
+
+    private fun shouldRunForegroundService(): Boolean =
+        _tracker.state.value.running &&
+            !ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+
     override fun onDestroy() {
+        isRunning = false
+        stopForegroundAndNotification()
         _scope.cancel()
         super.onDestroy()
     }
