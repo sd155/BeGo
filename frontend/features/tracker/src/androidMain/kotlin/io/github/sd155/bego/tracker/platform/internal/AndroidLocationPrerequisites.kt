@@ -70,13 +70,16 @@ internal class AndroidLocationPrerequisites(
     override suspend fun ensureReady(): Result<LocationError, Unit> =
         permissions.checkAndRequest(
             context = activity,
-            permissions = locationPermissions()
+            permissions = permissions()
         )
             .let { isPermissionsGranted ->
                 if (isPermissionsGranted) Unit.asSuccess()
                 else LocationError.PlatformFailure(reason = PlatformReason.Permissions).asFailure()
             }
             .next { checkLocationSettings() }
+
+    private fun permissions(): Array<String> =
+        locationPermissions() + notificationPermissions()
 
     private fun locationPermissions(): Array<String> =
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
@@ -90,6 +93,14 @@ internal class AndroidLocationPrerequisites(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION,
             )
+
+    private fun notificationPermissions(): Array<String> =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            arrayOf(
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        else
+            emptyArray()
 
     private suspend fun checkLocationSettings(): Result<LocationError, Unit> =
         suspendCoroutine { continuation ->

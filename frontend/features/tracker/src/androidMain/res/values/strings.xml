@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="notification_title">BeGo tracker</string>
-    <string name="notification_content">Done: %1$s m • Pace: %2$s min/km</string>
+    <string name="notification_tracking_title">BeGo tracker</string>
+    <string name="notification_tracking_content">Ran: %1$s m • Pace: %2$s min/km</string>
+    <string name="notification_completed_title">Run finished</string>
+    <string name="notification_completed_content">Completed: %1$s m • Pace: %2$s min/km</string>
     <string name="permissions_denied_hint">Location permission is required to use the tracker.</string>
     <string name="settings_denied_hint">Location services must be enabled to use the tracker.</string>
     <string name="retry_action">Retry</string>

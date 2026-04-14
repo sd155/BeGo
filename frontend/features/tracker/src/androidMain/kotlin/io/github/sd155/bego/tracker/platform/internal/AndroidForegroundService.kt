@@ -19,6 +19,7 @@ import io.github.sd155.bego.di.DiTreeHolder
 import io.github.sd155.bego.tracker.R
 import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.bego.tracker.domain.Tracker
+import io.github.sd155.bego.tracker.domain.TrackerState
 import io.github.sd155.bego.tracker.ui.UiFormatter
 import io.github.sd155.logs.api.Logger
 import kotlinx.coroutines.CoroutineScope
@@ -44,7 +45,8 @@ internal class AndroidForegroundService : Service() {
 
     companion object {
         private const val CHANNEL_ID = "BegoTrackerForegroundServiceChannel"
-        private const val NOTIFICATION_ID = 1
+        private const val TRACKING_NOTIFICATION_ID = 1
+        private const val COMPLETED_NOTIFICATION_ID = 2
         private const val ACTION_START = "io.github.sd155.bego.tracker.action.START_FOREGROUND"
         private const val ACTION_STOP = "io.github.sd155.bego.tracker.action.STOP_FOREGROUND"
         @Volatile
@@ -64,6 +66,11 @@ internal class AndroidForegroundService : Service() {
             }
             context.startService(intent)
         }
+
+        fun cancelCompletedNotification(context: Context) {
+            context.getSystemService(NotificationManager::class.java)
+                .cancel(COMPLETED_NOTIFICATION_ID)
+        }
     }
 
     override fun onCreate() {
@@ -72,11 +79,16 @@ internal class AndroidForegroundService : Service() {
         createNotificationChannel()
         _tracker.state
             .onEach { state ->
+                if (shouldShowCompletedNotification(state)) {
+                    showCompletedNotification(state)
+                    stopForegroundService()
+                    return@onEach
+                }
                 if (!shouldRunForegroundService()) {
                     stopForegroundService()
                     return@onEach
                 }
-                _notificationManager.notify(NOTIFICATION_ID, createNotification(state.distance, state.pace))
+                _notificationManager.notify(TRACKING_NOTIFICATION_ID, createTrackingNotification(state))
             }
             .launchIn(_scope)
     }
@@ -111,8 +123,8 @@ internal class AndroidForegroundService : Service() {
         try {
             ServiceCompat.startForeground(
                 this,
-                NOTIFICATION_ID,
-                createNotification(),
+                TRACKING_NOTIFICATION_ID,
+                createTrackingNotification(_tracker.state.value),
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
                 } else {
@@ -130,33 +142,42 @@ internal class AndroidForegroundService : Service() {
         }
     }
 
-    private fun createNotification(
-        distanceMeters: Double = _tracker.state.value.distance,
-        paceMsPerKm: Long = _tracker.state.value.pace,
+    private fun createTrackingNotification(
+        state: TrackerState,
     ): Notification {
+        val contentText = getString(
+            R.string.notification_tracking_content,
+            _formatter.formatDistance(state.distance),
+            _formatter.formatPace(state.pace),
+        )
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.foreground_service_icon)
-            .setContentTitle(getString(R.string.notification_title))
-            .setContentText(
-                getString(
-                    R.string.notification_content,
-                    _formatter.formatDistance(distanceMeters),
-                    _formatter.formatPace(paceMsPerKm),
-                )
-            )
+            .setContentTitle(getString(R.string.notification_tracking_title))
+            .setContentText(contentText)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOnlyAlertOnce(true)
             .setOngoing(true)
             .setContentIntent(_contentIntent)
-            .setStyle(
-                NotificationCompat.BigTextStyle().bigText(
-                    getString(
-                        R.string.notification_content,
-                        _formatter.formatDistance(distanceMeters),
-                        _formatter.formatPace(paceMsPerKm),
-                    )
-                )
-            )
+            .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+            .build()
+    }
+
+    private fun createCompletedNotification(
+        state: TrackerState,
+    ): Notification {
+        val contentText = getString(
+            R.string.notification_completed_content,
+            _formatter.formatDistance(state.distance),
+            _formatter.formatPace(state.pace),
+        )
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.foreground_service_icon)
+            .setContentTitle(getString(R.string.notification_completed_title))
+            .setContentText(contentText)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setAutoCancel(true)
+            .setContentIntent(_contentIntent)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             .build()
     }
 
@@ -183,12 +204,23 @@ internal class AndroidForegroundService : Service() {
 
     private fun stopForegroundAndNotification() {
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
-        _notificationManager.cancel(NOTIFICATION_ID)
+        _notificationManager.cancel(TRACKING_NOTIFICATION_ID)
     }
 
     private fun shouldRunForegroundService(): Boolean =
         _tracker.state.value.running &&
             !ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+
+    private fun shouldShowCompletedNotification(state: TrackerState): Boolean =
+        !state.running &&
+            state.time > 0L &&
+            state.finish > 0.0 &&
+            state.distance >= state.finish &&
+            !ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+
+    private fun showCompletedNotification(state: TrackerState) {
+        _notificationManager.notify(COMPLETED_NOTIFICATION_ID, createCompletedNotification(state))
+    }
 
     override fun onDestroy() {
         isRunning = false

@@ -37,6 +37,7 @@ internal class AndroidRuntime(
 
     override fun onStart(owner: LifecycleOwner) {
         _isAppInForeground = true
+        AndroidForegroundService.cancelCompletedNotification(_appContext)
         updateForegroundService()
     }
 
