@@ -24,6 +24,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.features.diKodein)
+            implementation(projects.features.history)
             implementation(projects.features.theme)
             implementation(projects.features.tracker)
             implementation(libs.compose.navigation)
