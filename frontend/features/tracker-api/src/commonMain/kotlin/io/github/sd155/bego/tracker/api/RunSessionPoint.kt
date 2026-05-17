@@ -1,5 +1,11 @@
 package io.github.sd155.bego.tracker.api
 
+/**
+ * A single tracker-emitted sample belonging to one running session.
+ *
+ * The session is identified by [sessionStartTimeMs]. Consumers are responsible for
+ * dispatching, persistence, and any additional session-level aggregation they require.
+ */
 data class RunSessionPoint(
     val sessionStartTimeMs: Long,
     val sessionDurationMs: Long,

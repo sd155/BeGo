@@ -10,8 +10,14 @@ import io.github.sd155.bego.tracker.platform.internal.AndroidHooks
 import io.github.sd155.bego.tracker.platform.internal.AndroidRuntime
 import io.github.sd155.logs.api.Logger
 
+/**
+ * Android-specific wiring helper for the tracker feature.
+ */
 class TrackerAndroidComponentsBuilder {
 
+    /**
+     * Creates the Android implementation of [LocationProvider].
+     */
     fun createLocationProvider(
         applicationContext: Context,
         logger: Logger,
@@ -21,9 +27,15 @@ class TrackerAndroidComponentsBuilder {
             logger = logger,
         )
 
+    /**
+     * Creates Android UI hooks required by the tracker screen.
+     */
     fun createHooks(logger: Logger): PlatformHooks =
         AndroidHooks(logger)
 
+    /**
+     * Registers Android runtime components that depend on common tracker objects.
+     */
     fun bind(
         builder: DiModuleBuilder,
         context: Context,
