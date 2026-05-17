@@ -30,7 +30,8 @@ dependencyResolutionManagement {
 
 include(":apps:compose")
 include(":features:di-kodein")
-include(":features:history")
 include(":features:utils")
 include(":features:theme")
+include(":features:tracker-api")
 include(":features:tracker")
+include(":features:history")
