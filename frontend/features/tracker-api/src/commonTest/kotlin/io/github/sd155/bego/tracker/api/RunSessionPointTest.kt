@@ -16,6 +16,19 @@ class RunSessionPointTest {
     }
 
     @Test
+    fun boundaryRunSessionPointTest() {
+        val point = buildRunSessionPoint(
+            latitudeDegrees = -90.0,
+            longitudeDegrees = 180.0,
+            bearingDegrees = 360f,
+        )
+
+        assertEquals(-90.0, point.latitudeDegrees)
+        assertEquals(180.0, point.longitudeDegrees)
+        assertEquals(360f, point.bearingDegrees)
+    }
+
+    @Test
     fun invalidRunSessionPointTest() {
         assertFailsWith<IllegalArgumentException> {
             buildRunSessionPoint(sessionStartTimeMs = 0L)
