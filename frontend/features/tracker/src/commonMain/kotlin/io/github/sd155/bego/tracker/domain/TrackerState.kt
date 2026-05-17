@@ -11,4 +11,4 @@ internal data class TrackerState(
 )
 
 internal fun TrackerState.isRunning() =
-    startTime > 0L
+    startTime > 0L && finish > distance
