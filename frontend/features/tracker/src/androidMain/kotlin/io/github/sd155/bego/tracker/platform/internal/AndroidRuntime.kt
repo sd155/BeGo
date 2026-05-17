@@ -6,6 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import io.github.sd155.bego.tracker.domain.Tracker
+import io.github.sd155.bego.tracker.domain.isRunning
 import io.github.sd155.logs.api.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,13 +24,13 @@ internal class AndroidRuntime(
     private val _scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val _processLifecycle = ProcessLifecycleOwner.get().lifecycle
     private var _isAppInForeground = _processLifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
-    private var _isTracking = tracker.state.value.running
+    private var _isTracking = tracker.state.value.isRunning()
 
     init {
         _processLifecycle.addObserver(this)
         tracker.state
             .onEach { state ->
-                _isTracking = state.running
+                _isTracking = state.isRunning()
                 updateForegroundService()
             }
             .launchIn(_scope)

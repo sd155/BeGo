@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sqrt
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 internal class Tracker(
     private val logger: Logger,
@@ -155,9 +157,13 @@ internal class Tracker(
         return speedMetersPerSecond * deltaTimeSeconds * _maxSpeedDistanceMultiplier + _maxSpeedDistanceSlackMeters
     }
 
+    @OptIn(ExperimentalTime::class)
     internal suspend fun start(): Result<LocationError, Unit> =
         locationProvider.sub(onUpdate = ::handleTrackPoint)
-            .withSuccess { _stopwatch.start() }
+            .withSuccess {
+                _state.value = _state.value.copy(startTime = Clock.System.now().toEpochMilliseconds())
+                _stopwatch.start()
+            }
 
     internal fun stop() {
         _stopwatch.stop()
@@ -172,13 +178,11 @@ internal class Tracker(
     }
 
     internal fun setTargetDistance(distance: Double) {
-        if (isNotRunning()) {
-            _state.value = _state.value.copy(finish = distance)
+        _state.value.let { state ->
+            if (!state.isRunning())
+                _state.value = state.copy(finish = distance)
         }
     }
-
-    private fun isNotRunning() =
-        _state.value.startTime == 0L
 
     /**
      * That is simplified flat-Earth approximation.

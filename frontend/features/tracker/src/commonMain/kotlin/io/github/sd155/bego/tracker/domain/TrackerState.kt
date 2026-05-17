@@ -9,3 +9,6 @@ internal data class TrackerState(
     val pace: Long = 0L,
     val last: TrackPoint? = null,
 )
+
+internal fun TrackerState.isRunning() =
+    startTime > 0L
