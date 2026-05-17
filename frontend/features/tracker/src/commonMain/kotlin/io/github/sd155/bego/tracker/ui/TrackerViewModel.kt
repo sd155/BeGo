@@ -6,7 +6,6 @@ import io.github.sd155.bego.tracker.app.LocationPrerequisites
 import io.github.sd155.bego.tracker.domain.LocationError
 import io.github.sd155.bego.tracker.domain.Tracker
 import io.github.sd155.bego.tracker.domain.TrackerState
-import io.github.sd155.bego.tracker.domain.isRunning
 import io.github.sd155.bego.utils.fold
 import io.github.sd155.logs.api.Logger
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +43,7 @@ internal class TrackerViewModel(
             is TrackerViewState.PlatformNotReady -> Unit
             else ->
                 _state.value =
-                    if (state.isRunning())
+                    if (state.running)
                         TrackerViewState.Running(
                             target = _formatter.formatTarget(distanceMeters = state.finish),
                             time = _formatter.formatTime(timeMs = state.time),

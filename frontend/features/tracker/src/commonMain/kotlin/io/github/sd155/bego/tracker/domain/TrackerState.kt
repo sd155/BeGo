@@ -8,7 +8,5 @@ internal data class TrackerState(
     val speed: Float = 0f,
     val pace: Long = 0L,
     val last: TrackPoint? = null,
+    val running: Boolean = false,
 )
-
-internal fun TrackerState.isRunning() =
-    startTime > 0L && finish > distance

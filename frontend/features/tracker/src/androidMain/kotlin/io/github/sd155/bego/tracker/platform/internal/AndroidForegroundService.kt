@@ -20,7 +20,6 @@ import io.github.sd155.bego.tracker.R
 import io.github.sd155.bego.tracker.app.trackerModuleName
 import io.github.sd155.bego.tracker.domain.Tracker
 import io.github.sd155.bego.tracker.domain.TrackerState
-import io.github.sd155.bego.tracker.domain.isRunning
 import io.github.sd155.bego.tracker.ui.UiFormatter
 import io.github.sd155.logs.api.Logger
 import kotlinx.coroutines.CoroutineScope
@@ -209,11 +208,11 @@ internal class AndroidForegroundService : Service() {
     }
 
     private fun shouldRunForegroundService(): Boolean =
-        _tracker.state.value.isRunning() &&
+        _tracker.state.value.running &&
             !ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
 
     private fun shouldShowCompletedNotification(state: TrackerState): Boolean =
-        !state.isRunning() &&
+        !state.running &&
             state.time > 0L &&
             state.finish > 0.0 &&
             state.distance >= state.finish &&

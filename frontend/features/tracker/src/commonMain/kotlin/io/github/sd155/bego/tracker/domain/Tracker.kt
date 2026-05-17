@@ -42,7 +42,10 @@ internal class Tracker(
     }
 
     private fun handleStopwatchState(state: StopwatchState) {
-        _state.value = _state.value.copy(time = state.elapsedMs)
+        _state.value = _state.value.copy(
+            time = state.elapsedMs,
+            running = state.isRunning,
+        )
     }
 
     private fun handleTrackPoint(point: TrackPoint) {
@@ -161,7 +164,7 @@ internal class Tracker(
     @OptIn(ExperimentalTime::class)
     internal suspend fun start(): Result<LocationError, Unit> {
         val state = _state.value
-        if (state.isRunning()) {
+        if (state.running) {
             return Unit.asSuccess()
         }
         else {
@@ -186,7 +189,7 @@ internal class Tracker(
 
     internal fun setTargetDistance(distance: Double) {
         _state.value.let { state ->
-            if (!state.isRunning())
+            if (!state.running)
                 _state.value = state.copy(finish = distance)
         }
     }
