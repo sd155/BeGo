@@ -1,4 +1,4 @@
-package io.github.sd155.bego.tracker.platform.api
+package io.github.sd155.bego.tracker.platform.app
 
 import android.content.Context
 import io.github.sd155.bego.di.DiModuleBuilder

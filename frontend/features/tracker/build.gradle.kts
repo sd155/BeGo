@@ -24,6 +24,7 @@ kotlin {
     sourceSets {        
         commonMain.dependencies {
             implementation(projects.features.diKodein)
+            implementation(projects.features.trackerApi)
             implementation(projects.features.utils)
             implementation(projects.features.theme)
             implementation(libs.kotlinx.serialization.core)

@@ -1,5 +1,6 @@
 package io.github.sd155.bego.tracker.domain
 
+import io.github.sd155.bego.tracker.api.RunSessionPoint
 import io.github.sd155.bego.tracker.app.LocationProvider
 import io.github.sd155.bego.utils.Result
 import io.github.sd155.logs.api.Logger
@@ -16,6 +17,7 @@ import kotlin.math.sqrt
 
 internal class Tracker(
     private val logger: Logger,
+    private val sessionWriter: (RunSessionPoint) -> Unit,
     private val locationProvider: LocationProvider,
 ) {
     private val _minPlausibleSegmentMeters = 0.25
@@ -37,10 +39,7 @@ internal class Tracker(
     }
 
     private fun handleStopwatchState(state: StopwatchState) {
-        _state.value = _state.value.copy(
-            time = state.elapsedMs,
-            running = state.isRunning
-        )
+        _state.value = _state.value.copy(time = state.elapsedMs)
     }
 
     private fun handleTrackPoint(point: TrackPoint) {
@@ -75,6 +74,13 @@ internal class Tracker(
                         )
                             .apply {
                                 _state.value = this
+                                persistSessionPoint(
+                                    state = state,
+                                    point = filteredPoint,
+                                    accumulatedDistance = distance,
+                                    averageSpeed = speed,
+                                    averagePace = pace,
+                                )
                                 if (this.distance >= this.finish) stop()
                             }
                     }
@@ -85,8 +91,33 @@ internal class Tracker(
                 ?: run {
                     logger.debug(event = "First point received")
                     _state.value = state.copy(last = filteredPoint)
+                    persistSessionPoint(state = state, point = filteredPoint)
                 }
         }
+    }
+
+    private fun persistSessionPoint(
+        state: TrackerState,
+        point: TrackPoint,
+        accumulatedDistance: Double = 0.0,
+        averageSpeed: Float = 0f,
+        averagePace: Long = 0L,
+    ) {
+        sessionWriter(
+            RunSessionPoint(
+                sessionStartTimeMs = state.startTime,
+                sessionDurationMs = state.time,
+                targetDistanceMeters = state.finish,
+                sessionDistanceMeters = accumulatedDistance,
+                latitudeDegrees = point.latitudeDegrees,
+                longitudeDegrees = point.longitudeDegrees,
+                altitudeMeters = point.altitudeMeters,
+                bearingDegrees = point.bearingDegrees,
+                speedMetersPerSecond = point.speedMetersPerSecond,
+                averageSpeedKph = averageSpeed,
+                averagePaceMsPerKm = averagePace,
+            )
+        )
     }
 
     private fun calculateSpeedKph(distanceMeters: Double, timeMs: Long): Float =
@@ -141,10 +172,13 @@ internal class Tracker(
     }
 
     internal fun setTargetDistance(distance: Double) {
-        if (!_state.value.running) {
+        if (isNotRunning()) {
             _state.value = _state.value.copy(finish = distance)
         }
     }
+
+    private fun isNotRunning() =
+        _state.value.startTime == 0L
 
     /**
      * That is simplified flat-Earth approximation.

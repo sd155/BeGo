@@ -6,7 +6,7 @@ import io.github.sd155.bego.di.DiTree
 import io.github.sd155.bego.di.DiTreeHolder
 import io.github.sd155.bego.di.diTree
 import io.github.sd155.bego.tracker.app.trackerModule
-import io.github.sd155.bego.tracker.platform.api.TrackerAndroidComponentsBuilder
+import io.github.sd155.bego.tracker.platform.app.TrackerAndroidComponentsBuilder
 import io.github.sd155.logs.AndroidLoggerConfigurator
 import io.github.sd155.logs.createAndroidLogger
 
@@ -29,6 +29,7 @@ internal class BegoApplication : Application(), DiTreeHolder {
                 ),
                 trackerModule(
                     loggerBuilder = ::createAndroidLogger,
+                    sessionWriter = {},
                     locationProviderBuilder = { logger ->
                         trackerComponentsBuilder.createLocationProvider(
                             applicationContext = applicationContext,
