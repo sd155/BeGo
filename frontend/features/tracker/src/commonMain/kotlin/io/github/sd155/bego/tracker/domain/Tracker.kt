@@ -3,6 +3,7 @@ package io.github.sd155.bego.tracker.domain
 import io.github.sd155.bego.tracker.api.RunSessionPoint
 import io.github.sd155.bego.tracker.app.LocationProvider
 import io.github.sd155.bego.utils.Result
+import io.github.sd155.bego.utils.asSuccess
 import io.github.sd155.logs.api.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -158,12 +159,18 @@ internal class Tracker(
     }
 
     @OptIn(ExperimentalTime::class)
-    internal suspend fun start(): Result<LocationError, Unit> =
-        locationProvider.sub(onUpdate = ::handleTrackPoint)
-            .withSuccess {
-                _state.value = _state.value.copy(startTime = Clock.System.now().toEpochMilliseconds())
-                _stopwatch.start()
-            }
+    internal suspend fun start(): Result<LocationError, Unit> {
+        val state = _state.value
+        if (state.isRunning()) {
+            return Unit.asSuccess()
+        }
+        else {
+            _state.value = state.copy(startTime = Clock.System.now().toEpochMilliseconds())
+            return locationProvider.sub(onUpdate = ::handleTrackPoint)
+                .withSuccess { _stopwatch.start() }
+                .withFailure { _state.value = TrackerState() }
+        }
+    }
 
     internal fun stop() {
         _stopwatch.stop()
