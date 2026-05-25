@@ -2,6 +2,7 @@ package io.github.sd155.bego.tracker.app
 
 import androidx.compose.runtime.Composable
 import io.github.sd155.bego.di.diTree
+import io.github.sd155.bego.tracker.api.RunSessionPoint
 import io.github.sd155.bego.tracker.domain.LocationError
 import io.github.sd155.bego.tracker.domain.PlatformReason
 import io.github.sd155.bego.tracker.domain.Tracker
@@ -19,6 +20,7 @@ class TrackerModuleTest {
         lateinit var hooksLogger: Logger
         val locationProvider = TestLocationProvider()
         val hooks = TestPlatformHooks()
+        val sessionPoints = mutableListOf<RunSessionPoint>()
 
         val diTree = diTree {
             importAll(
@@ -27,6 +29,7 @@ class TrackerModuleTest {
                         createdSources += source
                         TestLogger(source = source)
                     },
+                    sessionWriter = { point -> sessionPoints += point },
                     locationProviderBuilder = { logger ->
                         locationProviderLogger = logger
                         locationProvider

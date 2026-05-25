@@ -3,6 +3,7 @@ package io.github.sd155.bego.tracker.app
 import io.github.sd155.bego.di.DiModule
 import io.github.sd155.bego.di.DiModuleBuilder
 import io.github.sd155.bego.di.diModule
+import io.github.sd155.bego.tracker.api.RunSessionPoint
 import io.github.sd155.bego.tracker.domain.Tracker
 import io.github.sd155.logs.api.Logger
 
@@ -11,6 +12,7 @@ import io.github.sd155.logs.api.Logger
  * This module provides the necessary dependencies for the tracker functionality.
  *
  * @param loggerBuilder A function that creates a logger instance for the tracker feature
+ * @param sessionWriter A synchronous consumer for tracker-emitted session points
  * @param locationProviderBuilder Creates the platform-specific location provider using the tracker logger
  * @param platformHooksBuilder Creates the platform-specific tracker screen hooks using the tracker logger
  * @param platformBinding Optional platform-specific binding step that can register additional dependencies
@@ -19,6 +21,7 @@ import io.github.sd155.logs.api.Logger
  */
 fun trackerModule(
     loggerBuilder: (source: String) -> Logger,
+    sessionWriter: (RunSessionPoint) -> Unit,
     locationProviderBuilder: (logger: Logger) -> LocationProvider,
     platformHooksBuilder: (logger: Logger) -> PlatformHooks,
     platformBinding: DiModuleBuilder.(components: TrackerCommonComponents) -> Unit = {},
@@ -28,6 +31,7 @@ fun trackerModule(
     val hooks = platformHooksBuilder(logger)
     val tracker = Tracker(
         logger = logger,
+        sessionWriter = sessionWriter,
         locationProvider = locationProvider,
     )
     bindSingleton<Logger>(tag = trackerModuleName) { logger }

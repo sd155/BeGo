@@ -9,6 +9,7 @@ Follow the existing code style strictly:
     - Constants: `SCREAMING_SNAKE_CASE`.
     - JSON field names: always `snake_case`, enforced via `@SerialName("snake_case")` on serializable properties. Kotlin property names remain in `camelCase`.
     - Private backing properties (e.g., for delegated lazy initialization): prefixed with `_` (e.g., `_root`).
+    - Test functions: `camelCase` identifiers ending with `Test`; do not use backticked sentence-style names.
 - **Braces**: K&R style — opening brace on the same line as the declaration (`if`, `fun`, `class`, etc.).
 - **Spacing**:
     - One space after keywords (`if`, `when`, `try`, etc.).
@@ -25,6 +26,7 @@ Follow the existing code style strictly:
 - Access modifiers are part of the architecture, not a style preference.
 - `public` is used only for the module API and for instantiating internal platform-split components from outside the module.
 - `internal` is used for everything that must stay inside the module boundary, even if the owning type is `public`.
+- Do not widen visibility proactively. Default to `private` or `internal` and make a type `public` only when a current cross-module use case requires it.
 - If a type is `public` only to allow platform-specific construction or DI wiring, this should be reflected in the module documentation.
 
 ### UI Composition Rules
@@ -56,7 +58,7 @@ Follow the existing code style strictly:
 ```
 
 - **Imperative mood**: “add”, “fix”, “update” — never “added” or “fixed”.
-- **Scopes** must match actual Gradle modules: `theme`, `tracker`.
+- **Scopes** must match actual Gradle modules: `history`, `tracker-api`, `theme`, `tracker`.
 - **Types**: `feat`, `fix`, `docs`, `refactor`, `test`, `build`, `ci`, `chore`.
 - **Breaking changes**: append `!` after type/scope **and** include a `BREAKING CHANGE:` footer. Required for any incompatible change in public API.
 

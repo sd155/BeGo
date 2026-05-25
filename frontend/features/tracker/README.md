@@ -10,6 +10,7 @@ Back to the [BeGo frontend application](../../README.md)
 - **Distance presets**: Supports most popular race distances (1km, 5km, 10km, 21km, 42km).
 - **Automatic Session Finish**: Stops tracking automatically when a target distance (default: 1000m) is reached.
 - **Speed and Pace**: UI displays running session speed (km/h) and pace (min/km).
+- **Session point export**: Emits the first observed point and each plausible subsequent point through the injected `RunSessionPoint` callback.
 - **Multi-language Support**: Built-in support for English and Russian languages.
 
 ## API
@@ -20,7 +21,7 @@ Back to the [BeGo frontend application](../../README.md)
   - `TrackerScreenRoute`
   - composable `TrackerScreen(DiTree)`
   - `TrackerCommonComponents`
-  - `trackerModule((String) -> Logger, (Logger) -> LocationProvider, (Logger) -> PlatformHooks, DiModuleBuilder.(TrackerCommonComponents) -> Unit): DiModule`
+  - `trackerModule((String) -> Logger, (RunSessionPoint) -> Unit, (Logger) -> LocationProvider, (Logger) -> PlatformHooks, DiModuleBuilder.(TrackerCommonComponents) -> Unit): DiModule`
 - Android
   - `TrackerAndroidComponentsBuilder`
   - `DiTreeHolder`
@@ -29,10 +30,12 @@ Back to the [BeGo frontend application](../../README.md)
 
 ## DI wiring contract
 - The tracker module exports `trackerModule(...)` so the app composition root can register tracker dependencies in the shared DI tree.
+- The app composition root must provide a synchronous `sessionWriter` callback when composing the tracker module.
 - The tracker module exports `TrackerCommonComponents` so platform-specific binding code can extend the feature module using already-created common dependencies.
 - `PlatformHooks` is public only for platform-specific construction and DI wiring. Its rendering and prerequisite methods are module-internal.
 - `TrackerScreen` is the feature app-layer and resolves its own bindings from the provided `DiTree`.
 - Domain and UI implementation types such as `Tracker`, `TrackerViewModel`, `TrackerView`, `TrackerState`, and `TrackPoint` are internal.
+- Cross-feature persistence contracts such as `RunSessionPoint` live in the separate `tracker-api` module.
 
 ## Structure
 

@@ -25,7 +25,9 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.features.diKodein)
             implementation(projects.features.theme)
+            implementation(projects.features.trackerApi)
             implementation(projects.features.tracker)
+            implementation(projects.features.history)
             implementation(libs.compose.navigation)
             implementation(libs.sd155.kmplogs.api)
         }

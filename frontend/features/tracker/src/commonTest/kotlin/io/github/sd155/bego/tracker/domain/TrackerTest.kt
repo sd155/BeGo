@@ -1,5 +1,6 @@
 package io.github.sd155.bego.tracker.domain
 
+import io.github.sd155.bego.tracker.api.RunSessionPoint
 import io.github.sd155.bego.tracker.app.LocationProvider
 import io.github.sd155.bego.utils.Result
 import io.github.sd155.bego.utils.asFailure
@@ -9,7 +10,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -19,6 +19,7 @@ class TrackerTest {
     fun setTargetDistanceTest() {
         val tracker = Tracker(
             logger = TestLogger(),
+            sessionWriter = {},
             locationProvider = TestLocationProvider(),
         )
 
@@ -31,6 +32,7 @@ class TrackerTest {
     fun startTrackerLocationFailureTest() = runBlocking {
         val tracker = Tracker(
             logger = TestLogger(),
+            sessionWriter = {},
             locationProvider = TestLocationProvider(
                 subResult = LocationError.IllegalState.asFailure(),
             ),
@@ -40,7 +42,6 @@ class TrackerTest {
 
         assertIs<Result.Failure<LocationError>>(result)
         assertEquals(LocationError.IllegalState, result.error)
-        assertFalse(tracker.state.value.running)
     }
 
     @Test
@@ -48,6 +49,7 @@ class TrackerTest {
         val locationProvider = TestLocationProvider()
         val tracker = Tracker(
             logger = TestLogger(),
+            sessionWriter = {},
             locationProvider = locationProvider,
         )
 
@@ -61,7 +63,7 @@ class TrackerTest {
         awaitState(tracker) { it.distance > 0.0 }
 
         tracker.reset()
-        awaitState(tracker) { !it.running && it.time == 0L && it.distance == 0.0 && it.finish == 0.0 && it.last == null }
+        awaitState(tracker) { it.startTime == 0L && it.distance == 0.0 && it.finish == 0.0 && it.last == null }
 
         assertEquals(1, locationProvider.unsubCalls)
         assertNull(tracker.state.value.last)
@@ -71,6 +73,7 @@ class TrackerTest {
     fun setTargetDistanceWhileRunningTest() = runBlocking {
         val tracker = Tracker(
             logger = TestLogger(),
+            sessionWriter = {},
             locationProvider = TestLocationProvider(),
         )
 
@@ -85,13 +88,63 @@ class TrackerTest {
     }
 
     @Test
+    fun stopTrackerStateTransitionTest() = runBlocking {
+        val locationProvider = TestLocationProvider()
+        val tracker = Tracker(
+            logger = TestLogger(),
+            sessionWriter = {},
+            locationProvider = locationProvider,
+        )
+
+        tracker.setTargetDistance(1000.0)
+        tracker.start()
+        awaitState(tracker) { it.running }
+
+        locationProvider.emit(point(timeMs = 1_000L, latitude = 60.16990, longitude = 24.9384))
+        locationProvider.emit(point(timeMs = 2_000L, latitude = 60.16992, longitude = 24.9384))
+        awaitState(tracker) { it.distance > 0.0 }
+
+        tracker.stop()
+        awaitState(tracker) { !it.running }
+
+        assertEquals(1000.0, tracker.state.value.finish)
+        assertTrue(tracker.state.value.distance > 0.0)
+        assertEquals(1, locationProvider.unsubCalls)
+    }
+
+    @Test
+    fun finishedTrackerStateTransitionTest() = runBlocking {
+        val locationProvider = TestLocationProvider()
+        val tracker = Tracker(
+            logger = TestLogger(),
+            sessionWriter = {},
+            locationProvider = locationProvider,
+        )
+
+        tracker.setTargetDistance(0.1)
+        tracker.start()
+        awaitState(tracker) { it.running }
+
+        locationProvider.emit(point(timeMs = 1_000L, latitude = 60.16990, longitude = 24.9384))
+        locationProvider.emit(point(timeMs = 2_000L, latitude = 60.16992, longitude = 24.9384))
+        locationProvider.emit(point(timeMs = 3_000L, latitude = 60.16994, longitude = 24.9384))
+        awaitState(tracker) { it.distance >= it.finish }
+        awaitState(tracker) { !it.running }
+
+        assertTrue(tracker.state.value.distance >= tracker.state.value.finish)
+        assertEquals(1, locationProvider.unsubCalls)
+    }
+
+    @Test
     fun rejectedPointStillAdvancesLastPointTest() = runBlocking {
         val locationProvider = TestLocationProvider()
         val tracker = Tracker(
             logger = TestLogger(),
+            sessionWriter = {},
             locationProvider = locationProvider,
         )
 
+        tracker.setTargetDistance(1000.0)
         tracker.start()
         awaitState(tracker) { it.running }
 
@@ -109,9 +162,11 @@ class TrackerTest {
         val locationProvider = TestLocationProvider()
         val tracker = Tracker(
             logger = TestLogger(),
+            sessionWriter = {},
             locationProvider = locationProvider,
         )
 
+        tracker.setTargetDistance(1000.0)
         tracker.start()
         awaitState(tracker) { it.running }
 
@@ -132,9 +187,11 @@ class TrackerTest {
         val locationProvider = TestLocationProvider()
         val tracker = Tracker(
             logger = TestLogger(),
+            sessionWriter = {},
             locationProvider = locationProvider,
         )
 
+        tracker.setTargetDistance(1000.0)
         tracker.start()
         awaitState(tracker) { it.running }
 
@@ -147,6 +204,87 @@ class TrackerTest {
 
         assertEquals(0.0, tracker.state.value.distance)
         tracker.stop()
+    }
+
+    @Test
+    fun acceptedPointsWriteRunSessionPointsTest() = runBlocking {
+        val locationProvider = TestLocationProvider()
+        val sessionPoints = mutableListOf<RunSessionPoint>()
+        val tracker = Tracker(
+            logger = TestLogger(),
+            sessionWriter = { point -> sessionPoints += point },
+            locationProvider = locationProvider,
+        )
+
+        tracker.setTargetDistance(1000.0)
+        tracker.start()
+        awaitState(tracker) { it.running }
+
+        locationProvider.emit(point(timeMs = 1_000L, latitude = 60.16990, longitude = 24.9384))
+        locationProvider.emit(point(timeMs = 2_000L, latitude = 60.16992, longitude = 24.9384))
+        locationProvider.emit(point(timeMs = 3_000L, latitude = 60.16994, longitude = 24.9384))
+        awaitState(tracker) { it.distance > 0.0 }
+
+        assertEquals(3, sessionPoints.size)
+        val startTime = sessionPoints.first().sessionStartTimeMs
+        assertTrue(startTime > 0L)
+        sessionPoints.forEach { assertEquals(startTime, it.sessionStartTimeMs) }
+        assertEquals(tracker.state.value.startTime, startTime)
+        assertEquals(0.0, sessionPoints.first().sessionDistanceMeters)
+        assertEquals(0L, sessionPoints.first().averagePaceMsPerKm)
+        assertEquals(0f, sessionPoints.first().averageSpeedKph)
+        assertEquals(tracker.state.value.finish, sessionPoints.last().targetDistanceMeters)
+        assertEquals(tracker.state.value.time, sessionPoints.last().sessionDurationMs)
+        assertEquals(tracker.state.value.distance, sessionPoints.last().sessionDistanceMeters)
+        assertEquals(tracker.state.value.speed, sessionPoints.last().averageSpeedKph)
+        assertEquals(tracker.state.value.pace, sessionPoints.last().averagePaceMsPerKm)
+    }
+
+    @Test
+    fun repeatedStartDoesNotResubscribeOrResetSessionStartTimeTest() = runBlocking {
+        val locationProvider = TestLocationProvider()
+        val tracker = Tracker(
+            logger = TestLogger(),
+            sessionWriter = {},
+            locationProvider = locationProvider,
+        )
+
+        tracker.setTargetDistance(1000.0)
+        tracker.start()
+        awaitState(tracker) { it.running }
+        val firstStartTime = tracker.state.value.startTime
+
+        val secondStart = tracker.start()
+
+        assertIs<Result.Success<Unit>>(secondStart)
+        assertEquals(1, locationProvider.subCalls)
+        assertEquals(firstStartTime, tracker.state.value.startTime)
+        assertTrue(tracker.state.value.running)
+    }
+
+    @Test
+    fun immediateLocationCallbackAfterSubscriptionUsesValidSessionStartTimeTest() = runBlocking {
+        val sessionPoints = mutableListOf<RunSessionPoint>()
+        val locationProvider = TestLocationProvider(
+            onSubscribe = { onUpdate ->
+                onUpdate(point(timeMs = 1_000L, latitude = 60.16990, longitude = 24.9384))
+            },
+        )
+        val tracker = Tracker(
+            logger = TestLogger(),
+            sessionWriter = { point -> sessionPoints += point },
+            locationProvider = locationProvider,
+        )
+
+        tracker.setTargetDistance(1000.0)
+        val result = tracker.start()
+        awaitState(tracker) { it.last != null }
+
+        assertIs<Result.Success<Unit>>(result)
+        assertEquals(1, locationProvider.subCalls)
+        assertEquals(1, sessionPoints.size)
+        assertEquals(tracker.state.value.startTime, sessionPoints.single().sessionStartTimeMs)
+        assertTrue(sessionPoints.single().sessionStartTimeMs > 0L)
     }
 
     private suspend fun awaitState(
@@ -181,13 +319,18 @@ class TrackerTest {
 
     private class TestLocationProvider(
         private val subResult: Result<LocationError, Unit> = Unit.asSuccess(),
+        private val onSubscribe: (((TrackPoint) -> Unit) -> Unit)? = null,
     ) : LocationProvider() {
         private var onUpdate: ((TrackPoint) -> Unit)? = null
+        var subCalls: Int = 0
+            private set
         var unsubCalls: Int = 0
             private set
 
         override suspend fun sub(onUpdate: (TrackPoint) -> Unit): Result<LocationError, Unit> {
+            subCalls += 1
             this.onUpdate = onUpdate
+            onSubscribe?.invoke(onUpdate)
             return subResult
         }
 
@@ -209,4 +352,5 @@ class TrackerTest {
         override fun error(event: String, e: Throwable?, diagnostics: List<Any>) = Unit
         override fun fatal(event: String, e: Throwable?, diagnostics: List<Any>) = Unit
     }
+
 }

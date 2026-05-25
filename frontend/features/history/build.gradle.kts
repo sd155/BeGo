@@ -3,8 +3,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
 }
 
@@ -14,32 +12,22 @@ private val _jvmTarget = JvmTarget.fromTarget(_java)
 
 kotlin {
     jvmToolchain(_java.toInt())
-
     androidTarget {
         compilerOptions {
             jvmTarget.set(_jvmTarget)
         }
     }
-    
-    sourceSets {        
+
+    sourceSets {
         commonMain.dependencies {
             implementation(projects.features.diKodein)
-            implementation(projects.features.trackerApi)
             implementation(projects.features.utils)
-            implementation(projects.features.theme)
-            implementation(libs.kotlinx.serialization.core)
-            implementation(libs.compose.android.lifecycle.viewmodel)
-            implementation(libs.compose.viewmodel)
+            implementation(projects.features.trackerApi)
             implementation(libs.sd155.kmplogs.api)
-            implementation(compose.components.resources)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
         }
         androidMain.dependencies {
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.google.gms.location)
-            implementation(libs.lifecycle.process)
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.kotlinx.coroutines.core)
         }
         androidUnitTest.dependencies {
             implementation(libs.kotlin.test)
@@ -49,7 +37,7 @@ kotlin {
 }
 
 android {
-    namespace = "${libs.versions.application.namespace.get()}.tracker"
+    namespace = "${libs.versions.application.namespace.get()}.history"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
@@ -73,8 +61,4 @@ android {
         sourceCompatibility = _javaVersion
         targetCompatibility = _javaVersion
     }
-    dependencies {
-        debugImplementation(libs.androidx.ui.tooling)
-        debugImplementation(libs.sd155.kmplogs.core)
-    }
-} 
+}

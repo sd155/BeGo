@@ -1,7 +1,9 @@
 package io.github.sd155.bego.tracker.domain
 
+import io.github.sd155.bego.tracker.api.RunSessionPoint
 import io.github.sd155.bego.tracker.app.LocationProvider
 import io.github.sd155.bego.utils.Result
+import io.github.sd155.bego.utils.asSuccess
 import io.github.sd155.logs.api.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,9 +15,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sqrt
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 internal class Tracker(
     private val logger: Logger,
+    private val sessionWriter: (RunSessionPoint) -> Unit,
     private val locationProvider: LocationProvider,
 ) {
     private val _minPlausibleSegmentMeters = 0.25
@@ -39,7 +44,7 @@ internal class Tracker(
     private fun handleStopwatchState(state: StopwatchState) {
         _state.value = _state.value.copy(
             time = state.elapsedMs,
-            running = state.isRunning
+            running = state.isRunning,
         )
     }
 
@@ -75,6 +80,13 @@ internal class Tracker(
                         )
                             .apply {
                                 _state.value = this
+                                persistSessionPoint(
+                                    state = state,
+                                    point = filteredPoint,
+                                    accumulatedDistance = distance,
+                                    averageSpeed = speed,
+                                    averagePace = pace,
+                                )
                                 if (this.distance >= this.finish) stop()
                             }
                     }
@@ -85,8 +97,33 @@ internal class Tracker(
                 ?: run {
                     logger.debug(event = "First point received")
                     _state.value = state.copy(last = filteredPoint)
+                    persistSessionPoint(state = state, point = filteredPoint)
                 }
         }
+    }
+
+    private fun persistSessionPoint(
+        state: TrackerState,
+        point: TrackPoint,
+        accumulatedDistance: Double = 0.0,
+        averageSpeed: Float = 0f,
+        averagePace: Long = 0L,
+    ) {
+        sessionWriter(
+            RunSessionPoint(
+                sessionStartTimeMs = state.startTime,
+                sessionDurationMs = state.time,
+                targetDistanceMeters = state.finish,
+                sessionDistanceMeters = accumulatedDistance,
+                latitudeDegrees = point.latitudeDegrees,
+                longitudeDegrees = point.longitudeDegrees,
+                altitudeMeters = point.altitudeMeters,
+                bearingDegrees = point.bearingDegrees,
+                speedMetersPerSecond = point.speedMetersPerSecond,
+                averageSpeedKph = averageSpeed,
+                averagePaceMsPerKm = averagePace,
+            )
+        )
     }
 
     private fun calculateSpeedKph(distanceMeters: Double, timeMs: Long): Float =
@@ -124,9 +161,19 @@ internal class Tracker(
         return speedMetersPerSecond * deltaTimeSeconds * _maxSpeedDistanceMultiplier + _maxSpeedDistanceSlackMeters
     }
 
-    internal suspend fun start(): Result<LocationError, Unit> =
-        locationProvider.sub(onUpdate = ::handleTrackPoint)
-            .withSuccess { _stopwatch.start() }
+    @OptIn(ExperimentalTime::class)
+    internal suspend fun start(): Result<LocationError, Unit> {
+        val state = _state.value
+        if (state.running) {
+            return Unit.asSuccess()
+        }
+        else {
+            _state.value = state.copy(startTime = Clock.System.now().toEpochMilliseconds())
+            return locationProvider.sub(onUpdate = ::handleTrackPoint)
+                .withSuccess { _stopwatch.start() }
+                .withFailure { _state.value = TrackerState() }
+        }
+    }
 
     internal fun stop() {
         _stopwatch.stop()
@@ -141,8 +188,9 @@ internal class Tracker(
     }
 
     internal fun setTargetDistance(distance: Double) {
-        if (!_state.value.running) {
-            _state.value = _state.value.copy(finish = distance)
+        _state.value.let { state ->
+            if (!state.running)
+                _state.value = state.copy(finish = distance)
         }
     }
 
