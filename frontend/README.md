@@ -10,6 +10,7 @@
 ## Functionality
 - **Running Tracker**: Accurate running session tracking with smoothed GPS, speed, and pace display
 - **Stopwatch**: Precise timing for running sessions
+- **Session History Storage**: Persistent storage of tracker-emitted session points for later history processing
 
 ## Frontend scheme
 ```text
@@ -26,7 +27,9 @@
 │
 ├── features/                     # KMP project features
 │   ├── di-kodein/                # Shared DI module (Kodein DI)
+│   ├── history/                  # Session-point history storage and wiring contracts
 │   ├── theme/                    # App theme module
+│   ├── tracker-api/              # Shared tracker contracts used across module boundaries
 │   ├── tracker/                  # Running tracker feature module
 │   └── utils/                    # Multiplatform utilities: typed result, SafeContinuation, etc.
 │
@@ -44,11 +47,14 @@
 
 ## Frontend Features
 - `di-kodein`: Thin DI wrapper over Kodein used by the app composition root and feature wiring, [more details](./features/di-kodein/README.md)
+- `history`: Session-point storage module plus app-wiring contract for connecting `tracker` to persistence, [more details](./features/history/README.md)
 - `theme`: App theme system, [more details](./features/theme/README.md)
+- `tracker-api`: Shared tracker contracts used across module boundaries, [more details](./features/tracker-api/README.md)
 - `tracker`: Running tracker with smoothed GPS, speed, and pace, [more details](./features/tracker/README.md)
 - `utils`: Multiplatform utilities (typed result, SafeContinuation, etc.), [more details](./features/utils/README.md)
 
 ## Dependency Injection
 - `apps/compose` owns the app composition root. It assembles feature modules into a single shared `DiTree`.
 - Feature modules expose small wiring APIs, such as `trackerModule(...)`, instead of exposing Kodein types directly.
+- Cross-feature wiring happens in the composition root. For example, `apps/compose` resolves `history`'s `SessionPointConsumer` and passes it into `trackerModule(sessionWriter = ...)`.
 - Android framework entry points that cannot use constructor injection access the shared root through `DiTreeHolder` implemented by the app `Application`.
