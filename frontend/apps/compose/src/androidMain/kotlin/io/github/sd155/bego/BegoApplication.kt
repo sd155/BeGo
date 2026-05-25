@@ -5,6 +5,9 @@ import android.content.pm.ApplicationInfo
 import io.github.sd155.bego.di.DiTree
 import io.github.sd155.bego.di.DiTreeHolder
 import io.github.sd155.bego.di.diTree
+import io.github.sd155.bego.history.app.SessionPointConsumer
+import io.github.sd155.bego.history.app.historyModule
+import io.github.sd155.bego.history.platform.app.HistoryAndroidComponentsBuilder
 import io.github.sd155.bego.tracker.app.trackerModule
 import io.github.sd155.bego.tracker.platform.app.TrackerAndroidComponentsBuilder
 import io.github.sd155.logs.AndroidLoggerConfigurator
@@ -19,6 +22,7 @@ internal class BegoApplication : Application(), DiTreeHolder {
         super.onCreate()
         dependencies = diTree {
             val trackerComponentsBuilder = TrackerAndroidComponentsBuilder()
+            val historyComponentsBuilder = HistoryAndroidComponentsBuilder()
             importAll(
                 applicationModule(
                     appName = AppName(
@@ -29,7 +33,7 @@ internal class BegoApplication : Application(), DiTreeHolder {
                 ),
                 trackerModule(
                     loggerBuilder = ::createAndroidLogger,
-                    sessionWriter = {},
+                    sessionWriter = { point -> diTree.instance<SessionPointConsumer>().consume(point) },
                     locationProviderBuilder = { logger ->
                         trackerComponentsBuilder.createLocationProvider(
                             applicationContext = applicationContext,
@@ -47,6 +51,15 @@ internal class BegoApplication : Application(), DiTreeHolder {
                         )
                     }
                 ),
+                historyModule(
+                    loggerBuilder = ::createAndroidLogger,
+                    repositoryBuilder = { logger ->
+                        historyComponentsBuilder.createRepository(
+                            applicationContext = applicationContext,
+                            logger = logger,
+                        )
+                    }
+                )
             )
         }
         AndroidLoggerConfigurator().apply {
