@@ -12,7 +12,6 @@ private val _jvmTarget = JvmTarget.fromTarget(_java)
 
 kotlin {
     jvmToolchain(_java.toInt())
-    jvm()
     androidTarget {
         compilerOptions {
             jvmTarget.set(_jvmTarget)
@@ -21,15 +20,18 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.kotlinx.serialization.core)
-            implementation(libs.kotlinx.serialization.json)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+            implementation(projects.features.diKodein)
+            implementation(projects.features.utils)
+            implementation(projects.features.trackerApi)
+            implementation(libs.sd155.kmplogs.api)
         }
         androidMain.dependencies {
             implementation(libs.androidx.core.ktx)
             implementation(libs.kotlinx.coroutines.core)
+        }
+        androidUnitTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlin.test.junit)
         }
     }
 }
