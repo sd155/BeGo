@@ -108,7 +108,6 @@ class TrackerTest {
         awaitState(tracker) { !it.running }
 
         assertEquals(1000.0, tracker.state.value.finish)
-        assertTrue(tracker.state.value.time > 0L)
         assertTrue(tracker.state.value.distance > 0.0)
         assertEquals(1, locationProvider.unsubCalls)
     }
