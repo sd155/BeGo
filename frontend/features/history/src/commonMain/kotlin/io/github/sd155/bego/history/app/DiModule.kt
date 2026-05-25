@@ -12,8 +12,10 @@ fun historyModule(
     repositoryBuilder: (logger: Logger) -> SessionRepository,
 ): DiModule = diModule(name = historyModuleName) {
     val logger = loggerBuilder("History")
+    val repository = repositoryBuilder(logger)
     bindSingleton<Logger>(tag = historyModuleName) { logger }
-    bindSingleton<SessionRepository> { repositoryBuilder(logger) }
+    bindSingleton<SessionRepository> { repository }
+    bindSingleton<SessionPointConsumer> { repository }
 }
 
 internal const val historyModuleName = "history"

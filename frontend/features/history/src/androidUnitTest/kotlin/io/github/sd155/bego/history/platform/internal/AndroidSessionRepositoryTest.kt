@@ -4,11 +4,11 @@ import android.content.Context
 import android.content.ContextWrapper
 import io.github.sd155.bego.tracker.api.RunSessionPoint
 import io.github.sd155.logs.api.Logger
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class AndroidSessionRepositoryTest {
@@ -21,12 +21,10 @@ class AndroidSessionRepositoryTest {
         )
         val point = sessionPoint()
 
-        val result = repository.save(point)
+        repository.consume(point)
         val sessionFile = File(filesDir, "history/sessions/${point.sessionStartTimeMs}.jsonl")
 
-        assertIs<io.github.sd155.bego.utils.Result.Success<Unit>>(result)
-        assertTrue(sessionFile.exists())
-        assertEquals(listOf(point.asJson()), sessionFile.readLines())
+        awaitFileLines(sessionFile) { it == listOf(point.asJson()) }
     }
 
     @Test
@@ -40,10 +38,10 @@ class AndroidSessionRepositoryTest {
         val second = sessionPoint(sessionDurationMs = 1000L, sessionDistanceMeters = 12.5)
         val sessionFile = File(filesDir, "history/sessions/${first.sessionStartTimeMs}.jsonl")
 
-        repository.save(first)
-        repository.save(second)
+        repository.consume(first)
+        repository.consume(second)
 
-        assertEquals(listOf(first.asJson(), second.asJson()), sessionFile.readLines())
+        awaitFileLines(sessionFile) { it == listOf(first.asJson(), second.asJson()) }
     }
 
     @Test
@@ -56,12 +54,36 @@ class AndroidSessionRepositoryTest {
         val first = sessionPoint(sessionStartTimeMs = 1L)
         val second = sessionPoint(sessionStartTimeMs = 2L)
 
-        repository.save(first)
-        repository.save(second)
+        repository.consume(first)
+        repository.consume(second)
 
         val sessionsDir = File(filesDir, "history/sessions")
-        val fileNames = sessionsDir.list()?.sorted().orEmpty()
+        val fileNames = awaitSessionFiles(sessionsDir)
         assertEquals(listOf("1.jsonl", "2.jsonl"), fileNames)
+    }
+
+    private suspend fun awaitFileLines(
+        file: File,
+        predicate: (List<String>) -> Boolean,
+    ) {
+        repeat(100) {
+            val lines = if (file.exists()) file.readLines() else emptyList()
+            if (predicate(lines)) return
+            delay(10)
+        }
+        val lines = if (file.exists()) file.readLines() else emptyList()
+        assertTrue(predicate(lines), "Timed out waiting for file content: $lines")
+    }
+
+    private suspend fun awaitSessionFiles(
+        sessionsDir: File,
+    ): List<String> {
+        repeat(100) {
+            val fileNames = sessionsDir.list()?.sorted().orEmpty()
+            if (fileNames.size == 2) return fileNames
+            delay(10)
+        }
+        return sessionsDir.list()?.sorted().orEmpty()
     }
 
     private fun createFilesDir(name: String): File =

@@ -8,6 +8,10 @@ import io.github.sd155.bego.utils.Result
 import io.github.sd155.bego.utils.asFailure
 import io.github.sd155.bego.utils.asSuccess
 import io.github.sd155.logs.api.Logger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.io.File
 
 /**
@@ -19,11 +23,16 @@ internal class AndroidSessionRepository(
     applicationContext: Context,
     private val logger: Logger,
 ) : SessionRepository() {
+    private val _scope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1))
     private val _filesDir = applicationContext.applicationContext.filesDir
     private val _sessionsDir = File(_filesDir, SESSIONS_DIR_PATH)
     private val _fileLock = Any()
 
-    override suspend fun save(sessionPoint: RunSessionPoint): Result<SessionRepositoryFailure, Unit> {
+    override fun consume(sessionPoint: RunSessionPoint) {
+        _scope.launch { persist(sessionPoint) }
+    }
+
+    private fun persist(sessionPoint: RunSessionPoint): Result<SessionRepositoryFailure, Unit> {
         return try {
             synchronized(_fileLock) {
                 if (!_sessionsDir.exists() && !_sessionsDir.mkdirs()) {
