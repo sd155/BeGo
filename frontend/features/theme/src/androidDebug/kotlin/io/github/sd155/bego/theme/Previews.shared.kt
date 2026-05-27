@@ -6,7 +6,12 @@
  */
 package io.github.sd155.bego.theme
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 /** English locale identifier */
 const val LOCALE_EN = "en"
@@ -42,6 +47,31 @@ fun ThemedPreview(content: @Composable () -> Unit) {
     BegoTheme(
         screen = screenSize(),
         platformIcons = AndroidPlatformIcons(),
-        content = content,
-    )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(BegoTheme.palette.background),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = BegoTheme.sizes.dockReservedHeight),
+            ) {
+                content()
+            }
+            FloatingDock {
+                DockItem(
+                    label = "Feature 1",
+                    selected = true,
+                    onClick = {},
+                )
+                DockItem(
+                    label = "Feature 2",
+                    selected = false,
+                    onClick = {},
+                )
+            }
+        }
+    }
 }

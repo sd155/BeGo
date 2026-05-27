@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dock_item_label">История</string>
+    <string name="history_screen_label">История</string>
+    <string name="history_placeholder_title">Ваши забеги соберутся здесь.</string>
+    <string name="history_placeholder_body">Этот экран станет библиотекой завершённых сессий и их треков.</string>
+    <string name="history_placeholder_eyebrow">Скоро</string>
+    <string name="history_placeholder_next_title">Лента сессий</string>
+    <string name="history_placeholder_next_body">Список недавних забегов с дистанцией, длительностью и темпом.</string>
+    <string name="history_placeholder_replay_title">Повтор трека</string>
+    <string name="history_placeholder_replay_body">Позже здесь появятся GPS-маршрут и воспроизведение пробежки.</string>
+</resources>
