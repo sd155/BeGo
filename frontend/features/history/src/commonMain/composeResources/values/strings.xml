@@ -1,0 +1,11 @@
+<resources>
+    <string name="dock_item_label">History</string>
+    <string name="history_screen_label">History</string>
+    <string name="history_placeholder_title">Your runs, stacked and ready.</string>
+    <string name="history_placeholder_body">This screen will become the library of every completed session and its track.</string>
+    <string name="history_placeholder_eyebrow">Coming Next</string>
+    <string name="history_placeholder_next_title">Session timeline</string>
+    <string name="history_placeholder_next_body">List recent runs with distance, duration and pace.</string>
+    <string name="history_placeholder_replay_title">Track replay</string>
+    <string name="history_placeholder_replay_body">GPS trail and route playback will land here next.</string>
+</resources>

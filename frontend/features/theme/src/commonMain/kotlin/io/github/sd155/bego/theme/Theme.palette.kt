@@ -13,6 +13,11 @@ import androidx.compose.ui.graphics.Color
  * @property accent The accent color used for highlights and CTAs.
  * @property warning The warning color used for error states and alerts.
  * @property onAccent The color to use on top of accent color for contrast.
+ * @property dockSurface The surface color used by the floating dock shell.
+ * @property dockOutline The outline color used by the floating dock shell.
+ * @property dockIndicatorInactive The inactive indicator color used by dock items.
+ * @property panelSurface The surface color used by elevated informational panels.
+ * @property panelOutline The outline color used by elevated informational panels.
  */
 class BegoPalette(
     val primary: Color,
@@ -21,6 +26,11 @@ class BegoPalette(
     val accent: Color,
     val warning: Color,
     val onAccent: Color,
+    val dockSurface: Color,
+    val dockOutline: Color,
+    val dockIndicatorInactive: Color,
+    val panelSurface: Color,
+    val panelOutline: Color,
 )
 
 internal fun begoPalette(isDarkTheme: Boolean) = when (isDarkTheme) {
@@ -32,6 +42,11 @@ internal fun begoPalette(isDarkTheme: Boolean) = when (isDarkTheme) {
             accent = Colors.colorBlue700,
             warning = Colors.colorRed700,
             onAccent = Colors.colorNeutral700Light,
+            dockSurface = Colors.colorNeutral700Light.copy(alpha = 0.08f),
+            dockOutline = Colors.colorNeutral400Light.copy(alpha = 0.35f),
+            dockIndicatorInactive = Colors.colorNeutral400Light.copy(alpha = 0.5f),
+            panelSurface = Colors.colorNeutral700Light.copy(alpha = 0.07f),
+            panelOutline = Colors.colorNeutral400Light.copy(alpha = 0.2f),
         )
     false ->
         BegoPalette(
@@ -41,6 +56,11 @@ internal fun begoPalette(isDarkTheme: Boolean) = when (isDarkTheme) {
             accent = Colors.colorBlue700,
             warning = Colors.colorRed700,
             onAccent = Colors.colorNeutral700Light,
+            dockSurface = Colors.colorNeutral700Dark.copy(alpha = 0.08f),
+            dockOutline = Colors.colorNeutral400Dark.copy(alpha = 0.35f),
+            dockIndicatorInactive = Colors.colorNeutral400Dark.copy(alpha = 0.5f),
+            panelSurface = Colors.colorNeutral700Dark.copy(alpha = 0.07f),
+            panelOutline = Colors.colorNeutral400Dark.copy(alpha = 0.2f),
         )
 }
 

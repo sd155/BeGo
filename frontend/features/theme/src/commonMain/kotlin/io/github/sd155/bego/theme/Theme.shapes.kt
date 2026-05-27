@@ -3,6 +3,7 @@ package io.github.sd155.bego.theme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.dp
 
 /**
  * Shape definitions for the Bego application.
@@ -12,6 +13,9 @@ import androidx.compose.ui.graphics.Shape
  */
 class BegoShapes(
     val button: Shape = RoundedCornerShape(percent = 50),
+    val dockItem: Shape = RoundedCornerShape(size = 22.dp),
+    val dock: Shape = RoundedCornerShape(size = 28.dp),
+    val panel: Shape = RoundedCornerShape(size = 28.dp),
 )
 
 internal val LocalBegoShapes = staticCompositionLocalOf<BegoShapes> {

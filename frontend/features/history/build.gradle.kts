@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
 }
 
@@ -12,6 +14,7 @@ private val _jvmTarget = JvmTarget.fromTarget(_java)
 
 kotlin {
     jvmToolchain(_java.toInt())
+
     androidTarget {
         compilerOptions {
             jvmTarget.set(_jvmTarget)
@@ -23,7 +26,12 @@ kotlin {
             implementation(projects.features.diKodein)
             implementation(projects.features.utils)
             implementation(projects.features.trackerApi)
+            implementation(projects.features.theme)
+            implementation(libs.kotlinx.serialization.core)
+            implementation(libs.compose.android.lifecycle.viewmodel)
+            implementation(libs.compose.viewmodel)
             implementation(libs.sd155.kmplogs.api)
+            implementation(compose.components.resources)
         }
         androidMain.dependencies {
             implementation(libs.androidx.core.ktx)

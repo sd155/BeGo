@@ -7,7 +7,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import bego.features.tracker.generated.resources.Res
+import bego.features.tracker.generated.resources.dock_item_label
 import io.github.sd155.bego.di.DiTree
+import io.github.sd155.bego.theme.DockItem
 import io.github.sd155.bego.tracker.domain.PlatformReason
 import io.github.sd155.bego.tracker.domain.Tracker
 import io.github.sd155.bego.tracker.ui.TrackerView
@@ -16,6 +19,7 @@ import io.github.sd155.bego.tracker.ui.TrackerViewModel
 import io.github.sd155.bego.tracker.ui.TrackerViewState
 import io.github.sd155.logs.api.Logger
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Navigation route object for the tracker screen.
@@ -23,6 +27,17 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 object TrackerScreenRoute
+
+@Composable
+fun TrackerDockItem(
+    selected: Boolean,
+    onClick: () -> Unit,
+) =
+    DockItem(
+        label = stringResource(Res.string.dock_item_label),
+        selected = selected,
+        onClick = onClick,
+    )
 
 /**
  * Main entry point composable for the tracker feature.
